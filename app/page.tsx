@@ -3,10 +3,13 @@
 import { useMemo, useState } from "react";
 
 type PropertyType = "아파트" | "빌라" | "오피스텔";
+type SaleChannel = "경매" | "공매";
 type RiskLevel = "안정" | "주의" | "위험";
 
 type AuctionItem = {
   id: number;
+  channel: SaleChannel;
+  agency: string;
   caseNo: string;
   title: string;
   type: PropertyType;
@@ -37,6 +40,8 @@ const won = new Intl.NumberFormat("ko-KR");
 const items: AuctionItem[] = [
   {
     id: 1,
+    channel: "경매",
+    agency: "법원경매",
     caseNo: "2025타경18432",
     title: "마포구 공덕동 래미안 84",
     type: "아파트",
@@ -63,6 +68,8 @@ const items: AuctionItem[] = [
   },
   {
     id: 2,
+    channel: "경매",
+    agency: "법원경매",
     caseNo: "2024타경9127",
     title: "관악구 신림동 다세대 2층",
     type: "빌라",
@@ -89,6 +96,8 @@ const items: AuctionItem[] = [
   },
   {
     id: 3,
+    channel: "경매",
+    agency: "법원경매",
     caseNo: "2025타경2201",
     title: "성남 분당구 정자동 오피스텔",
     type: "오피스텔",
@@ -115,6 +124,8 @@ const items: AuctionItem[] = [
   },
   {
     id: 4,
+    channel: "경매",
+    agency: "법원경매",
     caseNo: "2025타경7810",
     title: "인천 서구 청라동 아파트 59",
     type: "아파트",
@@ -141,6 +152,8 @@ const items: AuctionItem[] = [
   },
   {
     id: 5,
+    channel: "경매",
+    agency: "법원경매",
     caseNo: "2024타경14663",
     title: "강서구 화곡동 신축급 빌라",
     type: "빌라",
@@ -167,6 +180,8 @@ const items: AuctionItem[] = [
   },
   {
     id: 6,
+    channel: "경매",
+    agency: "법원경매",
     caseNo: "2025타경5069",
     title: "수원 영통구 광교 아파트 74",
     type: "아파트",
@@ -190,6 +205,90 @@ const items: AuctionItem[] = [
     taxRisk: false,
     occupancy: "협의 필요",
     notes: ["시세 대비 최저가 여유", "학교, 교통 수요 확인"],
+  },
+  {
+    id: 7,
+    channel: "공매",
+    agency: "온비드",
+    caseNo: "2026-03122-001",
+    title: "판교 힐스테이트 아파트 84",
+    type: "아파트",
+    district: "경기 성남시",
+    address: "경기 성남시 분당구 판교동 22층 중 11층",
+    appraised: 166000,
+    minimum: 149400,
+    market: 171000,
+    lastTrade: 168500,
+    deposit: 85000,
+    monthlyRent: 0,
+    area: 84.6,
+    floor: "11/22층",
+    failedBids: 0,
+    auctionDate: "2026-08-09",
+    tenant: "전입 있음",
+    seniorDeposit: 0,
+    takeoverAmount: 0,
+    liens: false,
+    illegalBuilding: false,
+    taxRisk: false,
+    occupancy: "협의 필요",
+    notes: ["공매 샘플 물건", "관리비, 점유자 협의 조건 확인 필요"],
+  },
+  {
+    id: 8,
+    channel: "공매",
+    agency: "캠코",
+    caseNo: "2026-04491-002",
+    title: "부천 중동 역세권 오피스텔",
+    type: "오피스텔",
+    district: "경기 부천시",
+    address: "경기 부천시 중동 15층 중 6층",
+    appraised: 28500,
+    minimum: 22800,
+    market: 27600,
+    lastTrade: 26900,
+    deposit: 16000,
+    monthlyRent: 20,
+    area: 31.4,
+    floor: "6/15층",
+    failedBids: 1,
+    auctionDate: "2026-07-31",
+    tenant: "확인 필요",
+    seniorDeposit: 0,
+    takeoverAmount: 0,
+    liens: false,
+    illegalBuilding: false,
+    taxRisk: true,
+    occupancy: "협의 필요",
+    notes: ["압류재산 공매 샘플", "체납, 관리비, 인도 조건 재확인"],
+  },
+  {
+    id: 9,
+    channel: "공매",
+    agency: "온비드",
+    caseNo: "2026-02774-004",
+    title: "인천 부평구 구축 빌라",
+    type: "빌라",
+    district: "인천 부평구",
+    address: "인천 부평구 부평동 5층 중 3층",
+    appraised: 24000,
+    minimum: 16800,
+    market: 22500,
+    lastTrade: 21800,
+    deposit: 12000,
+    monthlyRent: 0,
+    area: 42.1,
+    floor: "3/5층",
+    failedBids: 2,
+    auctionDate: "2026-08-02",
+    tenant: "대항력 가능",
+    seniorDeposit: 9000,
+    takeoverAmount: 9000,
+    liens: false,
+    illegalBuilding: true,
+    taxRisk: true,
+    occupancy: "명도 난이도 높음",
+    notes: ["공매 샘플 물건", "선순위 임차권과 위반건축물 여부 보수 확인"],
   },
 ];
 
@@ -275,12 +374,13 @@ function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number) {
 
 export default function Home() {
   const [query, setQuery] = useState("");
+  const [channel, setChannel] = useState<SaleChannel | "전체">("전체");
   const [type, setType] = useState<PropertyType | "전체">("전체");
   const [level, setLevel] = useState<RiskLevel | "전체">("전체");
   const [bidRatio, setBidRatio] = useState(78);
   const [bufferRatio, setBufferRatio] = useState(4);
-  const [selectedIds, setSelectedIds] = useState<number[]>([4, 6]);
-  const [activeId, setActiveId] = useState(4);
+  const [selectedIds, setSelectedIds] = useState<number[]>([4, 6, 7]);
+  const [activeId, setActiveId] = useState(7);
 
   const enriched = useMemo(
     () =>
@@ -295,10 +395,13 @@ export default function Home() {
     const matchQuery =
       item.title.includes(query) ||
       item.district.includes(query) ||
-      item.caseNo.includes(query);
+      item.caseNo.includes(query) ||
+      item.channel.includes(query) ||
+      item.agency.includes(query);
+    const matchChannel = channel === "전체" || item.channel === channel;
     const matchType = type === "전체" || item.type === type;
     const matchLevel = level === "전체" || item.analysis.level === level;
-    return matchQuery && matchType && matchLevel;
+    return matchQuery && matchChannel && matchType && matchLevel;
   });
 
   const active =
@@ -306,6 +409,8 @@ export default function Home() {
   const selected = enriched.filter((item) => selectedIds.includes(item.id));
   const stats = {
     total: filtered.length,
+    auction: filtered.filter((item) => item.channel === "경매").length,
+    publicSale: filtered.filter((item) => item.channel === "공매").length,
     stable: filtered.filter((item) => item.analysis.level === "안정").length,
     caution: filtered.filter((item) => item.analysis.level === "주의").length,
     risky: filtered.filter((item) => item.analysis.level === "위험").length,
@@ -325,21 +430,21 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
           <div>
             <p className="text-sm font-semibold text-[#6c5f4c]">
-              경매 물건 권리분석 워크벤치
+              경매·공매 물건 권리분석 워크벤치
             </p>
             <h1 className="mt-2 max-w-3xl text-3xl font-semibold tracking-normal text-[#14211d] md:text-5xl">
-              아파트와 빌라 경매를 모아보고, 위험도와 적정 입찰가를 한 번에 비교하세요.
+              아파트와 빌라 경매·공매를 모아보고, 위험도와 적정 입찰가를 비교하세요.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-[#53615b]">
-              샘플 데이터 기반의 시제품입니다. 말소기준권리, 임차인 인수 가능성,
-              유치권, 위반건축물, 체납 리스크를 점수화하고 시세 대비 안전마진을
-              계산합니다.
+              현재는 실시간 법원·온비드 연동 전 단계의 샘플 데이터입니다.
+              말소기준권리, 임차인 인수 가능성, 유치권, 위반건축물, 체납
+              리스크를 점수화하고 시세 대비 안전마진을 계산합니다.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 self-end md:grid-cols-4 lg:grid-cols-2">
             <Metric label="검색 물건" value={`${stats.total}건`} />
-            <Metric label="안정" value={`${stats.stable}건`} tone="green" />
-            <Metric label="주의" value={`${stats.caution}건`} tone="amber" />
+            <Metric label="경매" value={`${stats.auction}건`} tone="green" />
+            <Metric label="공매" value={`${stats.publicSale}건`} tone="blue" />
             <Metric label="위험" value={`${stats.risky}건`} tone="red" />
           </div>
         </div>
@@ -354,10 +459,17 @@ export default function Home() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="예: 화곡, 2025타경, 아파트"
+              placeholder="예: 판교, 온비드, 2025타경"
               className="mt-2 h-11 w-full rounded-md border border-[#c8c0b2] bg-[#fbfaf7] px-3 text-sm outline-none transition focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#95d5b2]"
             />
           </div>
+
+          <FilterGroup
+            title="매각 방식"
+            options={["전체", "경매", "공매"]}
+            value={channel}
+            onChange={(value) => setChannel(value as SaleChannel | "전체")}
+          />
 
           <FilterGroup
             title="물건 종류"
@@ -422,7 +534,7 @@ export default function Home() {
           <section className="grid gap-4 xl:grid-cols-[1fr_380px]">
             <div className="overflow-hidden rounded-lg border border-[#d8d1c4] bg-white shadow-sm">
               <div className="grid grid-cols-[1.2fr_0.7fr_0.7fr_0.8fr_0.7fr] border-b border-[#e5ded2] bg-[#fbfaf7] px-4 py-3 text-xs font-bold uppercase tracking-normal text-[#6c5f4c]">
-                <span>물건</span>
+                <span>구분 / 물건</span>
                 <span>최저가</span>
                 <span>시세비율</span>
                 <span>권리분석</span>
@@ -439,10 +551,10 @@ export default function Home() {
                   >
                     <span>
                       <span className="block font-semibold text-[#1f2f2a]">
-                        {item.title}
+                        <ChannelBadge channel={item.channel} /> {item.title}
                       </span>
                       <span className="mt-1 block text-xs text-[#68756f]">
-                        {item.caseNo} · {item.district} · {item.floor}
+                        {item.agency} · {item.caseNo} · {item.district} · {item.floor}
                       </span>
                     </span>
                     <span className="font-semibold">{uk(item.minimum)}</span>
@@ -479,6 +591,7 @@ export default function Home() {
               <table className="w-full min-w-[850px] border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-[#e5ded2] bg-[#fbfaf7] text-left text-xs text-[#6c5f4c]">
+                    <th className="px-3 py-3">구분</th>
                     <th className="px-3 py-3">물건</th>
                     <th className="px-3 py-3">시세</th>
                     <th className="px-3 py-3">최저가</th>
@@ -492,13 +605,16 @@ export default function Home() {
                 <tbody>
                   {selected.length === 0 ? (
                     <tr>
-                      <td className="px-3 py-8 text-center text-[#68756f]" colSpan={8}>
+                      <td className="px-3 py-8 text-center text-[#68756f]" colSpan={9}>
                         비교할 물건을 선택하세요.
                       </td>
                     </tr>
                   ) : (
                     selected.map((item) => (
                       <tr key={item.id} className="border-b border-[#f0ebe1]">
+                        <td className="px-3 py-3">
+                          <ChannelBadge channel={item.channel} />
+                        </td>
                         <td className="px-3 py-3 font-semibold">{item.title}</td>
                         <td className="px-3 py-3">{uk(item.market)}</td>
                         <td className="px-3 py-3">{uk(item.minimum)}</td>
@@ -531,11 +647,12 @@ function Metric({
 }: {
   label: string;
   value: string;
-  tone?: "neutral" | "green" | "amber" | "red";
+  tone?: "neutral" | "green" | "blue" | "amber" | "red";
 }) {
   const tones = {
     neutral: "bg-white text-[#1f2f2a]",
     green: "bg-[#e6f4ec] text-[#17643f]",
+    blue: "bg-[#e8f1ff] text-[#2256a3]",
     amber: "bg-[#fff4d8] text-[#8a5a00]",
     red: "bg-[#fde8e3] text-[#b42318]",
   };
@@ -544,6 +661,18 @@ function Metric({
       <p className="text-xs font-semibold text-current opacity-70">{label}</p>
       <p className="mt-2 text-2xl font-bold">{value}</p>
     </div>
+  );
+}
+
+function ChannelBadge({ channel }: { channel: SaleChannel }) {
+  const style =
+    channel === "경매"
+      ? "bg-[#edf6f1] text-[#17643f]"
+      : "bg-[#e8f1ff] text-[#2256a3]";
+  return (
+    <span className={`inline-flex w-fit rounded-md px-2 py-0.5 text-xs font-bold ${style}`}>
+      {channel}
+    </span>
   );
 }
 
@@ -620,7 +749,11 @@ function DetailPanel({
     <aside className="rounded-lg border border-[#d8d1c4] bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold text-[#6c5f4c]">{item.caseNo}</p>
+          <p className="flex flex-wrap items-center gap-2 text-xs font-semibold text-[#6c5f4c]">
+            <ChannelBadge channel={item.channel} />
+            <span>{item.agency}</span>
+            <span>{item.caseNo}</span>
+          </p>
           <h2 className="mt-1 text-xl font-bold text-[#1f2f2a]">{item.title}</h2>
           <p className="mt-1 text-sm text-[#68756f]">{item.address}</p>
         </div>
@@ -674,6 +807,7 @@ function DetailPanel({
         <Check label="선순위 보증금" value={uk(item.seniorDeposit)} />
         <Check label="인수 추정액" value={uk(item.takeoverAmount)} />
         <Check label="점유/명도" value={item.occupancy} />
+        <Check label="입찰 마감" value={item.auctionDate} />
       </div>
 
       <div className="mt-5 rounded-lg border border-[#e5ded2] p-4">
