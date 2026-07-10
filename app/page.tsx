@@ -425,216 +425,121 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f1ea] text-[#1d2522]">
-      <section className="border-b border-[#d8d1c4] bg-[#f9f7f1]">
-        <div className="mx-auto grid max-w-7xl gap-6 px-5 py-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
-          <div>
-            <p className="text-sm font-semibold text-[#6c5f4c]">
-              경매·공매 물건 권리분석 워크벤치
-            </p>
-            <h1 className="mt-2 max-w-3xl text-3xl font-semibold tracking-normal text-[#14211d] md:text-5xl">
-              아파트와 빌라 경매·공매를 모아보고, 위험도와 적정 입찰가를 비교하세요.
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-[#53615b]">
-              현재는 실시간 법원·온비드 연동 전 단계의 샘플 데이터입니다.
-              말소기준권리, 임차인 인수 가능성, 유치권, 위반건축물, 체납
-              리스크를 점수화하고 시세 대비 안전마진을 계산합니다.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 self-end md:grid-cols-4 lg:grid-cols-2">
-            <Metric label="검색 물건" value={`${stats.total}건`} />
-            <Metric label="경매" value={`${stats.auction}건`} tone="green" />
-            <Metric label="공매" value={`${stats.publicSale}건`} tone="blue" />
-            <Metric label="위험" value={`${stats.risky}건`} tone="red" />
+    <main className="min-h-screen bg-[#f5f2ea] text-[#1b2420]">
+      <section className="border-b border-[#d9d2c5] bg-[#fcfaf5]">
+        <div className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-sm font-bold text-[#6b5f4f]">
+                경매·공매 권리분석 워크벤치
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-normal text-[#13201b] md:text-4xl">
+                물건을 고르면 위험 신호와 적정 입찰가가 바로 보입니다.
+              </h1>
+              <p className="mt-3 text-sm leading-6 text-[#5c6963] md:text-base">
+                현재는 실시간 연동 전 샘플 데이터입니다. 경매·공매 구분, 인수금,
+                점유 리스크, 시세 대비 안전마진을 한 화면에서 비교합니다.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[520px]">
+              <Metric label="검색 결과" value={`${stats.total}건`} />
+              <Metric label="경매" value={`${stats.auction}건`} tone="green" />
+              <Metric label="공매" value={`${stats.publicSale}건`} tone="blue" />
+              <Metric label="위험" value={`${stats.risky}건`} tone="red" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[310px_1fr] lg:px-8">
-        <aside className="space-y-4">
-          <div className="rounded-lg border border-[#d8d1c4] bg-white p-4 shadow-sm">
-            <label className="text-sm font-semibold text-[#29332f]">
-              지역, 사건번호, 물건명 검색
+      <section className="border-b border-[#ddd5c8] bg-white">
+        <div className="mx-auto grid max-w-7xl gap-3 px-5 py-4 lg:grid-cols-[minmax(240px,1fr)_auto_auto_auto] lg:items-end lg:px-8">
+          <div>
+            <label className="text-xs font-bold text-[#5c6963]">
+              검색
             </label>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="예: 판교, 온비드, 2025타경"
-              className="mt-2 h-11 w-full rounded-md border border-[#c8c0b2] bg-[#fbfaf7] px-3 text-sm outline-none transition focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#95d5b2]"
+              placeholder="판교, 온비드, 2025타경, 빌라"
+              className="mt-1 h-11 w-full rounded-md border border-[#c9c1b4] bg-[#fbfaf7] px-3 text-sm outline-none transition focus:border-[#2d6a4f] focus:ring-2 focus:ring-[#95d5b2]"
             />
           </div>
-
-          <FilterGroup
+          <InlineFilter
             title="매각 방식"
             options={["전체", "경매", "공매"]}
             value={channel}
             onChange={(value) => setChannel(value as SaleChannel | "전체")}
           />
-
-          <FilterGroup
-            title="물건 종류"
+          <InlineFilter
+            title="물건"
             options={["전체", "아파트", "빌라", "오피스텔"]}
             value={type}
             onChange={(value) => setType(value as PropertyType | "전체")}
           />
-
-          <FilterGroup
-            title="권리분석 결과"
+          <InlineFilter
+            title="판단"
             options={["전체", "안정", "주의", "위험"]}
             value={level}
             onChange={(value) => setLevel(value as RiskLevel | "전체")}
           />
-
-          <div className="rounded-lg border border-[#d8d1c4] bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <label className="text-sm font-semibold text-[#29332f]">
-                예상 입찰가
-              </label>
-              <span className="text-sm font-bold text-[#2d6a4f]">
-                시세의 {bidRatio}%
-              </span>
-            </div>
-            <input
-              type="range"
-              min="60"
-              max="95"
-              value={bidRatio}
-              onChange={(event) => setBidRatio(Number(event.target.value))}
-              className="mt-3 w-full accent-[#2d6a4f]"
-            />
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <label className="text-sm font-semibold text-[#29332f]">
-                보수 비용 버퍼
-              </label>
-              <span className="text-sm font-bold text-[#8a5a00]">
-                시세의 {bufferRatio}%
-              </span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="12"
-              value={bufferRatio}
-              onChange={(event) => setBufferRatio(Number(event.target.value))}
-              className="mt-3 w-full accent-[#b08900]"
-            />
-          </div>
-
-          <div className="rounded-lg border border-[#d8d1c4] bg-[#1f2f2a] p-4 text-white shadow-sm">
-            <p className="text-sm font-semibold">체크 기준</p>
-            <ul className="mt-3 space-y-2 text-sm leading-6 text-[#dbe7e0]">
-              <li>말소기준보다 앞선 임차권은 인수 가능성 반영</li>
-              <li>유치권, 체납, 위반건축물은 별도 위험 가산</li>
-              <li>적정가는 시세 할인, 인수금, 비용 버퍼 차감</li>
-            </ul>
-          </div>
-        </aside>
-
-        <div className="space-y-5">
-          <section className="grid gap-4 xl:grid-cols-[1fr_380px]">
-            <div className="overflow-hidden rounded-lg border border-[#d8d1c4] bg-white shadow-sm">
-              <div className="grid grid-cols-[1.2fr_0.7fr_0.7fr_0.8fr_0.7fr] border-b border-[#e5ded2] bg-[#fbfaf7] px-4 py-3 text-xs font-bold uppercase tracking-normal text-[#6c5f4c]">
-                <span>구분 / 물건</span>
-                <span>최저가</span>
-                <span>시세비율</span>
-                <span>권리분석</span>
-                <span>판단</span>
-              </div>
-              <div className="divide-y divide-[#eee8dd]">
-                {filtered.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveId(item.id)}
-                    className={`grid w-full grid-cols-[1.2fr_0.7fr_0.7fr_0.8fr_0.7fr] items-center gap-3 px-4 py-4 text-left text-sm transition hover:bg-[#f7f5ef] ${
-                      active.id === item.id ? "bg-[#edf6f1]" : ""
-                    }`}
-                  >
-                    <span>
-                      <span className="block font-semibold text-[#1f2f2a]">
-                        <ChannelBadge channel={item.channel} /> {item.title}
-                      </span>
-                      <span className="mt-1 block text-xs text-[#68756f]">
-                        {item.agency} · {item.caseNo} · {item.district} · {item.floor}
-                      </span>
-                    </span>
-                    <span className="font-semibold">{uk(item.minimum)}</span>
-                    <span>{percent(item.analysis.marketRatio)}</span>
-                    <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
-                    <Verdict value={item.analysis.verdict} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <DetailPanel item={active} onToggle={toggleSelected} selected={selectedIds.includes(active.id)} />
-          </section>
-
-          <section className="rounded-lg border border-[#d8d1c4] bg-white p-4 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-[#1f2f2a]">
-                  선택 물건 비교
-                </h2>
-                <p className="text-sm text-[#68756f]">
-                  최대 4개까지 비교합니다. 입찰가 슬라이더를 움직이면 전체 계산이
-                  같이 바뀝니다.
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedIds([])}
-                className="h-9 rounded-md border border-[#c8c0b2] px-3 text-sm font-semibold text-[#44504b] transition hover:bg-[#f4f1ea]"
-              >
-                선택 비우기
-              </button>
-            </div>
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[850px] border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-[#e5ded2] bg-[#fbfaf7] text-left text-xs text-[#6c5f4c]">
-                    <th className="px-3 py-3">구분</th>
-                    <th className="px-3 py-3">물건</th>
-                    <th className="px-3 py-3">시세</th>
-                    <th className="px-3 py-3">최저가</th>
-                    <th className="px-3 py-3">예상 입찰</th>
-                    <th className="px-3 py-3">인수금</th>
-                    <th className="px-3 py-3">총 투입</th>
-                    <th className="px-3 py-3">안전마진</th>
-                    <th className="px-3 py-3">추천</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selected.length === 0 ? (
-                    <tr>
-                      <td className="px-3 py-8 text-center text-[#68756f]" colSpan={9}>
-                        비교할 물건을 선택하세요.
-                      </td>
-                    </tr>
-                  ) : (
-                    selected.map((item) => (
-                      <tr key={item.id} className="border-b border-[#f0ebe1]">
-                        <td className="px-3 py-3">
-                          <ChannelBadge channel={item.channel} />
-                        </td>
-                        <td className="px-3 py-3 font-semibold">{item.title}</td>
-                        <td className="px-3 py-3">{uk(item.market)}</td>
-                        <td className="px-3 py-3">{uk(item.minimum)}</td>
-                        <td className="px-3 py-3">{uk(item.analysis.plannedBid)}</td>
-                        <td className="px-3 py-3">{uk(item.takeoverAmount)}</td>
-                        <td className="px-3 py-3">{uk(item.analysis.allIn)}</td>
-                        <td className={`px-3 py-3 font-semibold ${item.analysis.marginRate < 10 ? "text-[#b42318]" : "text-[#20724f]"}`}>
-                          {uk(item.analysis.margin)} · {percent(item.analysis.marginRate)}
-                        </td>
-                        <td className="px-3 py-3">
-                          <Verdict value={item.analysis.verdict} />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
         </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 xl:grid-cols-[minmax(0,1fr)_410px] lg:px-8">
+        <div className="space-y-5">
+          <div className="grid gap-3 rounded-lg border border-[#d9d2c5] bg-white p-4 shadow-sm md:grid-cols-[1fr_1fr_auto] md:items-center">
+            <RangeControl
+              label="예상 입찰가"
+              value={bidRatio}
+              suffix="시세 기준"
+              min={60}
+              max={95}
+              onChange={setBidRatio}
+              tone="green"
+            />
+            <RangeControl
+              label="수리·명도 버퍼"
+              value={bufferRatio}
+              suffix="비용 차감"
+              min={0}
+              max={12}
+              onChange={setBufferRatio}
+              tone="amber"
+            />
+            <div className="rounded-md bg-[#1f2f2a] px-4 py-3 text-sm text-white">
+              <p className="font-bold">계산 기준</p>
+              <p className="mt-1 text-[#dfe8e2]">
+                시세 할인 - 인수금 - 비용 버퍼
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            {filtered.map((item) => (
+              <ListingCard
+                key={item.id}
+                item={item}
+                active={active.id === item.id}
+                selected={selectedIds.includes(item.id)}
+                onOpen={() => setActiveId(item.id)}
+                onToggle={() => toggleSelected(item.id)}
+              />
+            ))}
+            {filtered.length === 0 ? (
+              <div className="rounded-lg border border-[#d9d2c5] bg-white p-8 text-center text-sm font-semibold text-[#68756f]">
+                조건에 맞는 샘플 물건이 없습니다.
+              </div>
+            ) : null}
+          </div>
+
+          <ComparePanel selected={selected} onClear={() => setSelectedIds([])} />
+        </div>
+
+        <DetailPanel
+          item={active}
+          onToggle={toggleSelected}
+          selected={selectedIds.includes(active.id)}
+        />
       </section>
     </main>
   );
@@ -664,6 +569,87 @@ function Metric({
   );
 }
 
+function InlineFilter({
+  title,
+  options,
+  value,
+  onChange,
+}: {
+  title: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-bold text-[#5c6963]">{title}</p>
+      <div className="mt-1 flex min-h-11 flex-wrap gap-1.5 rounded-md border border-[#d9d2c5] bg-[#fbfaf7] p-1">
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() => onChange(option)}
+            className={`min-w-14 rounded px-3 py-2 text-sm font-bold transition ${
+              value === option
+                ? "bg-[#1f2f2a] text-white"
+                : "text-[#55635d] hover:bg-white"
+            }`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RangeControl({
+  label,
+  value,
+  suffix,
+  min,
+  max,
+  tone,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  suffix: string;
+  min: number;
+  max: number;
+  tone: "green" | "amber";
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-[#29332f]">{label}</p>
+          <p className="text-xs font-semibold text-[#68756f]">{suffix}</p>
+        </div>
+        <span
+          className={`rounded-md px-2.5 py-1 text-sm font-black ${
+            tone === "green"
+              ? "bg-[#e6f4ec] text-[#17643f]"
+              : "bg-[#fff4d8] text-[#8a5a00]"
+          }`}
+        >
+          {value}%
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className={`mt-3 w-full ${
+          tone === "green" ? "accent-[#2d6a4f]" : "accent-[#b08900]"
+        }`}
+      />
+    </div>
+  );
+}
+
 function ChannelBadge({ channel }: { channel: SaleChannel }) {
   const style =
     channel === "경매"
@@ -673,6 +659,213 @@ function ChannelBadge({ channel }: { channel: SaleChannel }) {
     <span className={`inline-flex w-fit rounded-md px-2 py-0.5 text-xs font-bold ${style}`}>
       {channel}
     </span>
+  );
+}
+
+function ListingCard({
+  item,
+  active,
+  selected,
+  onOpen,
+  onToggle,
+}: {
+  item: AuctionItem & { analysis: ReturnType<typeof analyze> };
+  active: boolean;
+  selected: boolean;
+  onOpen: () => void;
+  onToggle: () => void;
+}) {
+  const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
+
+  return (
+    <article
+      className={`rounded-lg border bg-white p-4 shadow-sm transition ${
+        active
+          ? "border-[#2d6a4f] ring-2 ring-[#b7e4c7]"
+          : "border-[#d9d2c5] hover:border-[#b6ad9f]"
+      }`}
+    >
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
+        <button onClick={onOpen} className="min-w-0 text-left">
+          <div className="flex flex-wrap items-center gap-2">
+            <ChannelBadge channel={item.channel} />
+            <span className="rounded-md bg-[#f0ede5] px-2 py-0.5 text-xs font-bold text-[#655d50]">
+              {item.agency}
+            </span>
+            <span className="text-xs font-semibold text-[#68756f]">
+              {item.caseNo}
+            </span>
+          </div>
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h2 className="text-lg font-black text-[#17231f]">
+                {item.title}
+              </h2>
+              <p className="mt-1 text-sm text-[#68756f]">
+                {item.district} · {item.area}㎡ · {item.floor} · 마감 {item.auctionDate}
+              </p>
+            </div>
+            <Verdict value={item.analysis.verdict} />
+          </div>
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-4">
+            <PriceStat label="시세" value={uk(item.market)} />
+            <PriceStat label="최저가" value={uk(item.minimum)} sub={percent(item.analysis.marketRatio)} />
+            <PriceStat label="적정 상한" value={uk(item.analysis.suggested)} strong />
+            <PriceStat
+              label="안전마진"
+              value={percent(item.analysis.marginRate)}
+              danger={item.analysis.marginRate < 10}
+            />
+          </div>
+        </button>
+
+        <div className="space-y-3">
+          <div className="rounded-lg bg-[#f7f5ef] p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-bold text-[#68756f]">권리 위험도</span>
+              <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
+            </div>
+            <RiskMeter level={item.analysis.level} score={item.analysis.risk} />
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span
+              className={`text-xs font-bold ${
+                gapToSuggested >= 0 ? "text-[#17643f]" : "text-[#b42318]"
+              }`}
+            >
+              현재 예상가가 상한보다 {uk(Math.abs(gapToSuggested))}
+              {gapToSuggested >= 0 ? " 낮음" : " 높음"}
+            </span>
+            <button
+              onClick={onToggle}
+              className={`h-9 rounded-md px-3 text-sm font-black transition ${
+                selected
+                  ? "bg-[#1f2f2a] text-white"
+                  : "border border-[#c8c0b2] bg-white text-[#44504b] hover:bg-[#f4f1ea]"
+              }`}
+            >
+              {selected ? "비교중" : "비교 담기"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function PriceStat({
+  label,
+  value,
+  sub,
+  strong,
+  danger,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  strong?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <div className="min-w-0 rounded-md border border-[#ebe5da] bg-[#fcfbf8] p-3">
+      <p className="text-xs font-bold text-[#6b746f]">{label}</p>
+      <p
+        className={`mt-1 truncate text-base font-black ${
+          danger
+            ? "text-[#b42318]"
+            : strong
+              ? "text-[#17643f]"
+              : "text-[#1f2f2a]"
+        }`}
+      >
+        {value}
+      </p>
+      {sub ? <p className="mt-0.5 text-xs font-bold text-[#8a7f70]">{sub}</p> : null}
+    </div>
+  );
+}
+
+function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
+  const color =
+    level === "위험" ? "bg-[#d1493f]" : level === "주의" ? "bg-[#d89b17]" : "bg-[#2d6a4f]";
+  return (
+    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#dfd8cb]">
+      <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
+    </div>
+  );
+}
+
+function ComparePanel({
+  selected,
+  onClear,
+}: {
+  selected: Array<AuctionItem & { analysis: ReturnType<typeof analyze> }>;
+  onClear: () => void;
+}) {
+  return (
+    <section className="rounded-lg border border-[#d8d1c4] bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-black text-[#1f2f2a]">선택 물건 비교</h2>
+          <p className="text-sm text-[#68756f]">
+            총투입금과 안전마진이 낮은 물건을 먼저 제외하기 좋습니다.
+          </p>
+        </div>
+        <button
+          onClick={onClear}
+          className="h-9 rounded-md border border-[#c8c0b2] px-3 text-sm font-bold text-[#44504b] transition hover:bg-[#f4f1ea]"
+        >
+          선택 비우기
+        </button>
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {selected.length === 0 ? (
+          <div className="rounded-md bg-[#f7f5ef] p-5 text-center text-sm font-bold text-[#68756f] md:col-span-3">
+            비교할 물건을 선택하세요.
+          </div>
+        ) : (
+          selected.map((item) => (
+            <div key={item.id} className="rounded-md border border-[#e5ded2] bg-[#fcfbf8] p-4">
+              <div className="flex items-center justify-between gap-2">
+                <ChannelBadge channel={item.channel} />
+                <Verdict value={item.analysis.verdict} />
+              </div>
+              <h3 className="mt-3 text-sm font-black text-[#1f2f2a]">{item.title}</h3>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <MiniStat label="예상 입찰" value={uk(item.analysis.plannedBid)} />
+                <MiniStat label="총투입" value={uk(item.analysis.allIn)} />
+                <MiniStat label="인수금" value={uk(item.takeoverAmount)} />
+                <MiniStat
+                  label="마진"
+                  value={percent(item.analysis.marginRate)}
+                  danger={item.analysis.marginRate < 10}
+                />
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+function MiniStat({
+  label,
+  value,
+  danger,
+}: {
+  label: string;
+  value: string;
+  danger?: boolean;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-bold text-[#68756f]">{label}</p>
+      <p className={`mt-0.5 font-black ${danger ? "text-[#b42318]" : "text-[#1f2f2a]"}`}>
+        {value}
+      </p>
+    </div>
   );
 }
 
@@ -746,7 +939,7 @@ function DetailPanel({
   onToggle: (id: number) => void;
 }) {
   return (
-    <aside className="rounded-lg border border-[#d8d1c4] bg-white p-5 shadow-sm">
+    <aside className="h-fit rounded-lg border border-[#d8d1c4] bg-white p-5 shadow-sm xl:sticky xl:top-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="flex flex-wrap items-center gap-2 text-xs font-semibold text-[#6c5f4c]">
@@ -776,33 +969,29 @@ function DetailPanel({
         <Info label="최근 실거래" value={uk(item.lastTrade)} />
       </div>
 
-      <div className="mt-5 rounded-lg bg-[#f4f1ea] p-4">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-semibold text-[#29332f]">적정 입찰 상한</span>
-          <span className="text-2xl font-bold text-[#2d6a4f]">
+      <div className="mt-5 rounded-lg border border-[#cfe6d8] bg-[#f0faf4] p-4">
+        <p className="text-xs font-black text-[#17643f]">추천 결론</p>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <Verdict value={item.analysis.verdict} />
+          <span className="text-xs font-bold text-[#53615b]">
+            예상 입찰 {uk(item.analysis.plannedBid)}
+          </span>
+        </div>
+        <div className="mt-4 flex items-end justify-between gap-3">
+          <span className="text-sm font-bold text-[#29332f]">적정 입찰 상한</span>
+          <span className="text-2xl font-black text-[#2d6a4f]">
             {uk(item.analysis.suggested)}
           </span>
         </div>
-        <div className="mt-3 h-3 overflow-hidden rounded-full bg-[#ded6c9]">
-          <div
-            className={`h-full rounded-full ${
-              item.analysis.level === "위험"
-                ? "bg-[#d1493f]"
-                : item.analysis.level === "주의"
-                  ? "bg-[#d89b17]"
-                  : "bg-[#2d6a4f]"
-            }`}
-            style={{ width: `${item.analysis.risk}%` }}
-          />
-        </div>
+        <RiskMeter level={item.analysis.level} score={item.analysis.risk} />
         <div className="mt-3 flex items-center justify-between text-xs font-semibold text-[#68756f]">
           <span>위험도 {item.analysis.risk}점</span>
           <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
         </div>
       </div>
 
-      <div className="mt-5 space-y-3">
-        <h3 className="text-sm font-bold text-[#1f2f2a]">권리분석 체크</h3>
+      <div className="mt-5 space-y-2">
+        <h3 className="text-sm font-black text-[#1f2f2a]">확인할 항목</h3>
         <Check label="임차인" value={item.tenant} />
         <Check label="선순위 보증금" value={uk(item.seniorDeposit)} />
         <Check label="인수 추정액" value={uk(item.takeoverAmount)} />
@@ -810,8 +999,8 @@ function DetailPanel({
         <Check label="입찰 마감" value={item.auctionDate} />
       </div>
 
-      <div className="mt-5 rounded-lg border border-[#e5ded2] p-4">
-        <h3 className="text-sm font-bold text-[#1f2f2a]">위험 신호</h3>
+      <div className="mt-5 rounded-lg border border-[#e5ded2] bg-[#fcfbf8] p-4">
+        <h3 className="text-sm font-black text-[#1f2f2a]">위험 신호</h3>
         <div className="mt-3 flex flex-wrap gap-2">
           {item.analysis.flags.length === 0 ? (
             <span className="rounded-md bg-[#e6f4ec] px-2.5 py-1 text-xs font-bold text-[#17643f]">
