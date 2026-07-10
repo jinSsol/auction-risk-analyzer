@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type PropertyType = "아파트" | "빌라" | "오피스텔";
@@ -380,7 +381,6 @@ export default function Home() {
   const [bidRatio, setBidRatio] = useState(78);
   const [bufferRatio, setBufferRatio] = useState(4);
   const [selectedIds, setSelectedIds] = useState<number[]>([4, 6, 7]);
-  const [activeId, setActiveId] = useState(7);
 
   const enriched = useMemo(
     () =>
@@ -404,8 +404,6 @@ export default function Home() {
     return matchQuery && matchChannel && matchType && matchLevel;
   });
 
-  const active =
-    enriched.find((item) => item.id === activeId) ?? enriched[0];
   const selected = enriched.filter((item) => selectedIds.includes(item.id));
   const stats = {
     total: filtered.length,
@@ -485,7 +483,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 xl:grid-cols-[minmax(0,1fr)_410px] lg:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
         <div className="space-y-5">
           <div className="grid gap-3 rounded-lg border border-[#dde7e2] bg-white p-4 shadow-sm shadow-[#1a2d2410] md:grid-cols-[1fr_1fr_auto] md:items-center">
             <RangeControl
@@ -519,9 +517,8 @@ export default function Home() {
               <ListingCard
                 key={item.id}
                 item={item}
-                active={active.id === item.id}
                 selected={selectedIds.includes(item.id)}
-                onOpen={() => setActiveId(item.id)}
+                href={`/properties/${item.id}`}
                 onToggle={() => toggleSelected(item.id)}
               />
             ))}
@@ -534,12 +531,6 @@ export default function Home() {
 
           <ComparePanel selected={selected} onClear={() => setSelectedIds([])} />
         </div>
-
-        <DetailPanel
-          item={active}
-          onToggle={toggleSelected}
-          selected={selectedIds.includes(active.id)}
-        />
       </section>
     </main>
   );
@@ -664,29 +655,21 @@ function ChannelBadge({ channel }: { channel: SaleChannel }) {
 
 function ListingCard({
   item,
-  active,
   selected,
-  onOpen,
+  href,
   onToggle,
 }: {
   item: AuctionItem & { analysis: ReturnType<typeof analyze> };
-  active: boolean;
   selected: boolean;
-  onOpen: () => void;
+  href: string;
   onToggle: () => void;
 }) {
   const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
 
   return (
-    <article
-      className={`rounded-lg border bg-white p-4 shadow-sm transition ${
-        active
-          ? "border-[#22a06b] ring-2 ring-[#a7f3c5]"
-          : "border-[#dde7e2] hover:border-[#9edcc0]"
-      }`}
-    >
+    <article className="rounded-lg border border-[#dde7e2] bg-white p-4 shadow-sm transition hover:border-[#9edcc0] hover:shadow-md">
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
-        <button onClick={onOpen} className="min-w-0 text-left">
+        <Link href={href} className="min-w-0 text-left">
           <div className="flex flex-wrap items-center gap-2">
             <ChannelBadge channel={item.channel} />
             <span className="rounded-md bg-[#f3f5f2] px-2 py-0.5 text-xs font-bold text-[#65706b]">
@@ -718,7 +701,7 @@ function ListingCard({
               danger={item.analysis.marginRate < 10}
             />
           </div>
-        </button>
+        </Link>
 
         <div className="space-y-3">
           <div className="rounded-lg bg-[#f6faf8] p-3">
