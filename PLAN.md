@@ -177,6 +177,100 @@ Principles:
 - Add clear disclaimers that final bidding requires document review and, for complex cases, expert advice.
 - Track assumptions used in the bid calculation.
 
+## Web + Mobile Launch Strategy
+
+The product should launch as both a web app and a store-distributed mobile app, but the web app should remain the product core during MVP development.
+
+Recommended approach:
+
+- Build and validate the full MVP in the web app first.
+- Make the web app mobile-first and installable as a PWA.
+- Package the same product experience into iOS and Android using Capacitor.
+- Avoid rewriting the current React UI in native/KMP until product-market fit and core workflows are clearer.
+
+### Why Web First
+
+- Fastest iteration cycle for product, UI, and copy.
+- Current prototype already works as a web app.
+- Manual property entry, checklist analysis, bid calculation, and comparison can be built once.
+- Web deployment can be updated without app-store review delays.
+- Early users can test through a link before store launch.
+
+### Mobile App Path
+
+Phase A: PWA readiness
+
+- Add app manifest.
+- Add production icons and splash-friendly assets.
+- Polish mobile navigation, safe-area spacing, and touch targets.
+- Add privacy policy, terms, and legal/investment disclaimer pages.
+
+Phase B: Capacitor shell
+
+- Add `mobile/` workspace using Capacitor.
+- Load the production web app URL or packaged web build.
+- Configure iOS and Android app names, bundle IDs, icons, and splash screens.
+- Handle back navigation, external links, file downloads/uploads, and safe-area behavior.
+
+Phase C: Store readiness
+
+- Prepare App Store and Play Store screenshots.
+- Write app description and keywords.
+- Provide privacy policy URL and support contact.
+- Add reviewer notes explaining that the app is a decision-support tool, not legal or investment advice.
+- Verify that the app has enough app-specific value beyond simply displaying a website.
+
+### Web URL vs Packaged Web Build
+
+Initial recommendation: load the production web URL inside the app shell.
+
+Pros:
+
+- Web updates are reflected in the app quickly.
+- One production surface to maintain.
+- Lower maintenance while the product changes frequently.
+
+Cons:
+
+- Requires reliable network access.
+- Store review can reject apps that feel like thin website wrappers.
+
+Mitigation:
+
+- Add app-specific polish: native share, push reminders later, saved-property shortcuts, document upload, and mobile-friendly offline states.
+- Keep the mobile UI highly touch-friendly.
+- Avoid presenting the mobile shell as a different product from the web app.
+
+### When To Consider KMP or Native Rewrite
+
+KMP becomes more attractive after the product has stable workflows and needs deeper native behavior.
+
+Consider KMP later if:
+
+- Offline-first saved workspaces become central.
+- Document capture, OCR, push reminders, and background sync become major features.
+- Android/iOS-specific UX quality becomes a competitive advantage.
+- The app needs complex local computation or native integrations.
+
+For now, KMP would slow MVP validation because the existing React UI would need to be rebuilt.
+
+### Launch Sequence
+
+1. Finish web MVP with manual property creation, checklist analysis, persistence, and bid calculator.
+2. Add public web launch essentials: custom domain, privacy policy, terms, disclaimer, SEO basics, and analytics.
+3. Add PWA metadata and mobile polish.
+4. Create Capacitor app shell.
+5. Test iOS and Android builds with the production web app.
+6. Prepare store assets and submit a limited first release.
+7. Use store feedback and analytics to decide whether to keep investing in Capacitor or plan native/KMP.
+
+### Store-Specific Risk Notes
+
+- The app should not claim to guarantee bidding safety.
+- Avoid language that sounds like legal advice, investment advice, or guaranteed returns.
+- Keep source/assumption visibility close to any automated recommendation.
+- Include a clear disclaimer in onboarding, detail pages, and store metadata.
+
 ## Data Model Draft
 
 Property:

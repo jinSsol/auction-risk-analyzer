@@ -15,7 +15,8 @@
 
 ## Product Plan
 
-전체 제품 방향, MVP 범위, 데이터 모델, 단계별 로드맵은 [PLAN.md](./PLAN.md)에 정리되어 있습니다.
+- 제품 요구사항과 MVP 정의: [PRD.md](./PRD.md)
+- 제품 방향, 데이터 모델, 단계별 로드맵: [PLAN.md](./PLAN.md)
 
 ## Development
 
