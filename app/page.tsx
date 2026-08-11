@@ -6,7 +6,12 @@ import { items } from "./auction-data";
 import { analyze, percent, uk, type AnalyzedItem } from "./lib/auction-analysis";
 import { mergeAuctionItems } from "./lib/auction-merge";
 import { loadUserAuctionItems, type UserAuctionItem } from "./lib/auction-storage";
+import { summarizeRightsChecklist } from "./lib/rights-checklist";
 import type { PropertyType, RiskLevel, SaleChannel } from "./lib/auction-types";
+
+const DEFAULT_COMPARE_IDS = ["sample-4", "sample-6", "sample-7"];
+const COMPARISON_STORAGE_KEY = "auction-risk-analyzer:comparison:v1";
+const MAX_COMPARE_COUNT = 4;
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -17,19 +22,23 @@ export default function Home() {
   const [bidRatio, setBidRatio] = useState(78);
   const [bufferRatio, setBufferRatio] = useState(4);
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([
-    "sample-4",
-    "sample-6",
-    "sample-7",
-  ]);
+  const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_COMPARE_IDS);
+  const [comparisonReady, setComparisonReady] = useState(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setUserItems(loadUserAuctionItems());
+      setSelectedIds(loadComparisonIds() ?? DEFAULT_COMPARE_IDS);
+      setComparisonReady(true);
     }, 0);
 
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!comparisonReady) return;
+    saveComparisonIds(selectedIds);
+  }, [comparisonReady, selectedIds]);
 
   const mergedItems = useMemo(
     () => mergeAuctionItems(items, userItems),
@@ -64,7 +73,9 @@ export default function Home() {
     return matchQuery && matchChannel && matchType && matchLevel && matchOwner;
   });
 
-  const selected = enriched.filter((item) => selectedIds.includes(item.id));
+  const selected = selectedIds
+    .map((id) => enriched.find((item) => item.id === id))
+    .filter((item): item is AnalyzedItem => Boolean(item));
   const stats = {
     total: filtered.length,
     auction: filtered.filter((item) => item.channel === "경매").length,
@@ -79,7 +90,7 @@ export default function Home() {
     setSelectedIds((current) =>
       current.includes(id)
         ? current.filter((itemId) => itemId !== id)
-        : [...current, id].slice(-4)
+        : [...current, id].slice(-MAX_COMPARE_COUNT)
     );
   }
 
@@ -207,10 +218,67 @@ export default function Home() {
             ) : null}
           </div>
 
-          <ComparePanel selected={selected} onClear={() => setSelectedIds([])} />
+          <ComparePanel
+            selected={selected}
+            onClear={() => setSelectedIds([])}
+            onRemove={(id) =>
+              setSelectedIds((current) => current.filter((itemId) => itemId !== id))
+            }
+          />
         </div>
       </section>
     </main>
+  );
+}
+
+function loadComparisonIds() {
+  try {
+    const raw = window.localStorage.getItem(COMPARISON_STORAGE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+
+    const ids = parsed
+      .filter((id): id is string => typeof id === "string")
+      .slice(0, MAX_COMPARE_COUNT);
+
+    return ids.length > 0 ? ids : [];
+  } catch {
+    return null;
+  }
+}
+
+function saveComparisonIds(ids: string[]) {
+  try {
+    window.localStorage.setItem(
+      COMPARISON_STORAGE_KEY,
+      JSON.stringify(ids.slice(0, MAX_COMPARE_COUNT))
+    );
+  } catch {
+    // Local persistence is a convenience layer; the comparison UI still works without it.
+  }
+}
+
+function compareForBasket(left: AnalyzedItem, right: AnalyzedItem) {
+  return basketScore(left) - basketScore(right);
+}
+
+function basketScore(item: AnalyzedItem) {
+  const verdictPenalty =
+    item.analysis.verdict === "입찰 검토"
+      ? 0
+      : item.analysis.verdict === "가격 조정"
+        ? 300
+        : 700;
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
+
+  return (
+    verdictPenalty +
+    item.analysis.risk * 4 +
+    checklist.unknownCount * 18 +
+    Math.max(0, 12 - item.analysis.marginRate) * 10 +
+    item.analysis.allIn / 1000
   );
 }
 
@@ -478,17 +546,26 @@ function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
 function ComparePanel({
   selected,
   onClear,
+  onRemove,
 }: {
   selected: AnalyzedItem[];
   onClear: () => void;
+  onRemove: (id: string) => void;
 }) {
+  const ranked = [...selected].sort(compareForBasket);
+
   return (
     <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-[#17211D]">비교 바구니</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold text-[#17211D]">비교 바구니</h2>
+            <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
+              {selected.length}/{MAX_COMPARE_COUNT}
+            </span>
+          </div>
           <p className="text-sm text-[#66736D]">
-            총투입금과 안전마진이 낮은 물건을 먼저 제외하기 좋습니다.
+            2-4개 물건을 총투입금, 권리 미확인, 마진, 판정 기준으로 비교합니다.
           </p>
         </div>
         <button
@@ -498,31 +575,67 @@ function ComparePanel({
           선택 비우기
         </button>
       </div>
-      <div className="mt-4 grid gap-3 md:grid-cols-3">
+      {selected.length === 1 ? (
+        <p className="mt-3 rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-semibold text-[#255C99]">
+          하나 더 담으면 총투입금과 권리 리스크를 나란히 비교할 수 있습니다.
+        </p>
+      ) : null}
+      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {selected.length === 0 ? (
-          <div className="rounded-lg bg-[#F9FBFA] p-5 text-center text-sm font-medium text-[#66736D] md:col-span-3">
+          <div className="rounded-lg bg-[#F9FBFA] p-5 text-center text-sm font-medium text-[#66736D] md:col-span-2 xl:col-span-4">
             비교할 물건을 선택하세요.
           </div>
         ) : (
-          selected.map((item) => (
+          ranked.map((item, index) => {
+            const checklist = summarizeRightsChecklist(item.rightsChecklist);
+
+            return (
             <div key={item.id} className="interactive-card rounded-lg border border-[#E5ECE8] bg-white p-4 hover:border-[#B8C7C0] hover:shadow-[0_10px_24px_rgba(23,33,29,0.07)]">
               <div className="flex items-center justify-between gap-2">
-                <ChannelBadge channel={item.channel} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-[#17211D] px-2.5 py-1 text-xs font-semibold text-white">
+                    #{index + 1}
+                  </span>
+                  <ChannelBadge channel={item.channel} />
+                </div>
                 <Verdict value={item.analysis.verdict} />
               </div>
-              <h3 className="mt-3 text-sm font-semibold text-[#17211D]">{item.title}</h3>
+              <a
+                href={`/properties/${item.id}`}
+                className="mt-3 block text-sm font-semibold text-[#17211D] transition hover:text-[#0F766E]"
+              >
+                {item.title}
+              </a>
+              <p className="mt-1 text-xs font-medium text-[#66736D]">
+                {item.district} · {item.area}㎡ · {item.auctionDate}
+              </p>
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <MiniStat label="예상 입찰" value={uk(item.analysis.plannedBid)} />
                 <MiniStat label="총투입" value={uk(item.analysis.allIn)} />
-                <MiniStat label="인수금" value={uk(item.takeoverAmount)} />
+                <MiniStat label="인수금" value={uk(item.analysis.takeoverAmount)} />
+                <MiniStat label="예상 마진" value={uk(item.analysis.margin)} danger={item.analysis.margin < 0} />
                 <MiniStat
-                  label="마진"
+                  label="마진율"
                   value={percent(item.analysis.marginRate)}
                   danger={item.analysis.marginRate < 10}
                 />
+                <MiniStat
+                  label="권리 미확인"
+                  value={`${checklist.unknownCount}개`}
+                  danger={checklist.unknownCount >= 4}
+                />
+                <MiniStat label="리스크" value={`${item.analysis.risk}점`} danger={item.analysis.level === "위험"} />
+                <MiniStat label="상한 기준" value={uk(item.analysis.doNotBidAbove)} />
               </div>
+              <button
+                onClick={() => onRemove(item.id)}
+                className="mt-3 h-9 w-full rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] text-sm font-semibold text-[#34423C] transition hover:border-[#B53A2E] hover:bg-[#FDE8E5] hover:text-[#B53A2E]"
+              >
+                비교에서 제외
+              </button>
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </section>

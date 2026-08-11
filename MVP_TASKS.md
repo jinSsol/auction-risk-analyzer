@@ -349,13 +349,13 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Persist comparison basket.
-- [ ] Compare 2-4 properties.
-- [ ] Show all-in cost.
-- [ ] Show takeover amount.
-- [ ] Show expected margin.
-- [ ] Show checklist unknown count.
-- [ ] Show verdict.
+- [x] Persist comparison basket.
+- [x] Compare 2-4 properties.
+- [x] Show all-in cost.
+- [x] Show takeover amount.
+- [x] Show expected margin.
+- [x] Show checklist unknown count.
+- [x] Show verdict.
 
 Completion criteria:
 

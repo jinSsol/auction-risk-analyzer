@@ -38,6 +38,9 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /판교 힐스테이트 아파트 84/);
   assert.match(html, /내 물건/);
   assert.match(html, /비교 바구니/);
+  assert.match(html, /2-4개 물건을 총투입금, 권리 미확인, 마진, 판정 기준으로 비교합니다/);
+  assert.match(html, /예상 마진/);
+  assert.match(html, /권리 미확인/);
 });
 
 test("server-renders sample property detail pages", async () => {
