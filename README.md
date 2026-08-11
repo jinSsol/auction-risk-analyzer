@@ -17,6 +17,7 @@
 
 - 제품 요구사항과 MVP 정의: [PRD.md](./PRD.md)
 - 제품 방향, 데이터 모델, 단계별 로드맵: [PLAN.md](./PLAN.md)
+- MVP 실행 체크리스트: [MVP_TASKS.md](./MVP_TASKS.md)
 
 ## Development
 
