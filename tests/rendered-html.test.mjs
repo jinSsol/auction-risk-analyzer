@@ -49,6 +49,8 @@ test("server-renders sample property detail pages", async () => {
   assert.match(html, /마포구 공덕동 래미안 84/);
   assert.match(html, /분석 요약/);
   assert.match(html, /추천 상한가/);
+  assert.match(html, /시세 근거/);
+  assert.match(html, /시세 근거 부족/);
   assert.match(html, /입찰 전 체크리스트/);
   assert.match(html, /href="\/"/);
 });
@@ -63,5 +65,6 @@ test("server-renders the manual property creation flow", async () => {
   assert.match(html, /공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요/);
   assert.match(html, /Step <!-- -->1/);
   assert.match(html, /매각 방식/);
+  assert.match(html, /가격/);
   assert.match(html, /다음/);
 });

@@ -82,6 +82,48 @@ export function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number
   };
 }
 
+export function analyzeComparableSales(item: AuctionItem) {
+  const sales = (item.comparableSales ?? []).filter((sale) => sale.price > 0);
+
+  if (sales.length === 0) {
+    return {
+      count: 0,
+      average: 0,
+      low: 0,
+      high: 0,
+      marketGap: 0,
+      marketGapRate: 0,
+      verdict: "시세 근거 부족" as const,
+    };
+  }
+
+  const prices = sales.map((sale) => sale.price);
+  const average = Math.round(
+    prices.reduce((total, price) => total + price, 0) / prices.length
+  );
+  const low = Math.min(...prices);
+  const high = Math.max(...prices);
+  const marketGap = item.market - average;
+  const marketGapRate = average > 0 ? (marketGap / average) * 100 : 0;
+  const absGapRate = Math.abs(marketGapRate);
+  const verdict =
+    absGapRate <= 5
+      ? "입력 시세 적정"
+      : marketGapRate > 5
+        ? "입력 시세 높음"
+        : "입력 시세 보수적";
+
+  return {
+    count: sales.length,
+    average,
+    low,
+    high,
+    marketGap,
+    marketGapRate,
+    verdict,
+  };
+}
+
 export type AnalyzedItem = AuctionItem & {
   analysis: ReturnType<typeof analyze>;
 };

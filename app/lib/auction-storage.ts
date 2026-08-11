@@ -1,4 +1,4 @@
-import type { AuctionItem } from "./auction-types";
+import type { AuctionItem, ComparableSale } from "./auction-types";
 
 export const USER_ITEMS_STORAGE_KEY = "auction-risk-analyzer:user-items:v1";
 
@@ -18,6 +18,31 @@ function browserStorage(): StorageLike | null {
 function numberOrZero(value: unknown) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : 0;
+}
+
+function normalizeComparableSale(value: unknown, index: number): ComparableSale | null {
+  if (!value || typeof value !== "object") return null;
+
+  const sale = value as Partial<ComparableSale>;
+  const price = numberOrZero(sale.price);
+  const label = typeof sale.label === "string" ? sale.label.trim() : "";
+  const tradeDate = typeof sale.tradeDate === "string" ? sale.tradeDate : "";
+  const area = numberOrZero(sale.area);
+  const floor = typeof sale.floor === "string" ? sale.floor.trim() : "";
+  const memo = typeof sale.memo === "string" ? sale.memo.trim() : "";
+
+  if (!label && !tradeDate && !area && !floor && !price && !memo) return null;
+  if (price <= 0) return null;
+
+  return {
+    id: typeof sale.id === "string" && sale.id ? sale.id : `comp-${index + 1}`,
+    label,
+    tradeDate,
+    area,
+    floor,
+    price,
+    memo,
+  };
 }
 
 function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
@@ -76,6 +101,12 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
       ? item.notes.filter((note): note is string => typeof note === "string")
       : [],
     userMemo: typeof item.userMemo === "string" ? item.userMemo : "",
+    comparableSales: Array.isArray(item.comparableSales)
+      ? item.comparableSales
+          .map((sale, index) => normalizeComparableSale(sale, index))
+          .filter((sale): sale is ComparableSale => Boolean(sale))
+          .slice(0, 3)
+      : [],
   };
 }
 

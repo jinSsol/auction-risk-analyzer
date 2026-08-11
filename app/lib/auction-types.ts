@@ -2,6 +2,16 @@ export type PropertyType = "아파트" | "빌라" | "오피스텔";
 export type SaleChannel = "경매" | "공매";
 export type RiskLevel = "안정" | "주의" | "위험";
 
+export type ComparableSale = {
+  id: string;
+  label: string;
+  tradeDate: string;
+  area: number;
+  floor: string;
+  price: number;
+  memo: string;
+};
+
 export type AuctionItem = {
   id: string;
   channel: SaleChannel;
@@ -31,4 +41,5 @@ export type AuctionItem = {
   occupancy: "명도 쉬움" | "협의 필요" | "명도 난이도 높음";
   notes: string[];
   userMemo?: string;
+  comparableSales?: ComparableSale[];
 };

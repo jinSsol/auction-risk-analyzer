@@ -241,21 +241,21 @@ Goal: make the manually saved property useful for real pre-bid review.
 
 Comparable trade fields:
 
-- [ ] Label or complex name
-- [ ] Trade date
-- [ ] Area
-- [ ] Floor
-- [ ] Price
-- [ ] Difference memo
+- [x] Label or complex name
+- [x] Trade date
+- [x] Area
+- [x] Floor
+- [x] Price
+- [x] Difference memo
 
 Tasks:
 
-- [ ] Add 1-3 comparable trade cards to the creation/edit flow.
-- [ ] Show comparable trade summary on detail page.
-- [ ] Calculate average price.
-- [ ] Calculate low/high range.
-- [ ] Compare user-entered market price with comparable average.
-- [ ] Show `시세 근거 부족` when no comparable data exists.
+- [x] Add 1-3 comparable trade cards to the creation/edit flow.
+- [x] Show comparable trade summary on detail page.
+- [x] Calculate average price.
+- [x] Calculate low/high range.
+- [x] Compare user-entered market price with comparable average.
+- [x] Show `시세 근거 부족` when no comparable data exists.
 
 Completion criteria:
 

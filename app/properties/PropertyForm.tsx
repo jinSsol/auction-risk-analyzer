@@ -10,7 +10,7 @@ import {
   upsertUserAuctionItem,
   type UserAuctionItem,
 } from "../lib/auction-storage";
-import type { AuctionItem, PropertyType, SaleChannel } from "../lib/auction-types";
+import type { AuctionItem, ComparableSale, PropertyType, SaleChannel } from "../lib/auction-types";
 
 type FormMode = "create" | "edit";
 type StepId = 0 | 1 | 2 | 3;
@@ -40,6 +40,17 @@ type Draft = {
   taxRisk: boolean;
   occupancy: AuctionItem["occupancy"];
   userMemo: string;
+  comparableSales: ComparableSaleDraft[];
+};
+
+type ComparableSaleDraft = {
+  id: string;
+  label: string;
+  tradeDate: string;
+  area: string;
+  floor: string;
+  price: string;
+  memo: string;
 };
 
 const emptyDraft: Draft = {
@@ -67,6 +78,7 @@ const emptyDraft: Draft = {
   taxRisk: false,
   occupancy: "협의 필요",
   userMemo: "",
+  comparableSales: createEmptyComparableSaleDrafts(),
 };
 
 const steps = ["출처", "기본 정보", "가격", "점유·메모"];
@@ -337,6 +349,19 @@ function BasicStep({ draft, update }: StepProps) {
 }
 
 function PriceStep({ draft, update }: StepProps) {
+  function updateComparableSale<K extends keyof ComparableSaleDraft>(
+    index: number,
+    key: K,
+    value: ComparableSaleDraft[K]
+  ) {
+    update(
+      "comparableSales",
+      draft.comparableSales.map((sale, saleIndex) =>
+        saleIndex === index ? { ...sale, [key]: value } : sale
+      )
+    );
+  }
+
   return (
     <div className="grid gap-4">
       <p className="rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-medium text-[#255C99]">
@@ -349,6 +374,30 @@ function PriceStep({ draft, update }: StepProps) {
         <TextInput label="최근 실거래" value={draft.lastTrade} onChange={(value) => update("lastTrade", value)} inputMode="numeric" placeholder="129500" />
       </div>
       <TextInput label="유찰 횟수" value={draft.failedBids} onChange={(value) => update("failedBids", value)} inputMode="numeric" placeholder="0" />
+      <div className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold text-[#17211D]">비교 실거래</h2>
+            <p className="mt-1 text-xs leading-5 text-[#66736D]">
+              비슷한 단지·면적의 최근 거래를 최대 3개까지 남겨두면 상세에서
+              입력 시세의 근거를 비교합니다.
+            </p>
+          </div>
+          <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
+            선택 입력
+          </span>
+        </div>
+        <div className="mt-4 grid gap-3">
+          {draft.comparableSales.map((sale, index) => (
+            <ComparableSaleCard
+              key={sale.id}
+              index={index}
+              sale={sale}
+              update={updateComparableSale}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -404,6 +453,73 @@ type StepProps = {
   draft: Draft;
   update: <K extends keyof Draft>(key: K, value: Draft[K]) => void;
 };
+
+function ComparableSaleCard({
+  index,
+  sale,
+  update,
+}: {
+  index: number;
+  sale: ComparableSaleDraft;
+  update: <K extends keyof ComparableSaleDraft>(
+    index: number,
+    key: K,
+    value: ComparableSaleDraft[K]
+  ) => void;
+}) {
+  return (
+    <div className="rounded-lg border border-[#E5ECE8] bg-white p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold text-[#66736D]">실거래 {index + 1}</p>
+        {sale.price ? (
+          <span className="rounded-full bg-[#EEF3F1] px-2 py-0.5 text-xs font-semibold text-[#34423C]">
+            {sale.price}만
+          </span>
+        ) : null}
+      </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <TextInput
+          label="단지/라벨"
+          value={sale.label}
+          onChange={(value) => update(index, "label", value)}
+          placeholder="예: 같은 단지 84A"
+        />
+        <TextInput
+          label="거래일"
+          value={sale.tradeDate}
+          onChange={(value) => update(index, "tradeDate", value)}
+          type="date"
+        />
+        <TextInput
+          label="면적(㎡)"
+          value={sale.area}
+          onChange={(value) => update(index, "area", value)}
+          inputMode="decimal"
+          placeholder="84.9"
+        />
+        <TextInput
+          label="층수"
+          value={sale.floor}
+          onChange={(value) => update(index, "floor", value)}
+          placeholder="12층"
+        />
+        <TextInput
+          label="거래가"
+          value={sale.price}
+          onChange={(value) => update(index, "price", value)}
+          inputMode="numeric"
+          placeholder="129500"
+        />
+        <TextInput
+          label="차이 메모"
+          value={sale.memo}
+          onChange={(value) => update(index, "memo", value)}
+          placeholder="층 낮음, 수리 상태 좋음"
+        />
+      </div>
+    </div>
+  );
+}
 
 const inputClass =
   "h-11 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#D8F1E4]";
@@ -544,6 +660,7 @@ function itemFromDraft(draft: Draft): Omit<UserAuctionItem, "id" | "source" | "c
     occupancy: draft.occupancy,
     notes: memo ? [memo] : ["직접 등록한 물건입니다."],
     userMemo: memo,
+    comparableSales: comparableSalesFromDraft(draft.comparableSales),
   };
 }
 
@@ -573,7 +690,51 @@ function draftFromItem(item: UserAuctionItem): Draft {
     taxRisk: item.taxRisk,
     occupancy: item.occupancy,
     userMemo: item.userMemo ?? item.notes.join("\n"),
+    comparableSales: comparableSalesToDraft(item.comparableSales ?? []),
   };
+}
+
+function createEmptyComparableSaleDrafts(): ComparableSaleDraft[] {
+  return [0, 1, 2].map((index) => ({
+    id: `comp-${index + 1}`,
+    label: "",
+    tradeDate: "",
+    area: "",
+    floor: "",
+    price: "",
+    memo: "",
+  }));
+}
+
+function comparableSalesFromDraft(sales: ComparableSaleDraft[]): ComparableSale[] {
+  return sales
+    .map((sale, index) => ({
+      id: sale.id || `comp-${index + 1}`,
+      label: sale.label.trim(),
+      tradeDate: sale.tradeDate,
+      area: toNumber(sale.area),
+      floor: sale.floor.trim(),
+      price: toNumber(sale.price),
+      memo: sale.memo.trim(),
+    }))
+    .filter((sale) => sale.price > 0)
+    .slice(0, 3);
+}
+
+function comparableSalesToDraft(sales: ComparableSale[]): ComparableSaleDraft[] {
+  const drafts = createEmptyComparableSaleDrafts();
+  sales.slice(0, 3).forEach((sale, index) => {
+    drafts[index] = {
+      id: sale.id || `comp-${index + 1}`,
+      label: sale.label,
+      tradeDate: sale.tradeDate,
+      area: sale.area ? String(sale.area) : "",
+      floor: sale.floor,
+      price: sale.price ? String(sale.price) : "",
+      memo: sale.memo,
+    };
+  });
+  return drafts;
 }
 
 function toNumber(value: string) {

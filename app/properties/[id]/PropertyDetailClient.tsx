@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { items } from "../../auction-data";
-import { analyze, percent, uk } from "../../lib/auction-analysis";
+import { analyze, analyzeComparableSales, percent, uk } from "../../lib/auction-analysis";
 import { mergeAuctionItems } from "../../lib/auction-merge";
 import { deleteUserAuctionItem, loadUserAuctionItems, saveUserAuctionItems, type UserAuctionItem } from "../../lib/auction-storage";
 import type { RiskLevel, SaleChannel } from "../../lib/auction-types";
@@ -72,6 +72,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
   const acquisitionCosts = Math.round(analysis.plannedBid * 0.035);
   const repairReserve = Math.round(item.market * 0.04);
   const totalWithBuffer = analysis.allIn + acquisitionCosts + repairReserve;
+  const comparableAnalysis = analyzeComparableSales(item);
 
   return (
     <main className="app-shell min-h-screen text-[#17211D]">
@@ -166,6 +167,45 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <Info label="예상 입찰" value={uk(analysis.plannedBid)} />
               <Info label="총투입 예상" value={uk(totalWithBuffer)} />
             </div>
+          </section>
+
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">시세 근거</h2>
+                <p className="mt-1 text-sm text-[#66736D]">
+                  직접 입력한 비교 실거래로 예상 시세가 무리 없는지 확인합니다.
+                </p>
+              </div>
+              <MarketVerdict value={comparableAnalysis.verdict} />
+            </div>
+
+            {comparableAnalysis.count === 0 ? (
+              <div className="mt-5 rounded-lg border border-[#F3D083] bg-[#FFF4D7] p-4 text-sm leading-6 text-[#8A5B00]">
+                시세 근거 부족: 가격 단계에서 비슷한 실거래를 1개 이상 입력하면
+                평균가와 예상 시세 차이를 비교할 수 있습니다.
+              </div>
+            ) : (
+              <>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <Info label="비교 거래 수" value={`${comparableAnalysis.count}건`} />
+                  <Info label="평균 거래가" value={uk(comparableAnalysis.average)} />
+                  <Info
+                    label="거래가 범위"
+                    value={`${uk(comparableAnalysis.low)} ~ ${uk(comparableAnalysis.high)}`}
+                  />
+                  <Info
+                    label="입력 시세 차이"
+                    value={`${comparableAnalysis.marketGap >= 0 ? "+" : ""}${uk(comparableAnalysis.marketGap)}`}
+                  />
+                </div>
+                <div className="mt-4 grid gap-3 md:grid-cols-3">
+                  {(item.comparableSales ?? []).map((sale) => (
+                    <ComparableSaleSummary key={sale.id} sale={sale} />
+                  ))}
+                </div>
+              </>
+            )}
           </section>
 
           <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
@@ -325,6 +365,52 @@ function CheckCard({ title, value }: { title: string; value: string }) {
       <p className="text-xs font-semibold text-[#66736D]">{title}</p>
       <p className="mt-1 font-semibold text-[#17211D]">{value}</p>
     </div>
+  );
+}
+
+function ComparableSaleSummary({
+  sale,
+}: {
+  sale: NonNullable<UserAuctionItem["comparableSales"]>[number];
+}) {
+  return (
+    <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-[#17211D]">
+            {sale.label || "비교 실거래"}
+          </p>
+          <p className="mt-1 text-xs font-medium text-[#66736D]">
+            {[sale.tradeDate, sale.area ? `${sale.area}㎡` : "", sale.floor]
+              .filter(Boolean)
+              .join(" · ") || "세부 정보 미입력"}
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold tabular-nums text-[#1F8A5B]">
+          {uk(sale.price)}
+        </span>
+      </div>
+      {sale.memo ? (
+        <p className="mt-3 text-xs leading-5 text-[#66736D]">{sale.memo}</p>
+      ) : null}
+    </div>
+  );
+}
+
+function MarketVerdict({ value }: { value: string }) {
+  const style =
+    value === "입력 시세 적정"
+      ? "bg-[#E7F6EE] text-[#1F8A5B]"
+      : value === "입력 시세 보수적"
+        ? "bg-[#E7F0FF] text-[#255C99]"
+        : value === "입력 시세 높음"
+          ? "bg-[#FFF4D7] text-[#8A5B00]"
+          : "bg-[#FDE8E5] text-[#B53A2E]";
+
+  return (
+    <span className={`rounded-full px-3 py-1 text-sm font-semibold ${style}`}>
+      {value}
+    </span>
   );
 }
 
