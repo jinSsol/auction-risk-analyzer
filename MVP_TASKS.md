@@ -434,15 +434,22 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Check listing page on mobile viewport.
-- [ ] Check detail page on mobile viewport.
-- [ ] Check property form on mobile viewport.
-- [ ] Check comparison basket on mobile viewport.
-- [ ] Fix text overflow or cramped controls.
+- [x] Check listing page on mobile viewport.
+- [x] Check detail page on mobile viewport.
+- [x] Check property form on mobile viewport.
+- [x] Check comparison basket on mobile viewport.
+- [x] Fix text overflow or cramped controls.
 
 Completion criteria:
 
 - Main flows are usable on a phone-sized viewport.
+
+Verification notes:
+
+- Browser-verified listing, detail, and new-property form at a 390px mobile viewport.
+- Confirmed no horizontal overflow on listing, detail, or form pages.
+- Confirmed comparison basket renders with saved cards, verdicts, margin, and unknown-count fields on mobile.
+- Reduced mobile hero heading size and improved numeric/card text wrapping for tighter screens.
 
 ### 4.5 MVP Release Checklist
 

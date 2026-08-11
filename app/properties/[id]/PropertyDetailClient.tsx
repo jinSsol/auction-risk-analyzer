@@ -130,7 +130,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                   {item.caseNo}
                 </span>
               </div>
-              <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
+              <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
                 {item.title}
               </h1>
               <p className="mt-3 text-sm font-medium leading-6 text-[#66736D] md:text-base">
@@ -147,7 +147,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
               </div>
               <div className="mt-4 flex items-end justify-between gap-3">
                 <span className="text-sm font-medium text-[#34423C]">추천 상한가</span>
-                <span className="text-3xl font-semibold tabular-nums text-[#17211D]">
+                <span className="break-words text-2xl font-semibold tabular-nums text-[#17211D] sm:text-3xl">
                   {uk(analysis.suggested)}
                 </span>
               </div>
@@ -597,7 +597,7 @@ function DecisionStat({
   return (
     <div className={`rounded-lg border p-4 ${styles[tone]}`}>
       <p className="text-xs font-semibold opacity-75">{label}</p>
-      <p className="mt-1 text-lg font-semibold tabular-nums">{value}</p>
+      <p className="mt-1 break-words text-lg font-semibold tabular-nums">{value}</p>
       <p className="mt-1 text-xs font-medium leading-5 opacity-80">{helper}</p>
     </div>
   );
@@ -647,7 +647,7 @@ function Info({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-4">
       <p className="text-xs font-semibold text-[#66736D]">{label}</p>
-      <p className="mt-1 text-xl font-semibold tabular-nums text-[#17211D]">{value}</p>
+      <p className="mt-1 break-words text-xl font-semibold tabular-nums text-[#17211D]">{value}</p>
     </div>
   );
 }
@@ -656,7 +656,7 @@ function CostLine({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm">
       <span className="font-medium text-[#66736D]">{label}</span>
-      <span className="font-semibold tabular-nums text-[#17211D]">{value}</span>
+      <span className="break-words text-right font-semibold tabular-nums text-[#17211D]">{value}</span>
     </div>
   );
 }
@@ -811,7 +811,7 @@ function MiniLine({
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
       <span className="font-medium text-[#66736D]">{label}</span>
-      <span className={strong ? "text-lg font-semibold tabular-nums text-[#1F8A5B]" : "font-semibold tabular-nums text-[#17211D]"}>
+      <span className={strong ? "break-words text-right text-lg font-semibold tabular-nums text-[#1F8A5B]" : "break-words text-right font-semibold tabular-nums text-[#17211D]"}>
         {value}
       </span>
     </div>

@@ -225,7 +225,7 @@ export function PropertyForm({
               <span className="h-1.5 w-1.5 rounded-full bg-[#1F8A5B] shadow-[0_0_0_4px_rgba(31,138,91,0.12)]" />
               {mode === "edit" ? "내 물건 수정" : "새 물건 등록"}
             </p>
-            <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-normal text-[#17211D]">
+            <h1 className="mt-5 text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-4xl">
               공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요.
             </h1>
             <p className="mt-3 text-sm leading-6 text-[#66736D]">
@@ -298,18 +298,18 @@ export function PropertyForm({
             >
               이전
             </button>
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:justify-end">
               {step < 3 ? (
                 <button
                   onClick={goNext}
-                  className="button-lift h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E]"
+                  className="button-lift h-11 w-full rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E] sm:w-auto"
                 >
                   다음
                 </button>
               ) : (
                 <button
                   onClick={submit}
-                  className="button-lift h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E]"
+                  className="button-lift h-11 w-full rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E] sm:w-auto"
                 >
                   저장하고 상세 보기
                 </button>

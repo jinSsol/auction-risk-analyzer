@@ -104,7 +104,7 @@ export default function Home() {
                 <span className="h-1.5 w-1.5 rounded-full bg-[#1F8A5B] shadow-[0_0_0_4px_rgba(31,138,91,0.12)]" />
                 권리 리스크 · 입찰가 분석
               </p>
-              <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
+              <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
                 경매·공매 물건의 권리 리스크와 입찰 상한을 한 화면에서 비교하세요.
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-[#66736D]">
@@ -326,7 +326,7 @@ function InlineFilter({
           <button
             key={option}
             onClick={() => onChange(option)}
-            className={`min-w-14 rounded-md px-3 py-1.5 text-sm transition ${
+            className={`min-h-9 min-w-14 rounded-md px-3 py-1.5 text-sm transition ${
               value === option
                 ? "bg-white font-semibold text-[#17211D] shadow-[0_4px_12px_rgba(23,33,29,0.08)]"
                 : "font-medium text-[#66736D] hover:bg-white/70"
@@ -518,7 +518,7 @@ function PriceStat({
     <div className="min-w-0 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
       <p className="text-xs font-semibold text-[#66736D]">{label}</p>
       <p
-        className={`mt-1 truncate text-base font-semibold tabular-nums ${
+        className={`mt-1 break-words text-base font-semibold tabular-nums ${
           danger
             ? "text-[#B53A2E]"
             : strong
@@ -654,7 +654,7 @@ function MiniStat({
   return (
     <div>
       <p className="text-xs font-bold text-[#66736D]">{label}</p>
-      <p className={`mt-0.5 font-semibold tabular-nums ${danger ? "text-[#B53A2E]" : "text-[#17211D]"}`}>
+      <p className={`mt-0.5 break-words font-semibold tabular-nums ${danger ? "text-[#B53A2E]" : "text-[#17211D]"}`}>
         {value}
       </p>
     </div>
