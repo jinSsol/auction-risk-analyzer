@@ -1,4 +1,5 @@
-import type { AuctionItem, RiskLevel } from "./auction-types";
+import type { AuctionItem, RightsChecklistAnswer, RightsChecklistId, RiskLevel } from "./auction-types";
+import { summarizeRightsChecklist } from "./rights-checklist";
 
 export const won = new Intl.NumberFormat("ko-KR");
 
@@ -10,40 +11,71 @@ export function percent(value: number) {
   return `${Math.round(value)}%`;
 }
 
+type RiskFactor = {
+  label: string;
+  points: number;
+  severity: "caution" | "danger";
+};
+
+function addRiskFactor(
+  factors: RiskFactor[],
+  label: string,
+  points: number,
+  severity: RiskFactor["severity"] = "caution"
+) {
+  factors.push({ label, points, severity });
+}
+
 export function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number) {
   let risk = 8;
-  const flags: string[] = [];
+  const riskFactors: RiskFactor[] = [];
+  const expertTriggers: string[] = [];
 
   if (item.tenant === "대항력 가능") {
-    risk += 28;
-    flags.push("대항력 임차인 가능성");
+    addRiskFactor(riskFactors, "대항력 임차인 가능성", 28, "danger");
+    expertTriggers.push("선순위 임차인 가능성");
   } else if (item.tenant === "확인 필요") {
-    risk += 14;
-    flags.push("전입/확정일자 확인 필요");
+    addRiskFactor(riskFactors, "전입/확정일자 확인 필요", 14);
   } else if (item.tenant === "전입 있음") {
-    risk += 8;
-    flags.push("임차인 명도 협의 필요");
+    addRiskFactor(riskFactors, "임차인 명도 협의 필요", 8);
   }
 
   if (item.takeoverAmount > 0) {
-    risk += 22;
-    flags.push(`인수 추정 ${uk(item.takeoverAmount)}`);
+    addRiskFactor(riskFactors, `인수 추정 ${uk(item.takeoverAmount)}`, 22, "danger");
+    expertTriggers.push("인수금 존재");
   }
   if (item.liens) {
-    risk += 22;
-    flags.push("유치권 신고");
+    addRiskFactor(riskFactors, "유치권 신고", 22, "danger");
+    expertTriggers.push("유치권 신고");
   }
   if (item.illegalBuilding) {
-    risk += 14;
-    flags.push("위반건축물 확인");
+    addRiskFactor(riskFactors, "위반건축물 확인", 14, "danger");
+    expertTriggers.push("위반건축물 가능성");
   }
   if (item.taxRisk) {
-    risk += 10;
-    flags.push("체납/관리비 리스크");
+    addRiskFactor(riskFactors, "체납/관리비 리스크", 10);
   }
-  if (item.occupancy === "명도 난이도 높음") risk += 12;
-  if (item.failedBids >= 3) risk += 8;
-  if (item.minimum / item.market > 0.85) risk += 6;
+  if (item.occupancy === "명도 난이도 높음") {
+    addRiskFactor(riskFactors, "명도 난이도 높음", 12);
+  }
+  if (item.failedBids >= 3) {
+    addRiskFactor(riskFactors, "유찰 3회 이상", 8);
+  }
+  if (item.minimum / item.market > 0.85) {
+    addRiskFactor(riskFactors, "최저가가 시세 대비 높음", 6);
+  }
+
+  const checklistSummary = summarizeRightsChecklist(item.rightsChecklist);
+  const checklistFactors = analyzeRightsChecklistAnswers(
+    checklistSummary.answers,
+    item.channel
+  );
+  checklistFactors.riskFactors.forEach((factor) => riskFactors.push(factor));
+  checklistFactors.expertTriggers.forEach((trigger) => {
+    if (!expertTriggers.includes(trigger)) expertTriggers.push(trigger);
+  });
+
+  risk += riskFactors.reduce((total, factor) => total + factor.points, 0);
 
   const cappedRisk = Math.min(96, risk);
   const level: RiskLevel =
@@ -60,14 +92,17 @@ export function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number
   const marginRate = (margin / item.market) * 100;
   const minGap = plannedBid - item.minimum;
   const verdict =
-    level === "위험"
-      ? "보류"
+    expertTriggers.length > 0 || level === "위험"
+      ? "전문가 검토"
       : plannedBid <= suggested && marginRate >= 12
         ? "입찰 검토"
         : "가격 조정";
+  const flags = riskFactors.map((factor) => factor.label);
 
   return {
     flags,
+    riskFactors,
+    expertTriggers,
     risk: cappedRisk,
     level,
     suggested,
@@ -80,6 +115,82 @@ export function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number
     saleRatio: (item.minimum / item.appraised) * 100,
     marketRatio: (item.minimum / item.market) * 100,
   };
+}
+
+function analyzeRightsChecklistAnswers(
+  answers: Record<RightsChecklistId, RightsChecklistAnswer>,
+  channel: AuctionItem["channel"]
+) {
+  const riskFactors: RiskFactor[] = [];
+  const expertTriggers: string[] = [];
+
+  const add = (
+    label: string,
+    points: number,
+    severity: RiskFactor["severity"] = "caution",
+    expertTrigger?: string
+  ) => {
+    riskFactors.push({ label, points, severity });
+    if (expertTrigger) expertTriggers.push(expertTrigger);
+  };
+
+  if (answers.occupancyTenant === "예") {
+    add("점유자 있음", 8);
+  } else if (answers.occupancyTenant === "모름") {
+    add("점유자 확인 필요", 4);
+  }
+
+  if (answers.moveInFixedDate === "예") {
+    add("전입/확정일자 선순위 가능", 18, "danger", "선순위 임차인 가능성");
+  } else if (answers.moveInFixedDate === "모름") {
+    add("전입/확정일자 확인 필요", 8);
+  }
+
+  if (answers.seniorTenantDeposit === "예") {
+    add("선순위 보증금 가능성", 24, "danger", "선순위 보증금 가능성");
+  } else if (answers.seniorTenantDeposit === "모름") {
+    add("선순위 보증금 확인 필요", 8);
+  }
+
+  if (answers.distributionDemand === "아니요") {
+    add("배당요구 미확인", 10);
+  } else if (answers.distributionDemand === "모름") {
+    add("배당요구 여부 확인 필요", 6);
+  }
+
+  if (answers.baselineRight === "아니요") {
+    add("말소기준권리 미확인", 16, "danger", "말소되지 않는 권리 가능성");
+  } else if (answers.baselineRight === "모름") {
+    add("말소기준권리 확인 필요", 8);
+  }
+
+  if (answers.lienClaim === "예") {
+    add("유치권 주장 가능성", 24, "danger", "유치권 신고");
+  } else if (answers.lienClaim === "모름") {
+    add("유치권 여부 확인 필요", 8);
+  }
+
+  if (answers.illegalBuildingUse === "예") {
+    add("건축물 이슈 가능성", 16, "danger", "위반건축물 가능성");
+  } else if (answers.illegalBuildingUse === "모름") {
+    add("건축물대장 확인 필요", 6);
+  }
+
+  if (answers.unpaidFees === "예") {
+    add("체납/관리비 승계 가능성", 10);
+  } else if (answers.unpaidFees === "모름") {
+    add("체납/관리비 확인 필요", 5);
+  }
+
+  if (channel === "공매") {
+    if (answers.publicSaleTransfer === "아니요") {
+      add("공매 인도조건 불명확", 16, "danger", "공매 인도·이전 조건 불명확");
+    } else if (answers.publicSaleTransfer === "모름") {
+      add("공매 인도조건 확인 필요", 10, "danger", "공매 인도·이전 조건 불명확");
+    }
+  }
+
+  return { riskFactors, expertTriggers };
 }
 
 export function analyzeComparableSales(item: AuctionItem) {

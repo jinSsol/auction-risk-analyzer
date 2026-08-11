@@ -146,9 +146,11 @@ export default function Home() {
           />
           <InlineFilter
             title="판단"
-            options={["전체", "안정", "주의", "위험"]}
-            value={level}
-            onChange={(value) => setLevel(value as RiskLevel | "전체")}
+            options={["전체", "검토 쉬움", "주의", "위험"]}
+            value={level === "안정" ? "검토 쉬움" : level}
+            onChange={(value) =>
+              setLevel(value === "검토 쉬움" ? "안정" : (value as RiskLevel | "전체"))
+            }
           />
           <InlineFilter
             title="구분"
@@ -552,9 +554,10 @@ function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
     주의: "bg-[#FFF4D7] text-[#8A5B00]",
     위험: "bg-[#FDE8E5] text-[#B53A2E]",
   };
+  const label = level === "안정" ? "검토 쉬움" : level;
   return (
     <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles[level]}`}>
-      {level} · {score}점
+      {label} · {score}점
     </span>
   );
 }

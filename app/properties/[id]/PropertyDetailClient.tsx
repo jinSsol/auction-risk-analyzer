@@ -277,6 +277,23 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
           <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-xl font-semibold">조심해서 볼 포인트</h2>
+            {analysis.expertTriggers.length > 0 ? (
+              <div className="mt-4 rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] p-4">
+                <p className="text-sm font-semibold text-[#B53A2E]">
+                  전문가 검토 권장
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {analysis.expertTriggers.map((trigger) => (
+                    <span
+                      key={trigger}
+                      className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#B53A2E]"
+                    >
+                      {trigger}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <div className="mt-4 flex flex-wrap gap-2">
               {analysis.flags.length === 0 ? (
                 <span className="rounded-full bg-[#E7F6EE] px-3 py-1.5 text-sm font-semibold text-[#1F8A5B]">
@@ -293,6 +310,18 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 ))
               )}
             </div>
+            {analysis.riskFactors.length > 0 ? (
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {analysis.riskFactors.map((factor) => (
+                  <RiskFactorCard
+                    key={`${factor.label}-${factor.points}`}
+                    label={factor.label}
+                    points={factor.points}
+                    severity={factor.severity}
+                  />
+                ))}
+              </div>
+            ) : null}
             <ul className="mt-4 space-y-2 text-sm leading-6 text-[#66736D]">
               {item.notes.map((note) => (
                 <li key={note}>{note}</li>
@@ -368,9 +397,10 @@ function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
     주의: "bg-[#FFF4D7] text-[#8A5B00]",
     위험: "bg-[#FDE8E5] text-[#B53A2E]",
   };
+  const label = level === "안정" ? "검토 쉬움" : level;
   return (
     <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles[level]}`}>
-      {level} · {score}점
+      {label} · {score}점
     </span>
   );
 }
@@ -419,6 +449,32 @@ function CheckCard({ title, value }: { title: string; value: string }) {
     <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-4">
       <p className="text-xs font-semibold text-[#66736D]">{title}</p>
       <p className="mt-1 font-semibold text-[#17211D]">{value}</p>
+    </div>
+  );
+}
+
+function RiskFactorCard({
+  label,
+  points,
+  severity,
+}: {
+  label: string;
+  points: number;
+  severity: "caution" | "danger";
+}) {
+  const style =
+    severity === "danger"
+      ? "border-[#F2B8AE] bg-[#FDE8E5] text-[#B53A2E]"
+      : "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]";
+
+  return (
+    <div className={`rounded-lg border p-3 ${style}`}>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold">{label}</p>
+        <span className="shrink-0 rounded-full bg-white/75 px-2.5 py-1 text-xs font-semibold tabular-nums">
+          +{points}점
+        </span>
+      </div>
     </div>
   );
 }

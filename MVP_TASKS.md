@@ -301,11 +301,11 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Extend `analyze()` to accept checklist/risk inputs.
-- [ ] Add risk factors with labels and points.
-- [ ] Treat `모름` as caution.
-- [ ] Add hard triggers for expert review.
-- [ ] Replace user-facing `안정` wording with `검토 쉬움` where appropriate.
+- [x] Extend `analyze()` to accept checklist/risk inputs.
+- [x] Add risk factors with labels and points.
+- [x] Treat `모름` as caution.
+- [x] Add hard triggers for expert review.
+- [x] Replace user-facing `안정` wording with `검토 쉬움` where appropriate.
 
 Suggested hard triggers:
 
