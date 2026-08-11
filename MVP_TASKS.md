@@ -381,6 +381,83 @@ Verification notes:
 - Edited repair budget and confirmed all-in cost changed from 103,750만 to 104,550만.
 - Added the user property to a comparison basket with sample properties and confirmed refresh persistence.
 
+## Phase 4: MVP Trust And Launch Readiness
+
+Goal:
+
+- Make the MVP feel trustworthy enough for first users before expanding into real-time data, AI automation, or native apps.
+
+### 4.1 Add Decision Summary Layer
+
+Tasks:
+
+- [x] Add a top detail-page decision summary card.
+- [x] Show risk level in plain language.
+- [x] Show price attractiveness.
+- [x] Show bid headroom against the recommended ceiling.
+- [x] Show checklist completion/unknown count.
+- [x] Show 2-3 core risk reasons.
+
+Completion criteria:
+
+- User can understand the property's main judgment within 5 seconds.
+- Summary explains risk/cost without sounding like investment advice.
+
+### 4.2 Add Legal/Storage Guidance
+
+Tasks:
+
+- [ ] Add non-advice disclaimer copy.
+- [ ] Explain final documents to verify.
+- [ ] Explain browser/local device storage.
+- [ ] Add guidance near save/delete flows.
+
+Completion criteria:
+
+- User understands the app is an analysis aid, not legal or investment advice.
+- User understands saved data is stored in the current browser for MVP.
+
+### 4.3 Strengthen Calculation Tests
+
+Tasks:
+
+- [ ] Add unit tests for risk scoring.
+- [ ] Add unit tests for checklist unknown/caution effects.
+- [ ] Add unit tests for all-in cost and bid ceiling.
+- [ ] Add tests for comparable-sale verdicts.
+
+Completion criteria:
+
+- Core analysis logic is protected independent of page rendering tests.
+
+### 4.4 Mobile MVP QA
+
+Tasks:
+
+- [ ] Check listing page on mobile viewport.
+- [ ] Check detail page on mobile viewport.
+- [ ] Check property form on mobile viewport.
+- [ ] Check comparison basket on mobile viewport.
+- [ ] Fix text overflow or cramped controls.
+
+Completion criteria:
+
+- Main flows are usable on a phone-sized viewport.
+
+### 4.5 MVP Release Checklist
+
+Tasks:
+
+- [ ] Write release checklist.
+- [ ] Write first-user test script.
+- [ ] Write MVP release notes.
+- [ ] Re-run deployed URL smoke test.
+- [ ] Decide PWA readiness scope.
+
+Completion criteria:
+
+- MVP can be shared with first testers with known caveats.
+
 ## Deferred Until After MVP
 
 - Real court auction data integration

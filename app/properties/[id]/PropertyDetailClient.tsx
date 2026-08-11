@@ -10,7 +10,7 @@ import {
   RIGHTS_CHECKLIST_ITEMS,
   summarizeRightsChecklist,
 } from "../../lib/rights-checklist";
-import type { RightsChecklistAnswer, RiskLevel, SaleChannel } from "../../lib/auction-types";
+import type { AuctionItem, RightsChecklistAnswer, RiskLevel, SaleChannel } from "../../lib/auction-types";
 
 export function PropertyDetailClient({ id }: { id: string }) {
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
@@ -75,6 +75,12 @@ export function PropertyDetailClient({ id }: { id: string }) {
   const analysis = analyze(item, 78, 4);
   const comparableAnalysis = analyzeComparableSales(item);
   const rightsSummary = summarizeRightsChecklist(item.rightsChecklist);
+  const priceSignal = getPriceSignal(item, analysis, comparableAnalysis.verdict);
+  const bidHeadroom = analysis.suggested - analysis.plannedBid;
+  const coreRiskReasons = analysis.riskFactors
+    .filter((factor) => factor.severity === "danger")
+    .concat(analysis.riskFactors.filter((factor) => factor.severity !== "danger"))
+    .slice(0, 3);
 
   return (
     <main className="app-shell min-h-screen text-[#17211D]">
@@ -151,6 +157,79 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[1fr_360px] lg:px-8">
         <div className="space-y-5">
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold text-[#1F8A5B]">
+                  5초 판단 요약
+                </p>
+                <h2 className="mt-1 text-xl font-semibold">
+                  이 물건은 {getDecisionHeadline(analysis.verdict)}
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-[#66736D]">
+                  입력한 시세, 권리 체크, 비용 가정을 기준으로 정리한 참고 요약입니다.
+                  최종 입찰 전 원문 서류와 전문가 확인이 필요합니다.
+                </p>
+              </div>
+              <Verdict value={analysis.verdict} />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <DecisionStat
+                label="위험도"
+                value={analysis.level === "안정" ? "검토 쉬움" : analysis.level}
+                helper={`${analysis.risk}점 · ${riskPlainText[analysis.level]}`}
+                tone={analysis.level === "위험" ? "danger" : analysis.level === "주의" ? "caution" : "good"}
+              />
+              <DecisionStat
+                label="가격 매력도"
+                value={priceSignal.label}
+                helper={priceSignal.helper}
+                tone={priceSignal.tone}
+              />
+              <DecisionStat
+                label="입찰 여유"
+                value={bidHeadroom >= 0 ? `${uk(bidHeadroom)} 여유` : `${uk(Math.abs(bidHeadroom))} 초과`}
+                helper={`추천 상한 ${uk(analysis.suggested)} 기준`}
+                tone={bidHeadroom >= 0 ? "good" : "danger"}
+              />
+              <DecisionStat
+                label="권리 확인"
+                value={`${rightsSummary.completedCount}/${rightsSummary.totalCount} 완료`}
+                helper={
+                  rightsSummary.unknownCount > 0
+                    ? `모름 ${rightsSummary.unknownCount}개 남음`
+                    : "미확인 항목 없음"
+                }
+                tone={rightsSummary.unknownCount >= 4 ? "caution" : "good"}
+              />
+            </div>
+            <div className="mt-5 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-4">
+              <p className="text-sm font-semibold text-[#17211D]">
+                먼저 볼 핵심 리스크
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {coreRiskReasons.length === 0 ? (
+                  <span className="rounded-full bg-[#E7F6EE] px-3 py-1.5 text-sm font-semibold text-[#1F8A5B]">
+                    큰 체크 포인트 없음
+                  </span>
+                ) : (
+                  coreRiskReasons.map((factor, index) => (
+                    <span
+                      key={`${factor.label}-${index}`}
+                      className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+                        factor.severity === "danger"
+                          ? "bg-[#FDE8E5] text-[#B53A2E]"
+                          : "bg-[#FFF4D7] text-[#8A5B00]"
+                      }`}
+                    >
+                      {factor.label}
+                    </span>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
+
           <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -468,6 +547,81 @@ const riskAccent: Record<RiskLevel, string> = {
   주의: "bg-[#B7791F]",
   위험: "bg-[#DC2626]",
 };
+
+const riskPlainText: Record<RiskLevel, string> = {
+  안정: "확인할 변수가 비교적 적음",
+  주의: "남은 확인 항목이 있음",
+  위험: "전문가 확인이 필요한 신호가 있음",
+};
+
+type DecisionTone = "good" | "caution" | "danger" | "neutral";
+
+function DecisionStat({
+  label,
+  value,
+  helper,
+  tone,
+}: {
+  label: string;
+  value: string;
+  helper: string;
+  tone: DecisionTone;
+}) {
+  const styles: Record<DecisionTone, string> = {
+    good: "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]",
+    caution: "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]",
+    danger: "border-[#F2B8AE] bg-[#FDE8E5] text-[#B53A2E]",
+    neutral: "border-[#DDE5E1] bg-[#F9FBFA] text-[#34423C]",
+  };
+
+  return (
+    <div className={`rounded-lg border p-4 ${styles[tone]}`}>
+      <p className="text-xs font-semibold opacity-75">{label}</p>
+      <p className="mt-1 text-lg font-semibold tabular-nums">{value}</p>
+      <p className="mt-1 text-xs font-medium leading-5 opacity-80">{helper}</p>
+    </div>
+  );
+}
+
+function getDecisionHeadline(verdict: string) {
+  if (verdict === "입찰 검토") return "입찰 검토 후보입니다";
+  if (verdict === "가격 조정") return "가격을 낮춰 봐야 합니다";
+  return "전문가 확인이 먼저입니다";
+}
+
+function getPriceSignal(
+  item: AuctionItem,
+  analysis: ReturnType<typeof analyze>,
+  comparableVerdict: string
+): { label: string; helper: string; tone: DecisionTone } {
+  const minimumDiscount = 100 - analysis.marketRatio;
+  const allInRate = item.market > 0 ? (analysis.allIn / item.market) * 100 : 0;
+
+  if (analysis.marginRate < 8 || analysis.plannedBid > analysis.suggested) {
+    return {
+      label: "가격 조정 필요",
+      helper: `총투입이 시세의 ${percent(allInRate)} 수준`,
+      tone: "danger",
+    };
+  }
+
+  if (minimumDiscount >= 20 && comparableVerdict !== "입력 시세 높음") {
+    return {
+      label: "할인폭 있음",
+      helper: `최저가가 시세보다 ${percent(minimumDiscount)} 낮음`,
+      tone: "good",
+    };
+  }
+
+  return {
+    label: "추가 비교 필요",
+    helper:
+      comparableVerdict === "시세 근거 부족"
+        ? "비교 실거래를 더 넣어야 함"
+        : `${comparableVerdict} · 마진 ${percent(analysis.marginRate)}`,
+    tone: "caution",
+  };
+}
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
