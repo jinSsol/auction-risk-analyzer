@@ -6,7 +6,11 @@ import { items } from "../../auction-data";
 import { analyze, analyzeComparableSales, percent, uk } from "../../lib/auction-analysis";
 import { mergeAuctionItems } from "../../lib/auction-merge";
 import { deleteUserAuctionItem, loadUserAuctionItems, saveUserAuctionItems, type UserAuctionItem } from "../../lib/auction-storage";
-import type { RiskLevel, SaleChannel } from "../../lib/auction-types";
+import {
+  RIGHTS_CHECKLIST_ITEMS,
+  summarizeRightsChecklist,
+} from "../../lib/rights-checklist";
+import type { RightsChecklistAnswer, RiskLevel, SaleChannel } from "../../lib/auction-types";
 
 export function PropertyDetailClient({ id }: { id: string }) {
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
@@ -73,6 +77,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
   const repairReserve = Math.round(item.market * 0.04);
   const totalWithBuffer = analysis.allIn + acquisitionCosts + repairReserve;
   const comparableAnalysis = analyzeComparableSales(item);
+  const rightsSummary = summarizeRightsChecklist(item.rightsChecklist);
 
   return (
     <main className="app-shell min-h-screen text-[#17211D]">
@@ -221,6 +226,56 @@ export function PropertyDetailClient({ id }: { id: string }) {
           </section>
 
           <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">권리분석 질문</h2>
+                <p className="mt-1 text-sm text-[#66736D]">
+                  문서에서 확인한 답변 기준입니다. `모름`은 다음 단계에서 주의
+                  신호로 다룰 예정입니다.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-[#E7F6EE] px-3 py-1 text-sm font-semibold text-[#1F8A5B]">
+                  확인 {rightsSummary.completedCount}/{rightsSummary.totalCount}
+                </span>
+                <span className="rounded-full bg-[#FFF4D7] px-3 py-1 text-sm font-semibold text-[#8A5B00]">
+                  모름 {rightsSummary.unknownCount}
+                </span>
+              </div>
+            </div>
+
+            {rightsSummary.unknownCount > 0 ? (
+              <div className="mt-5 rounded-lg border border-[#F3D083] bg-[#FFF4D7] p-4">
+                <p className="text-sm font-semibold text-[#8A5B00]">
+                  아직 확인할 것
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {rightsSummary.unknownItems.map((question) => (
+                    <span
+                      key={question.id}
+                      className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#8A5B00]"
+                    >
+                      {question.group}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              {RIGHTS_CHECKLIST_ITEMS.map((question) => (
+                <RightsAnswerCard
+                  key={question.id}
+                  group={question.group}
+                  question={question.question}
+                  documentHint={question.documentHint}
+                  answer={rightsSummary.answers[question.id]}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-xl font-semibold">조심해서 볼 포인트</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {analysis.flags.length === 0 ? (
@@ -365,6 +420,52 @@ function CheckCard({ title, value }: { title: string; value: string }) {
       <p className="text-xs font-semibold text-[#66736D]">{title}</p>
       <p className="mt-1 font-semibold text-[#17211D]">{value}</p>
     </div>
+  );
+}
+
+function RightsAnswerCard({
+  group,
+  question,
+  documentHint,
+  answer,
+}: {
+  group: string;
+  question: string;
+  documentHint: string;
+  answer: RightsChecklistAnswer;
+}) {
+  return (
+    <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#34423C]">
+          {group}
+        </span>
+        <AnswerBadge value={answer} />
+      </div>
+      <p className="mt-3 text-sm font-semibold leading-6 text-[#17211D]">
+        {question}
+      </p>
+      <p className="mt-2 text-xs leading-5 text-[#66736D]">
+        확인 문서: {documentHint}
+      </p>
+    </div>
+  );
+}
+
+function AnswerBadge({ value }: { value: RightsChecklistAnswer }) {
+  const style =
+    value === "아니요"
+      ? "bg-[#E7F6EE] text-[#1F8A5B]"
+      : value === "예"
+        ? "bg-[#FFF4D7] text-[#8A5B00]"
+        : value === "해당 없음"
+          ? "bg-[#E7F0FF] text-[#255C99]"
+          : "bg-[#FDE8E5] text-[#B53A2E]";
+
+  return (
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
+      {value}
+    </span>
   );
 }
 

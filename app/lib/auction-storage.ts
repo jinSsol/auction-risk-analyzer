@@ -1,4 +1,5 @@
 import type { AuctionItem, ComparableSale } from "./auction-types";
+import { normalizeRightsChecklist } from "./rights-checklist";
 
 export const USER_ITEMS_STORAGE_KEY = "auction-risk-analyzer:user-items:v1";
 
@@ -107,6 +108,7 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
           .filter((sale): sale is ComparableSale => Boolean(sale))
           .slice(0, 3)
       : [],
+    rightsChecklist: normalizeRightsChecklist(item.rightsChecklist),
   };
 }
 

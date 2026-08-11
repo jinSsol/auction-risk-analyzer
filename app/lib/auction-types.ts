@@ -1,6 +1,21 @@
 export type PropertyType = "아파트" | "빌라" | "오피스텔";
 export type SaleChannel = "경매" | "공매";
 export type RiskLevel = "안정" | "주의" | "위험";
+export type RightsChecklistAnswer = "아니요" | "예" | "모름" | "해당 없음";
+export type RightsChecklistId =
+  | "occupancyTenant"
+  | "moveInFixedDate"
+  | "seniorTenantDeposit"
+  | "distributionDemand"
+  | "baselineRight"
+  | "lienClaim"
+  | "illegalBuildingUse"
+  | "unpaidFees"
+  | "publicSaleTransfer";
+export type RightsChecklistAnswers = Record<
+  RightsChecklistId,
+  RightsChecklistAnswer
+>;
 
 export type ComparableSale = {
   id: string;
@@ -42,4 +57,5 @@ export type AuctionItem = {
   notes: string[];
   userMemo?: string;
   comparableSales?: ComparableSale[];
+  rightsChecklist?: RightsChecklistAnswers;
 };

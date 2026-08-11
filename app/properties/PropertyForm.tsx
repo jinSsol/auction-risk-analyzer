@@ -10,7 +10,21 @@ import {
   upsertUserAuctionItem,
   type UserAuctionItem,
 } from "../lib/auction-storage";
-import type { AuctionItem, ComparableSale, PropertyType, SaleChannel } from "../lib/auction-types";
+import {
+  CHECKLIST_ANSWERS,
+  RIGHTS_CHECKLIST_ITEMS,
+  createDefaultRightsChecklist,
+  summarizeRightsChecklist,
+} from "../lib/rights-checklist";
+import type {
+  AuctionItem,
+  ComparableSale,
+  PropertyType,
+  RightsChecklistAnswer,
+  RightsChecklistAnswers,
+  RightsChecklistId,
+  SaleChannel,
+} from "../lib/auction-types";
 
 type FormMode = "create" | "edit";
 type StepId = 0 | 1 | 2 | 3;
@@ -41,6 +55,7 @@ type Draft = {
   occupancy: AuctionItem["occupancy"];
   userMemo: string;
   comparableSales: ComparableSaleDraft[];
+  rightsChecklist: RightsChecklistAnswers;
 };
 
 type ComparableSaleDraft = {
@@ -79,6 +94,7 @@ const emptyDraft: Draft = {
   occupancy: "협의 필요",
   userMemo: "",
   comparableSales: createEmptyComparableSaleDrafts(),
+  rightsChecklist: createDefaultRightsChecklist(),
 };
 
 const steps = ["출처", "기본 정보", "가격", "점유·메모"];
@@ -403,6 +419,12 @@ function PriceStep({ draft, update }: StepProps) {
 }
 
 function RightsStep({ draft, update }: StepProps) {
+  const checklistSummary = summarizeRightsChecklist(draft.rightsChecklist);
+
+  function updateChecklist(id: RightsChecklistId, answer: RightsChecklistAnswer) {
+    update("rightsChecklist", { ...draft.rightsChecklist, [id]: answer });
+  }
+
   return (
     <div className="grid gap-4">
       <Field label="임차인 상태">
@@ -445,6 +467,37 @@ function RightsStep({ draft, update }: StepProps) {
           placeholder="확인해야 할 서류, 시세 근거, 통화 내용 등을 적어두세요."
         />
       </Field>
+      <section className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-[#17211D]">
+              권리분석 질문
+            </h2>
+            <p className="mt-1 text-xs leading-5 text-[#66736D]">
+              법률 용어를 몰라도 문서에서 확인한 내용대로 답하면 됩니다. 모르면
+              `모름`으로 남겨두세요.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
+              확인 {checklistSummary.completedCount}/{checklistSummary.totalCount}
+            </span>
+            <span className="rounded-full bg-[#FFF4D7] px-2.5 py-1 text-xs font-semibold text-[#8A5B00]">
+              모름 {checklistSummary.unknownCount}
+            </span>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3">
+          {RIGHTS_CHECKLIST_ITEMS.map((item) => (
+            <RightsChecklistCard
+              key={item.id}
+              item={item}
+              value={draft.rightsChecklist[item.id]}
+              onChange={(answer) => updateChecklist(item.id, answer)}
+            />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
@@ -516,6 +569,49 @@ function ComparableSaleCard({
           onChange={(value) => update(index, "memo", value)}
           placeholder="층 낮음, 수리 상태 좋음"
         />
+      </div>
+    </div>
+  );
+}
+
+function RightsChecklistCard({
+  item,
+  value,
+  onChange,
+}: {
+  item: (typeof RIGHTS_CHECKLIST_ITEMS)[number];
+  value: RightsChecklistAnswer;
+  onChange: (value: RightsChecklistAnswer) => void;
+}) {
+  return (
+    <div className="rounded-lg border border-[#E5ECE8] bg-white p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
+          {item.group}
+        </span>
+        <span className="text-xs font-medium text-[#8A9690]">
+          {item.documentHint}
+        </span>
+      </div>
+      <p className="mt-3 text-sm font-semibold leading-6 text-[#17211D]">
+        {item.question}
+      </p>
+      <p className="mt-1 text-xs leading-5 text-[#66736D]">{item.helper}</p>
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {CHECKLIST_ANSWERS.map((answer) => (
+          <button
+            key={answer}
+            type="button"
+            onClick={() => onChange(answer)}
+            className={`button-lift h-9 rounded-lg border px-2 text-sm font-semibold transition ${
+              value === answer
+                ? checklistAnswerActiveClass(answer)
+                : "border-[#DDE5E1] bg-white text-[#66736D] hover:bg-[#F9FBFA]"
+            }`}
+          >
+            {answer}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -619,6 +715,13 @@ function Toggle({
   );
 }
 
+function checklistAnswerActiveClass(answer: RightsChecklistAnswer) {
+  if (answer === "예") return "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]";
+  if (answer === "아니요") return "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]";
+  if (answer === "해당 없음") return "border-[#CFE3F8] bg-[#E7F0FF] text-[#255C99]";
+  return "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]";
+}
+
 function validateDraft(draft: Draft) {
   if (!draft.title.trim()) return "물건명을 입력해주세요.";
   if (toNumber(draft.market) <= 0) return "예상 시세는 0보다 크게 입력해주세요.";
@@ -661,6 +764,7 @@ function itemFromDraft(draft: Draft): Omit<UserAuctionItem, "id" | "source" | "c
     notes: memo ? [memo] : ["직접 등록한 물건입니다."],
     userMemo: memo,
     comparableSales: comparableSalesFromDraft(draft.comparableSales),
+    rightsChecklist: draft.rightsChecklist,
   };
 }
 
@@ -691,6 +795,7 @@ function draftFromItem(item: UserAuctionItem): Draft {
     occupancy: item.occupancy,
     userMemo: item.userMemo ?? item.notes.join("\n"),
     comparableSales: comparableSalesToDraft(item.comparableSales ?? []),
+    rightsChecklist: item.rightsChecklist ?? createDefaultRightsChecklist(),
   };
 }
 

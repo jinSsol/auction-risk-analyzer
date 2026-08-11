@@ -273,24 +273,24 @@ Answer options:
 
 Checklist groups:
 
-- [ ] Occupancy and tenant
-- [ ] Move-in date and fixed date
-- [ ] Senior tenant or senior deposit
-- [ ] Distribution demand
-- [ ] Baseline right for cancellation
-- [ ] Lien claim
-- [ ] Illegal building or usage issue
-- [ ] Unpaid taxes, management fees, or utility costs
-- [ ] Public sale-specific delivery/transfer conditions
+- [x] Occupancy and tenant
+- [x] Move-in date and fixed date
+- [x] Senior tenant or senior deposit
+- [x] Distribution demand
+- [x] Baseline right for cancellation
+- [x] Lien claim
+- [x] Illegal building or usage issue
+- [x] Unpaid taxes, management fees, or utility costs
+- [x] Public sale-specific delivery/transfer conditions
 
 Tasks:
 
-- [ ] Add beginner-friendly question wording.
-- [ ] Add short helper text for "why this matters."
-- [ ] Add document hint per question where useful.
-- [ ] Store checklist answers per property.
-- [ ] Count unknown answers.
-- [ ] Surface unknowns as "아직 확인할 것."
+- [x] Add beginner-friendly question wording.
+- [x] Add short helper text for "why this matters."
+- [x] Add document hint per question where useful.
+- [x] Store checklist answers per property.
+- [x] Count unknown answers.
+- [x] Surface unknowns as "아직 확인할 것."
 
 Completion criteria:
 
