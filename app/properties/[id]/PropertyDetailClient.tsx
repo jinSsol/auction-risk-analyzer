@@ -64,7 +64,9 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
   function deleteCurrentItem() {
     if (!isUserItem) return;
-    const ok = window.confirm("이 물건을 삭제할까요? 삭제 후에는 되돌릴 수 없습니다.");
+    const ok = window.confirm(
+      "이 브라우저에 저장된 물건을 삭제할까요? 삭제 후에는 되돌릴 수 없습니다."
+    );
     if (!ok) return;
 
     const nextItems = deleteUserAuctionItem(userItems, item.id);
@@ -439,6 +441,24 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
           <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+            <h2 className="text-lg font-semibold">확인 안내</h2>
+            <div className="mt-4 space-y-3">
+              <GuidanceLine
+                label="분석 보조"
+                value="이 화면은 법률·투자 자문이 아니라 입력값을 정리해 보는 참고 도구입니다."
+              />
+              <GuidanceLine
+                label="최종 문서"
+                value="입찰 전 등기사항전부증명서, 매각물건명세서, 현황조사서, 공매 공고문을 원문으로 확인하세요."
+              />
+              <GuidanceLine
+                label="저장 방식"
+                value="직접 등록한 물건과 비교 바구니는 현재 브라우저에만 저장됩니다."
+              />
+            </div>
+          </section>
+
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-lg font-semibold">주소 정보</h2>
             <p className="mt-3 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm font-medium leading-6 text-[#34423C]">
               {item.address}
@@ -637,6 +657,17 @@ function CostLine({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between gap-3 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm">
       <span className="font-medium text-[#66736D]">{label}</span>
       <span className="font-semibold tabular-nums text-[#17211D]">{value}</span>
+    </div>
+  );
+}
+
+function GuidanceLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
+      <p className="text-xs font-semibold text-[#1F8A5B]">{label}</p>
+      <p className="mt-1 text-xs font-medium leading-5 text-[#66736D]">
+        {value}
+      </p>
     </div>
   );
 }

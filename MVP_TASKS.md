@@ -407,10 +407,10 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Add non-advice disclaimer copy.
-- [ ] Explain final documents to verify.
-- [ ] Explain browser/local device storage.
-- [ ] Add guidance near save/delete flows.
+- [x] Add non-advice disclaimer copy.
+- [x] Explain final documents to verify.
+- [x] Explain browser/local device storage.
+- [x] Add guidance near save/delete flows.
 
 Completion criteria:
 

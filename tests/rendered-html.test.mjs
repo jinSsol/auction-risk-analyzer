@@ -57,6 +57,10 @@ test("server-renders sample property detail pages", async () => {
   assert.match(html, /입찰 여유/);
   assert.match(html, /권리 확인/);
   assert.match(html, /먼저 볼 핵심 리스크/);
+  assert.match(html, /확인 안내/);
+  assert.match(html, /법률·투자 자문이 아니라 입력값을 정리해 보는 참고 도구입니다/);
+  assert.match(html, /등기사항전부증명서, 매각물건명세서, 현황조사서, 공매 공고문/);
+  assert.match(html, /직접 등록한 물건과 비교 바구니는 현재 브라우저에만 저장됩니다/);
   assert.match(html, /시세 근거/);
   assert.match(html, /시세 근거 부족/);
   assert.match(html, /입찰 계산기/);
@@ -77,6 +81,7 @@ test("server-renders the manual property creation flow", async () => {
   const html = await response.text();
   assert.match(html, /새 물건 등록/);
   assert.match(html, /공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요/);
+  assert.match(html, /직접 등록한 물건은 현재 브라우저에 저장됩니다/);
   assert.match(html, /Step <!-- -->1/);
   assert.match(html, /매각 방식/);
   assert.match(html, /가격/);

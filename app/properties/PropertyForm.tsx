@@ -230,7 +230,7 @@ export function PropertyForm({
             </h1>
             <p className="mt-3 text-sm leading-6 text-[#66736D]">
               모르는 값은 비워도 됩니다. 다만 제목과 예상 시세는 분석을 위해
-              필요합니다.
+              필요합니다. 직접 등록한 물건은 현재 브라우저에 저장됩니다.
             </p>
           </div>
         </div>
@@ -274,6 +274,20 @@ export function PropertyForm({
             <p className="mt-4 rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] px-3 py-2 text-sm font-semibold text-[#B53A2E]">
               {error}
             </p>
+          ) : null}
+
+          {step === 3 ? (
+            <div className="mt-4 rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] p-4 text-sm leading-6 text-[#66736D]">
+              <p className="font-semibold text-[#17211D]">저장 전 확인</p>
+              <p className="mt-1">
+                이 내용은 현재 브라우저에만 저장됩니다. 다른 기기나 시크릿
+                브라우저에서는 다시 등록해야 보일 수 있습니다.
+              </p>
+              <p className="mt-1">
+                분석 결과는 입력값을 정리한 참고 자료이며 법률·투자 자문이
+                아닙니다. 입찰 전 원문 서류와 전문가 확인을 함께 진행하세요.
+              </p>
+            </div>
           ) : null}
 
           <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
