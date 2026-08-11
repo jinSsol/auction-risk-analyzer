@@ -142,8 +142,8 @@ export function PropertyForm({
 
   if (!loaded) {
     return (
-      <main className="min-h-screen bg-[#f7f3ea] px-5 py-8 text-[#181713]">
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#d8cfbf] bg-white p-6 text-sm font-bold text-[#6f695f]">
+      <main className="min-h-screen bg-[#F6F8F7] px-5 py-8 text-[#17211D]">
+        <div className="mx-auto max-w-3xl rounded-xl border border-[#DDE5E1] bg-white p-6 text-sm font-medium text-[#66736D] shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
           저장된 물건을 불러오는 중입니다.
         </div>
       </main>
@@ -152,14 +152,14 @@ export function PropertyForm({
 
   if (isMissingEditTarget) {
     return (
-      <main className="min-h-screen bg-[#f7f3ea] px-5 py-8 text-[#181713]">
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#d8cfbf] bg-white p-6">
+      <main className="min-h-screen bg-[#F6F8F7] px-5 py-8 text-[#17211D]">
+        <div className="mx-auto max-w-3xl rounded-xl border border-[#DDE5E1] bg-white p-6 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/" className="text-sm font-black text-[#13663d]">
+          <a href="/" className="text-sm font-semibold text-[#1F8A5B]">
             목록으로
           </a>
-          <h1 className="mt-4 text-2xl font-black">수정할 수 없는 물건입니다.</h1>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[#6f695f]">
+          <h1 className="mt-4 text-2xl font-semibold">수정할 수 없는 물건입니다.</h1>
+          <p className="mt-2 text-sm leading-6 text-[#66736D]">
             직접 등록한 물건만 수정할 수 있습니다. 샘플 물건은 읽기 전용으로
             유지됩니다.
           </p>
@@ -169,23 +169,23 @@ export function PropertyForm({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#181713]">
-      <section className="border-b border-[#ded7c9] bg-[#f7f3ea]">
+    <main className="min-h-screen bg-[#F6F8F7] text-[#17211D]">
+      <section className="border-b border-[#DDE5E1] bg-[#F6F8F7]">
         <div className="mx-auto max-w-4xl px-5 py-6 lg:px-8">
           <a
             href={mode === "edit" && itemId ? `/properties/${itemId}` : "/"}
-            className="inline-flex rounded-md border border-[#181713] bg-white px-3 py-2 text-sm font-black text-[#4f493f] shadow-[3px_3px_0_#d7ff6f] transition hover:-translate-y-0.5"
+            className="inline-flex rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
           >
             돌아가기
           </a>
           <div className="mt-5">
-            <p className="inline-flex rounded-full border border-[#181713] bg-[#d7ff6f] px-3 py-1 text-sm font-black text-[#181713] shadow-[3px_3px_0_#181713]">
+            <p className="inline-flex rounded-full bg-[#E7F6EE] px-3 py-1 text-xs font-semibold text-[#1F8A5B]">
               {mode === "edit" ? "내 물건 수정" : "새 물건 등록"}
             </p>
-            <h1 className="mt-5 text-4xl font-black tracking-normal text-[#181713]">
-              복잡한 공고를 네 단계로 가볍게 정리해요.
+            <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-normal text-[#17211D]">
+              공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요.
             </h1>
-            <p className="mt-3 text-sm font-semibold leading-6 text-[#625f56]">
+            <p className="mt-3 text-sm leading-6 text-[#66736D]">
               모르는 값은 비워도 됩니다. 다만 제목과 예상 시세는 분석을 위해
               필요합니다.
             </p>
@@ -194,16 +194,16 @@ export function PropertyForm({
       </section>
 
       <section className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
-        <div className="rounded-lg border border-[#d8cfbf] bg-white p-4 shadow-sm shadow-[#18171310]">
+        <div className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] md:p-5">
           <div className="grid gap-2 sm:grid-cols-4">
             {steps.map((label, index) => (
               <button
                 key={label}
                 onClick={() => setStep(index as StepId)}
-                className={`rounded-md px-3 py-3 text-left text-sm font-black transition ${
+                className={`rounded-lg border px-3 py-3 text-left text-sm transition ${
                   step === index
-                    ? "bg-[#181713] text-white"
-                    : "bg-[#fffaf1] text-[#625f56] hover:bg-[#f7f3ea]"
+                    ? "border-[#1F8A5B] bg-[#E7F6EE] font-semibold text-[#1F8A5B]"
+                    : "border-[#DDE5E1] bg-white font-medium text-[#66736D] hover:bg-[#F9FBFA]"
                 }`}
               >
                 <span className="block text-xs opacity-70">Step {index + 1}</span>
@@ -220,7 +220,7 @@ export function PropertyForm({
           </div>
 
           {error ? (
-            <p className="mt-4 rounded-md bg-[#ffe0d5] px-3 py-2 text-sm font-bold text-[#b83a24]">
+            <p className="mt-4 rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] px-3 py-2 text-sm font-semibold text-[#B53A2E]">
               {error}
             </p>
           ) : null}
@@ -229,7 +229,7 @@ export function PropertyForm({
             <button
               onClick={goBack}
               disabled={step === 0}
-              className="h-11 rounded-md border border-[#cfc6b8] bg-white px-4 text-sm font-black text-[#4f493f] transition hover:bg-[#fffaf1] disabled:cursor-not-allowed disabled:opacity-40"
+              className="h-11 rounded-lg border border-[#DDE5E1] bg-white px-4 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-not-allowed disabled:opacity-40"
             >
               이전
             </button>
@@ -237,14 +237,14 @@ export function PropertyForm({
               {step < 3 ? (
                 <button
                   onClick={goNext}
-                  className="h-11 rounded-md border border-[#181713] bg-[#181713] px-4 text-sm font-black text-white shadow-[3px_3px_0_#ff8a65] transition hover:-translate-y-0.5"
+                  className="h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white transition hover:bg-[#26332E]"
                 >
                   다음
                 </button>
               ) : (
                 <button
                   onClick={submit}
-                  className="h-11 rounded-md border border-[#181713] bg-[#d7ff6f] px-4 text-sm font-black text-[#181713] shadow-[3px_3px_0_#181713] transition hover:-translate-y-0.5"
+                  className="h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white transition hover:bg-[#26332E]"
                 >
                   저장하고 상세 보기
                 </button>
@@ -329,7 +329,7 @@ function BasicStep({ draft, update }: StepProps) {
 function PriceStep({ draft, update }: StepProps) {
   return (
     <div className="grid gap-4">
-      <p className="rounded-md bg-[#fffaf1] px-3 py-2 text-sm font-bold text-[#625f56]">
+      <p className="rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-medium text-[#255C99]">
         금액은 `만원` 단위로 입력하면 됩니다.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -396,12 +396,12 @@ type StepProps = {
 };
 
 const inputClass =
-  "h-11 w-full rounded-md border border-[#cfc6b8] bg-[#fffaf1] px-3 text-sm font-bold text-[#181713] outline-none transition focus:border-[#181713] focus:ring-2 focus:ring-[#d7ff6f]";
+  "h-11 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#D8F1E4]";
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs font-black text-[#625f56]">{label}</span>
+      <span className="text-xs font-semibold text-[#66736D]">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
   );
@@ -449,14 +449,16 @@ function Segmented({
 }) {
   return (
     <div>
-      <p className="text-xs font-black text-[#625f56]">{label}</p>
-      <div className="mt-1 grid grid-cols-2 gap-2 rounded-md border border-[#d8cfbf] bg-[#f7f3ea] p-1">
+      <p className="text-xs font-semibold text-[#66736D]">{label}</p>
+      <div className="mt-1 grid grid-cols-2 gap-2 rounded-lg border border-[#DDE5E1] bg-[#EEF3F1] p-1">
         {options.map((option) => (
           <button
             key={option}
             onClick={() => onChange(option)}
-            className={`h-10 rounded text-sm font-black transition ${
-              value === option ? "bg-[#181713] text-white" : "text-[#625f56] hover:bg-white"
+            className={`h-10 rounded-md text-sm transition ${
+              value === option
+                ? "bg-white font-semibold text-[#17211D] shadow-[0_1px_2px_rgba(23,33,29,0.08)]"
+                : "font-medium text-[#66736D] hover:bg-white/70"
             }`}
           >
             {option}
@@ -479,10 +481,10 @@ function Toggle({
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={`flex h-11 items-center justify-between rounded-md border px-3 text-sm font-black transition ${
+      className={`flex h-11 items-center justify-between rounded-lg border px-3 text-sm font-semibold transition ${
         checked
-          ? "border-[#181713] bg-[#d7ff6f] text-[#181713]"
-          : "border-[#cfc6b8] bg-[#fffaf1] text-[#625f56]"
+          ? "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]"
+          : "border-[#DDE5E1] bg-white text-[#66736D] hover:bg-[#F9FBFA]"
       }`}
     >
       <span>{label}</span>

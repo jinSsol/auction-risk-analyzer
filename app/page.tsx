@@ -84,25 +84,25 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f3ea] text-[#181713]">
-      <section className="border-b border-[#ded7c9] bg-[#f7f3ea]">
-        <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+    <main className="min-h-screen bg-[#F6F8F7] text-[#17211D]">
+      <section className="border-b border-[#DDE5E1] bg-[#F6F8F7]">
+        <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
-              <p className="inline-flex rounded-full border border-[#181713] bg-[#d7ff6f] px-3 py-1 text-sm font-black text-[#181713] shadow-[3px_3px_0_#181713]">
-                경매·공매 스타터 보드
+              <p className="inline-flex rounded-full bg-[#E7F6EE] px-3 py-1 text-xs font-semibold text-[#1F8A5B]">
+                권리 리스크 · 입찰가 분석
               </p>
-              <h1 className="mt-5 max-w-2xl text-4xl font-black tracking-normal text-[#181713] md:text-5xl">
-                무거운 공고를 가볍게 뜯어보는 내 물건 탐색장.
+              <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
+                경매·공매 물건의 권리 리스크와 입찰 상한을 한 화면에서 비교하세요.
               </h1>
-              <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-[#625f56] md:text-base">
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#66736D]">
                 지금은 실시간 연동 전 샘플 데이터입니다. 어려운 권리 용어는
                 체크리스트로 풀고, 시세·인수금·안전마진은 한눈에 비교합니다.
               </p>
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a
                 href="/properties/new"
-                className="mt-5 inline-flex h-12 items-center rounded-md border border-[#181713] bg-[#181713] px-5 text-sm font-black text-white shadow-[4px_4px_0_#ff8a65] transition hover:-translate-y-0.5"
+                className="mt-5 inline-flex h-11 items-center rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white transition hover:bg-[#26332E]"
               >
                 새 물건 등록
               </a>
@@ -117,17 +117,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="sticky top-0 z-10 border-b border-[#ded7c9] bg-[#fffaf1]/90 backdrop-blur">
-        <div className="mx-auto grid max-w-7xl gap-3 px-5 py-4 xl:grid-cols-[minmax(240px,1fr)_auto_auto_auto_auto] xl:items-end xl:px-8">
+      <section className="sticky top-0 z-10 border-b border-[#DDE5E1] bg-white/85 backdrop-blur">
+        <div className="mx-auto grid max-w-7xl gap-3 px-5 py-3 xl:grid-cols-[minmax(280px,1fr)_auto_auto_auto_auto] xl:items-end xl:px-8">
           <div>
-            <label className="text-xs font-black text-[#625f56]">
+            <label className="text-xs font-semibold text-[#66736D]">
               검색
             </label>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="판교, 온비드, 2025타경, 빌라"
-              className="mt-1 h-11 w-full rounded-md border border-[#cfc6b8] bg-white px-3 text-sm font-bold outline-none transition focus:border-[#181713] focus:ring-2 focus:ring-[#d7ff6f]"
+              className="mt-1 h-10 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#D8F1E4]"
             />
           </div>
           <InlineFilter
@@ -159,7 +159,7 @@ export default function Home() {
 
       <section className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
         <div className="space-y-5">
-          <div className="grid gap-3 rounded-lg border border-[#d8cfbf] bg-[#fffaf1] p-4 shadow-sm shadow-[#18171310] md:grid-cols-[1fr_1fr_auto] md:items-center">
+          <div className="grid gap-3 rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] md:grid-cols-[1fr_1fr_auto] md:items-center">
             <RangeControl
               label="예상 입찰가"
               value={bidRatio}
@@ -178,8 +178,8 @@ export default function Home() {
               onChange={setBufferRatio}
               tone="amber"
             />
-            <div className="rounded-md border border-[#181713] bg-[#181713] px-4 py-3 text-sm text-white shadow-[3px_3px_0_#d7ff6f]">
-              <p className="font-bold">계산 기준</p>
+            <div className="rounded-lg bg-[#17211D] px-4 py-3 text-sm text-white">
+              <p className="font-semibold">계산 기준</p>
               <p className="mt-1 text-[#d9eee5]">
                 시세 할인 - 인수금 - 비용 버퍼
               </p>
@@ -197,7 +197,7 @@ export default function Home() {
               />
             ))}
             {filtered.length === 0 ? (
-              <div className="rounded-lg border border-[#d8cfbf] bg-white p-8 text-center text-sm font-semibold text-[#6f695f]">
+              <div className="rounded-lg border border-[#DDE5E1] bg-white p-8 text-center text-sm font-semibold text-[#66736D]">
                 조건에 맞는 물건이 없습니다.
               </div>
             ) : null}
@@ -220,14 +220,14 @@ function Metric({
   tone?: "neutral" | "green" | "blue" | "amber" | "red";
 }) {
   const tones = {
-    neutral: "bg-white text-[#181713]",
-    green: "bg-[#dffbe8] text-[#13663d]",
-    blue: "bg-[#dff4ff] text-[#176785]",
-    amber: "bg-[#fff1bd] text-[#80620a]",
-    red: "bg-[#ffe0d5] text-[#b83a24]",
+    neutral: "bg-white text-[#17211D]",
+    green: "bg-[#E7F6EE] text-[#1F8A5B]",
+    blue: "bg-[#E7F0FF] text-[#255C99]",
+    amber: "bg-[#FFF4D7] text-[#8A5B00]",
+    red: "bg-[#FDE8E5] text-[#B53A2E]",
   };
   return (
-    <div className={`rounded-lg border border-[#18171312] p-4 shadow-sm shadow-[#18171312] ${tones[tone]}`}>
+    <div className={`rounded-xl border border-[#DDE5E1] p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] ${tones[tone]}`}>
       <p className="text-xs font-semibold text-current opacity-70">{label}</p>
       <p className="mt-2 text-2xl font-bold">{value}</p>
     </div>
@@ -247,16 +247,16 @@ function InlineFilter({
 }) {
   return (
     <div>
-      <p className="text-xs font-black text-[#5f5a50]">{title}</p>
-      <div className="mt-1 flex min-h-11 flex-wrap gap-1.5 rounded-md border border-[#d8cfbf] bg-[#f7f3ea] p-1">
+      <p className="text-xs font-semibold text-[#66736D]">{title}</p>
+      <div className="mt-1 flex min-h-10 flex-wrap gap-1 rounded-lg border border-[#DDE5E1] bg-[#EEF3F1] p-1">
         {options.map((option) => (
           <button
             key={option}
             onClick={() => onChange(option)}
-            className={`min-w-14 rounded px-3 py-2 text-sm font-bold transition ${
+            className={`min-w-14 rounded-md px-3 py-1.5 text-sm transition ${
               value === option
-                ? "bg-[#181713] text-white"
-                : "text-[#625f56] hover:bg-white"
+                ? "bg-white font-semibold text-[#17211D] shadow-[0_1px_2px_rgba(23,33,29,0.08)]"
+                : "font-medium text-[#66736D] hover:bg-white/70"
             }`}
           >
             {option}
@@ -288,14 +288,14 @@ function RangeControl({
     <div>
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-black text-[#25231f]">{label}</p>
-          <p className="text-xs font-bold text-[#6f695f]">{suffix}</p>
+          <p className="text-sm font-semibold text-[#17211D]">{label}</p>
+          <p className="text-xs font-medium text-[#66736D]">{suffix}</p>
         </div>
         <span
-          className={`rounded-md px-2.5 py-1 text-sm font-black ${
+          className={`rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums ${
             tone === "green"
-              ? "bg-[#dffbe8] text-[#13663d]"
-              : "bg-[#fff1bd] text-[#80620a]"
+              ? "bg-[#E7F6EE] text-[#1F8A5B]"
+              : "bg-[#FFF4D7] text-[#8A5B00]"
           }`}
         >
           {value}%
@@ -308,7 +308,7 @@ function RangeControl({
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className={`mt-3 w-full ${
-          tone === "green" ? "accent-[#00a86b]" : "accent-[#ff8a65]"
+          tone === "green" ? "accent-[#1F8A5B]" : "accent-[#1F8A5B]"
         }`}
       />
     </div>
@@ -318,10 +318,10 @@ function RangeControl({
 function ChannelBadge({ channel }: { channel: SaleChannel }) {
   const style =
     channel === "경매"
-      ? "bg-[#dffbe8] text-[#13663d]"
-      : "bg-[#dff4ff] text-[#176785]";
+      ? "bg-[#E7F6EE] text-[#1F8A5B]"
+      : "bg-[#E7F0FF] text-[#255C99]";
   return (
-    <span className={`inline-flex w-fit rounded-md px-2 py-0.5 text-xs font-bold ${style}`}>
+    <span className={`inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
       {channel}
     </span>
   );
@@ -341,29 +341,29 @@ function ListingCard({
   const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
 
   return (
-    <article className="rounded-lg border border-[#d8cfbf] bg-white p-4 shadow-sm shadow-[#1817130d] transition hover:-translate-y-0.5 hover:border-[#181713] hover:shadow-[5px_5px_0_#d7ff6f]">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
+    <article className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] transition hover:border-[#B8C7C0] hover:shadow-[0_8px_24px_rgba(23,33,29,0.08)]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-center">
         <a href={href} className="min-w-0 text-left">
           <div className="flex flex-wrap items-center gap-2">
             <ChannelBadge channel={item.channel} />
-            <span className="rounded-md bg-[#f3eadb] px-2 py-0.5 text-xs font-bold text-[#6a6258]">
+            <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
               {item.agency}
             </span>
             {item.id.startsWith("user-") ? (
-              <span className="rounded-md bg-[#181713] px-2 py-0.5 text-xs font-bold text-white">
+              <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
                 내 물건
               </span>
             ) : null}
-            <span className="text-xs font-semibold text-[#6f695f]">
+            <span className="text-xs font-semibold text-[#66736D]">
               {item.caseNo}
             </span>
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h2 className="text-lg font-black text-[#181713]">
+              <h2 className="text-lg font-semibold text-[#17211D]">
                 {item.title}
               </h2>
-              <p className="mt-1 text-sm font-semibold text-[#6f695f]">
+              <p className="mt-1 text-sm font-medium text-[#66736D]">
                 {item.district} · {item.area}㎡ · {item.floor} · 마감 {item.auctionDate}
               </p>
             </div>
@@ -383,9 +383,9 @@ function ListingCard({
         </a>
 
         <div className="space-y-3">
-          <div className="rounded-lg bg-[#f7f3ea] p-3">
+          <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-bold text-[#6f695f]">체크 난이도</span>
+              <span className="text-xs font-semibold text-[#66736D]">체크 난이도</span>
               <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
             </div>
             <RiskMeter level={item.analysis.level} score={item.analysis.risk} />
@@ -393,7 +393,7 @@ function ListingCard({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span
               className={`text-xs font-bold ${
-                gapToSuggested >= 0 ? "text-[#13663d]" : "text-[#b83a24]"
+                gapToSuggested >= 0 ? "text-[#1F8A5B]" : "text-[#B53A2E]"
               }`}
             >
               현재 예상가가 상한보다 {uk(Math.abs(gapToSuggested))}
@@ -401,10 +401,10 @@ function ListingCard({
             </span>
             <button
               onClick={onToggle}
-              className={`h-9 rounded-md px-3 text-sm font-black transition ${
+              className={`h-9 rounded-lg px-3 text-sm transition ${
                 selected
-                  ? "bg-[#181713] text-white"
-                  : "border border-[#cfc6b8] bg-white text-[#4f493f] hover:bg-[#fffaf1]"
+                  ? "bg-[#0F766E] font-semibold text-white"
+                  : "border border-[#DDE5E1] bg-white font-semibold text-[#34423C] hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
               }`}
             >
               {selected ? "비교중" : "비교 담기"}
@@ -430,29 +430,29 @@ function PriceStat({
   danger?: boolean;
 }) {
   return (
-    <div className="min-w-0 rounded-md border border-[#eee2d1] bg-[#fffaf1] p-3">
-      <p className="text-xs font-black text-[#70685d]">{label}</p>
+    <div className="min-w-0 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
+      <p className="text-xs font-semibold text-[#66736D]">{label}</p>
       <p
-        className={`mt-1 truncate text-base font-black ${
+        className={`mt-1 truncate text-base font-semibold tabular-nums ${
           danger
-            ? "text-[#b83a24]"
+            ? "text-[#B53A2E]"
             : strong
-              ? "text-[#13663d]"
-              : "text-[#181713]"
+              ? "text-[#1F8A5B]"
+              : "text-[#17211D]"
         }`}
       >
         {value}
       </p>
-      {sub ? <p className="mt-0.5 text-xs font-bold text-[#7b7469]">{sub}</p> : null}
+      {sub ? <p className="mt-0.5 text-xs font-medium text-[#8A9690]">{sub}</p> : null}
     </div>
   );
 }
 
 function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
   const color =
-    level === "위험" ? "bg-[#ff6f61]" : level === "주의" ? "bg-[#ffb84d]" : "bg-[#00a86b]";
+    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#B7791F]" : "bg-[#1F8A5B]";
   return (
-    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#e8decd]">
+    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#DDE5E1]">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   );
@@ -466,34 +466,34 @@ function ComparePanel({
   onClear: () => void;
 }) {
   return (
-    <section className="rounded-lg border border-[#d8cfbf] bg-[#fffaf1] p-4 shadow-sm shadow-[#18171310]">
+    <section className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-black text-[#181713]">비교 바구니</h2>
-          <p className="text-sm font-semibold text-[#6f695f]">
+          <h2 className="text-lg font-semibold text-[#17211D]">비교 바구니</h2>
+          <p className="text-sm text-[#66736D]">
             총투입금과 안전마진이 낮은 물건을 먼저 제외하기 좋습니다.
           </p>
         </div>
         <button
           onClick={onClear}
-          className="h-9 rounded-md border border-[#cfc6b8] bg-white px-3 text-sm font-bold text-[#4f493f] transition hover:bg-[#f7f3ea]"
+          className="h-9 rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
         >
           선택 비우기
         </button>
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {selected.length === 0 ? (
-          <div className="rounded-md bg-white p-5 text-center text-sm font-bold text-[#6f695f] md:col-span-3">
+          <div className="rounded-lg bg-[#F9FBFA] p-5 text-center text-sm font-medium text-[#66736D] md:col-span-3">
             비교할 물건을 선택하세요.
           </div>
         ) : (
           selected.map((item) => (
-            <div key={item.id} className="rounded-md border border-[#eee2d1] bg-white p-4">
+            <div key={item.id} className="rounded-lg border border-[#E5ECE8] bg-white p-4">
               <div className="flex items-center justify-between gap-2">
                 <ChannelBadge channel={item.channel} />
                 <Verdict value={item.analysis.verdict} />
               </div>
-              <h3 className="mt-3 text-sm font-black text-[#181713]">{item.title}</h3>
+              <h3 className="mt-3 text-sm font-semibold text-[#17211D]">{item.title}</h3>
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <MiniStat label="예상 입찰" value={uk(item.analysis.plannedBid)} />
                 <MiniStat label="총투입" value={uk(item.analysis.allIn)} />
@@ -523,8 +523,8 @@ function MiniStat({
 }) {
   return (
     <div>
-      <p className="text-xs font-bold text-[#6f695f]">{label}</p>
-      <p className={`mt-0.5 font-black ${danger ? "text-[#b83a24]" : "text-[#181713]"}`}>
+      <p className="text-xs font-bold text-[#66736D]">{label}</p>
+      <p className={`mt-0.5 font-semibold tabular-nums ${danger ? "text-[#B53A2E]" : "text-[#17211D]"}`}>
         {value}
       </p>
     </div>
@@ -533,12 +533,12 @@ function MiniStat({
 
 function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
   const styles = {
-    안정: "bg-[#dffbe8] text-[#13663d]",
-    주의: "bg-[#fff1bd] text-[#80620a]",
-    위험: "bg-[#ffe0d5] text-[#b83a24]",
+    안정: "bg-[#E7F6EE] text-[#1F8A5B]",
+    주의: "bg-[#FFF4D7] text-[#8A5B00]",
+    위험: "bg-[#FDE8E5] text-[#B53A2E]",
   };
   return (
-    <span className={`inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-bold ${styles[level]}`}>
+    <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles[level]}`}>
       {level} · {score}점
     </span>
   );
@@ -547,12 +547,12 @@ function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
 function Verdict({ value }: { value: string }) {
   const style =
     value === "입찰 검토"
-      ? "border-[#b8f3c8] bg-[#dffbe8] text-[#13663d]"
+      ? "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]"
       : value === "가격 조정"
-        ? "border-[#ffd979] bg-[#fff1bd] text-[#80620a]"
-        : "border-[#ffc2b6] bg-[#ffe0d5] text-[#b83a24]";
+        ? "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]"
+        : "border-[#F2B8AE] bg-[#FDE8E5] text-[#B53A2E]";
   return (
-    <span className={`inline-flex w-fit rounded-md border px-2.5 py-1 text-xs font-bold ${style}`}>
+    <span className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${style}`}>
       {value}
     </span>
   );

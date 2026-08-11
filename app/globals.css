@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f3ea;
-  --foreground: #181713;
+  --background: #f6f8f7;
+  --foreground: #17211d;
 }
 
 @theme inline {
@@ -24,8 +24,8 @@ input {
 }
 
 ::selection {
-  background: #d7ff6f;
-  color: #181713;
+  background: #d8f1e4;
+  color: #17211d;
 }
 
 button {
@@ -34,6 +34,6 @@ button {
 
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid #d7ff6f;
+  outline: 3px solid #d8f1e4;
   outline-offset: 2px;
 }
