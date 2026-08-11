@@ -142,8 +142,8 @@ export function PropertyForm({
 
   if (!loaded) {
     return (
-      <main className="min-h-screen bg-[#f6f8fb] px-5 py-8 text-[#17211d]">
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#dde7e2] bg-white p-6 text-sm font-bold text-[#68756f]">
+      <main className="min-h-screen bg-[#f7f3ea] px-5 py-8 text-[#181713]">
+        <div className="mx-auto max-w-3xl rounded-lg border border-[#d8cfbf] bg-white p-6 text-sm font-bold text-[#6f695f]">
           저장된 물건을 불러오는 중입니다.
         </div>
       </main>
@@ -152,14 +152,14 @@ export function PropertyForm({
 
   if (isMissingEditTarget) {
     return (
-      <main className="min-h-screen bg-[#f6f8fb] px-5 py-8 text-[#17211d]">
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#dde7e2] bg-white p-6">
+      <main className="min-h-screen bg-[#f7f3ea] px-5 py-8 text-[#181713]">
+        <div className="mx-auto max-w-3xl rounded-lg border border-[#d8cfbf] bg-white p-6">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/" className="text-sm font-black text-[#1b7a4d]">
+          <a href="/" className="text-sm font-black text-[#13663d]">
             목록으로
           </a>
           <h1 className="mt-4 text-2xl font-black">수정할 수 없는 물건입니다.</h1>
-          <p className="mt-2 text-sm leading-6 text-[#68756f]">
+          <p className="mt-2 text-sm font-semibold leading-6 text-[#6f695f]">
             직접 등록한 물건만 수정할 수 있습니다. 샘플 물건은 읽기 전용으로
             유지됩니다.
           </p>
@@ -169,23 +169,23 @@ export function PropertyForm({
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f8fb] text-[#17211d]">
-      <section className="border-b border-[#dde7e2] bg-[#fbfdfb]">
-        <div className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
+    <main className="min-h-screen bg-[#f7f3ea] text-[#181713]">
+      <section className="border-b border-[#ded7c9] bg-[#f7f3ea]">
+        <div className="mx-auto max-w-4xl px-5 py-6 lg:px-8">
           <a
             href={mode === "edit" && itemId ? `/properties/${itemId}` : "/"}
-            className="inline-flex rounded-md border border-[#cad8d1] bg-white px-3 py-2 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8]"
+            className="inline-flex rounded-md border border-[#181713] bg-white px-3 py-2 text-sm font-black text-[#4f493f] shadow-[3px_3px_0_#d7ff6f] transition hover:-translate-y-0.5"
           >
             돌아가기
           </a>
           <div className="mt-5">
-            <p className="inline-flex rounded-full bg-[#e9fbf0] px-3 py-1 text-sm font-black text-[#1b7a4d]">
+            <p className="inline-flex rounded-full border border-[#181713] bg-[#d7ff6f] px-3 py-1 text-sm font-black text-[#181713] shadow-[3px_3px_0_#181713]">
               {mode === "edit" ? "내 물건 수정" : "새 물건 등록"}
             </p>
-            <h1 className="mt-3 text-3xl font-black tracking-normal text-[#101b17]">
+            <h1 className="mt-5 text-4xl font-black tracking-normal text-[#181713]">
               복잡한 공고를 네 단계로 가볍게 정리해요.
             </h1>
-            <p className="mt-2 text-sm leading-6 text-[#68756f]">
+            <p className="mt-3 text-sm font-semibold leading-6 text-[#625f56]">
               모르는 값은 비워도 됩니다. 다만 제목과 예상 시세는 분석을 위해
               필요합니다.
             </p>
@@ -194,7 +194,7 @@ export function PropertyForm({
       </section>
 
       <section className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
-        <div className="rounded-lg border border-[#dde7e2] bg-white p-4 shadow-sm shadow-[#1a2d2410]">
+        <div className="rounded-lg border border-[#d8cfbf] bg-white p-4 shadow-sm shadow-[#18171310]">
           <div className="grid gap-2 sm:grid-cols-4">
             {steps.map((label, index) => (
               <button
@@ -202,8 +202,8 @@ export function PropertyForm({
                 onClick={() => setStep(index as StepId)}
                 className={`rounded-md px-3 py-3 text-left text-sm font-black transition ${
                   step === index
-                    ? "bg-[#17211d] text-white"
-                    : "bg-[#f6faf8] text-[#5c6963] hover:bg-[#edf5f1]"
+                    ? "bg-[#181713] text-white"
+                    : "bg-[#fffaf1] text-[#625f56] hover:bg-[#f7f3ea]"
                 }`}
               >
                 <span className="block text-xs opacity-70">Step {index + 1}</span>
@@ -220,7 +220,7 @@ export function PropertyForm({
           </div>
 
           {error ? (
-            <p className="mt-4 rounded-md bg-[#fff0ec] px-3 py-2 text-sm font-bold text-[#c2412d]">
+            <p className="mt-4 rounded-md bg-[#ffe0d5] px-3 py-2 text-sm font-bold text-[#b83a24]">
               {error}
             </p>
           ) : null}
@@ -229,7 +229,7 @@ export function PropertyForm({
             <button
               onClick={goBack}
               disabled={step === 0}
-              className="h-11 rounded-md border border-[#cad8d1] px-4 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8] disabled:cursor-not-allowed disabled:opacity-40"
+              className="h-11 rounded-md border border-[#cfc6b8] bg-white px-4 text-sm font-black text-[#4f493f] transition hover:bg-[#fffaf1] disabled:cursor-not-allowed disabled:opacity-40"
             >
               이전
             </button>
@@ -237,14 +237,14 @@ export function PropertyForm({
               {step < 3 ? (
                 <button
                   onClick={goNext}
-                  className="h-11 rounded-md bg-[#17211d] px-4 text-sm font-black text-white transition hover:bg-[#24332d]"
+                  className="h-11 rounded-md border border-[#181713] bg-[#181713] px-4 text-sm font-black text-white shadow-[3px_3px_0_#ff8a65] transition hover:-translate-y-0.5"
                 >
                   다음
                 </button>
               ) : (
                 <button
                   onClick={submit}
-                  className="h-11 rounded-md bg-[#1b7a4d] px-4 text-sm font-black text-white transition hover:bg-[#14683f]"
+                  className="h-11 rounded-md border border-[#181713] bg-[#d7ff6f] px-4 text-sm font-black text-[#181713] shadow-[3px_3px_0_#181713] transition hover:-translate-y-0.5"
                 >
                   저장하고 상세 보기
                 </button>
@@ -329,7 +329,7 @@ function BasicStep({ draft, update }: StepProps) {
 function PriceStep({ draft, update }: StepProps) {
   return (
     <div className="grid gap-4">
-      <p className="rounded-md bg-[#f6faf8] px-3 py-2 text-sm font-bold text-[#5c6963]">
+      <p className="rounded-md bg-[#fffaf1] px-3 py-2 text-sm font-bold text-[#625f56]">
         금액은 `만원` 단위로 입력하면 됩니다.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -396,12 +396,12 @@ type StepProps = {
 };
 
 const inputClass =
-  "h-11 w-full rounded-md border border-[#cad8d1] bg-[#fbfdfb] px-3 text-sm font-bold text-[#17211d] outline-none transition focus:border-[#22a06b] focus:ring-2 focus:ring-[#a7f3c5]";
+  "h-11 w-full rounded-md border border-[#cfc6b8] bg-[#fffaf1] px-3 text-sm font-bold text-[#181713] outline-none transition focus:border-[#181713] focus:ring-2 focus:ring-[#d7ff6f]";
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs font-black text-[#5c6963]">{label}</span>
+      <span className="text-xs font-black text-[#625f56]">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
   );
@@ -449,14 +449,14 @@ function Segmented({
 }) {
   return (
     <div>
-      <p className="text-xs font-black text-[#5c6963]">{label}</p>
-      <div className="mt-1 grid grid-cols-2 gap-2 rounded-md border border-[#dde7e2] bg-[#f6faf8] p-1">
+      <p className="text-xs font-black text-[#625f56]">{label}</p>
+      <div className="mt-1 grid grid-cols-2 gap-2 rounded-md border border-[#d8cfbf] bg-[#f7f3ea] p-1">
         {options.map((option) => (
           <button
             key={option}
             onClick={() => onChange(option)}
             className={`h-10 rounded text-sm font-black transition ${
-              value === option ? "bg-[#17211d] text-white" : "text-[#55635d] hover:bg-white"
+              value === option ? "bg-[#181713] text-white" : "text-[#625f56] hover:bg-white"
             }`}
           >
             {option}
@@ -481,8 +481,8 @@ function Toggle({
       onClick={() => onChange(!checked)}
       className={`flex h-11 items-center justify-between rounded-md border px-3 text-sm font-black transition ${
         checked
-          ? "border-[#bdf2d1] bg-[#e9fbf0] text-[#1b7a4d]"
-          : "border-[#cad8d1] bg-[#fbfdfb] text-[#5c6963]"
+          ? "border-[#181713] bg-[#d7ff6f] text-[#181713]"
+          : "border-[#cfc6b8] bg-[#fffaf1] text-[#625f56]"
       }`}
     >
       <span>{label}</span>

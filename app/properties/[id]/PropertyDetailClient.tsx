@@ -30,8 +30,8 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
   if (!loaded) {
     return (
-      <main className="min-h-screen bg-[#f6f8fb] px-5 py-8 text-[#17211d]">
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#dde7e2] bg-white p-6 text-sm font-bold text-[#68756f]">
+      <main className="min-h-screen bg-[#f7f3ea] px-5 py-8 text-[#181713]">
+        <div className="mx-auto max-w-3xl rounded-lg border border-[#d8cfbf] bg-white p-6 text-sm font-bold text-[#6f695f]">
           저장된 물건을 불러오는 중입니다.
         </div>
       </main>
@@ -40,14 +40,14 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
   if (!item) {
     return (
-      <main className="min-h-screen bg-[#f6f8fb] px-5 py-8 text-[#17211d]">
-        <div className="mx-auto max-w-3xl rounded-lg border border-[#dde7e2] bg-white p-6">
+      <main className="min-h-screen bg-[#f7f3ea] px-5 py-8 text-[#181713]">
+        <div className="mx-auto max-w-3xl rounded-lg border border-[#d8cfbf] bg-white p-6">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/" className="text-sm font-black text-[#1b7a4d]">
+          <a href="/" className="text-sm font-black text-[#13663d]">
             목록으로
           </a>
           <h1 className="mt-4 text-2xl font-black">물건을 찾을 수 없습니다.</h1>
-          <p className="mt-2 text-sm leading-6 text-[#68756f]">
+          <p className="mt-2 text-sm font-semibold leading-6 text-[#6f695f]">
             직접 등록한 물건은 이 브라우저에 저장됩니다. 다른 기기나 브라우저에서는
             다시 등록해야 보일 수 있습니다.
           </p>
@@ -74,14 +74,14 @@ export function PropertyDetailClient({ id }: { id: string }) {
   const totalWithBuffer = analysis.allIn + acquisitionCosts + repairReserve;
 
   return (
-    <main className="min-h-screen bg-[#f6f8fb] text-[#17211d]">
-      <section className="border-b border-[#dde7e2] bg-[#fbfdfb]">
-        <div className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
+    <main className="min-h-screen bg-[#f7f3ea] text-[#181713]">
+      <section className="border-b border-[#ded7c9] bg-[#f7f3ea]">
+        <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
-              className="inline-flex rounded-md border border-[#cad8d1] bg-white px-3 py-2 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8]"
+              className="inline-flex rounded-md border border-[#181713] bg-white px-3 py-2 text-sm font-black text-[#4f493f] shadow-[3px_3px_0_#d7ff6f] transition hover:-translate-y-0.5"
             >
               목록으로
             </a>
@@ -89,13 +89,13 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <div className="flex gap-2">
                 <a
                   href={`/properties/${item.id}/edit`}
-                  className="inline-flex rounded-md border border-[#cad8d1] bg-white px-3 py-2 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8]"
+                  className="inline-flex rounded-md border border-[#cfc6b8] bg-white px-3 py-2 text-sm font-black text-[#4f493f] transition hover:bg-[#fffaf1]"
                 >
                   수정
                 </a>
                 <button
                   onClick={deleteCurrentItem}
-                  className="rounded-md bg-[#fff0ec] px-3 py-2 text-sm font-black text-[#c2412d] transition hover:bg-[#ffe3dc]"
+                  className="rounded-md border border-[#ffc2b6] bg-[#ffe0d5] px-3 py-2 text-sm font-black text-[#b83a24] transition hover:bg-[#ffd2c5]"
                 >
                   삭제
                 </button>
@@ -108,34 +108,34 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <div className="flex flex-wrap items-center gap-2">
                 <ChannelBadge channel={item.channel} />
                 {isUserItem ? (
-                  <span className="rounded-md bg-[#17211d] px-2 py-0.5 text-xs font-bold text-white">
+                  <span className="rounded-md bg-[#181713] px-2 py-0.5 text-xs font-bold text-white">
                     내 물건
                   </span>
                 ) : null}
-                <span className="rounded-md bg-[#f3f5f2] px-2 py-0.5 text-xs font-bold text-[#65706b]">
+                <span className="rounded-md bg-[#f3eadb] px-2 py-0.5 text-xs font-bold text-[#6a6258]">
                   {item.agency}
                 </span>
-                <span className="text-xs font-bold text-[#68756f]">
+                <span className="text-xs font-bold text-[#6f695f]">
                   {item.caseNo}
                 </span>
               </div>
-              <h1 className="mt-3 text-3xl font-black tracking-normal text-[#101b17] md:text-4xl">
+              <h1 className="mt-4 max-w-3xl text-4xl font-black tracking-normal text-[#181713] md:text-5xl">
                 {item.title}
               </h1>
-              <p className="mt-2 text-sm leading-6 text-[#5c6963] md:text-base">
+              <p className="mt-3 text-sm font-semibold leading-6 text-[#625f56] md:text-base">
                 {item.district} · {item.area || "면적 확인 필요"}㎡ · {item.floor} · 마감 {item.auctionDate}
               </p>
             </div>
 
-            <div className="rounded-lg border border-[#bdf2d1] bg-[#e9fbf0] p-4">
-              <p className="text-xs font-black text-[#1b7a4d]">가볍게 보는 결론</p>
+            <div className="rounded-lg border border-[#181713] bg-[#d7ff6f] p-4 shadow-[5px_5px_0_#181713]">
+              <p className="text-xs font-black text-[#181713]">가볍게 보는 결론</p>
               <div className="mt-3 flex items-center justify-between gap-3">
                 <Verdict value={analysis.verdict} />
                 <RiskBadge level={analysis.level} score={analysis.risk} />
               </div>
               <div className="mt-4 flex items-end justify-between gap-3">
                 <span className="text-sm font-bold text-[#29332f]">추천 상한가</span>
-                <span className="text-3xl font-black text-[#1b7a4d]">
+                <span className="text-3xl font-black text-[#181713]">
                   {uk(analysis.suggested)}
                 </span>
               </div>
@@ -147,15 +147,15 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[1fr_360px] lg:px-8">
         <div className="space-y-5">
-          <section className="rounded-lg border border-[#dde7e2] bg-white p-5 shadow-sm shadow-[#1a2d2410]">
+          <section className="rounded-lg border border-[#d8cfbf] bg-white p-5 shadow-sm shadow-[#18171310]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-black">가격 한눈에 보기</h2>
-                <p className="mt-1 text-sm text-[#68756f]">
+                <p className="mt-1 text-sm font-semibold text-[#6f695f]">
                   현재 계산은 시세의 78%, 비용 버퍼 4% 기준입니다.
                 </p>
               </div>
-              <span className="rounded-full bg-[#eaf5ff] px-3 py-1 text-sm font-black text-[#2563a8]">
+              <span className="rounded-full bg-[#dff4ff] px-3 py-1 text-sm font-black text-[#176785]">
                 최저가 / 시세 {percent(analysis.marketRatio)}
               </span>
             </div>
@@ -167,7 +167,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </section>
 
-          <section className="rounded-lg border border-[#dde7e2] bg-white p-5 shadow-sm shadow-[#1a2d2410]">
+          <section className="rounded-lg border border-[#d8cfbf] bg-white p-5 shadow-sm shadow-[#18171310]">
             <h2 className="text-xl font-black">입찰 전 체크리스트</h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <CheckCard title="임차인 상태" value={item.tenant} />
@@ -179,25 +179,25 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </section>
 
-          <section className="rounded-lg border border-[#dde7e2] bg-white p-5 shadow-sm shadow-[#1a2d2410]">
+          <section className="rounded-lg border border-[#d8cfbf] bg-white p-5 shadow-sm shadow-[#18171310]">
             <h2 className="text-xl font-black">조심해서 볼 포인트</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {analysis.flags.length === 0 ? (
-                <span className="rounded-md bg-[#e9fbf0] px-3 py-1.5 text-sm font-black text-[#1b7a4d]">
+                <span className="rounded-md bg-[#dffbe8] px-3 py-1.5 text-sm font-black text-[#13663d]">
                   큰 체크 포인트 없음
                 </span>
               ) : (
                 analysis.flags.map((flag) => (
                   <span
                     key={flag}
-                    className="rounded-md bg-[#fff7da] px-3 py-1.5 text-sm font-black text-[#916100]"
+                    className="rounded-md bg-[#fff1bd] px-3 py-1.5 text-sm font-black text-[#80620a]"
                   >
                     {flag}
                   </span>
                 ))
               )}
             </div>
-            <ul className="mt-4 space-y-2 text-sm leading-6 text-[#5b6862]">
+            <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-[#6f695f]">
               {item.notes.map((note) => (
                 <li key={note}>{note}</li>
               ))}
@@ -206,9 +206,9 @@ export function PropertyDetailClient({ id }: { id: string }) {
         </div>
 
         <aside className="space-y-5">
-          <section className="rounded-lg border border-[#dde7e2] bg-white p-5 shadow-sm shadow-[#1a2d2410]">
+          <section className="rounded-lg border border-[#d8cfbf] bg-white p-5 shadow-sm shadow-[#18171310]">
             <h2 className="text-lg font-black">주소 정보</h2>
-            <p className="mt-3 rounded-md bg-[#f6faf8] p-3 text-sm font-bold leading-6 text-[#34423c]">
+            <p className="mt-3 rounded-md bg-[#fffaf1] p-3 text-sm font-bold leading-6 text-[#4f493f]">
               {item.address}
             </p>
             {item.sourceUrl ? (
@@ -216,34 +216,34 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 href={item.sourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-flex rounded-md border border-[#cad8d1] px-3 py-2 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8]"
+                className="mt-3 inline-flex rounded-md border border-[#cfc6b8] px-3 py-2 text-sm font-black text-[#4f493f] transition hover:bg-[#fffaf1]"
               >
                 원문 보기
               </a>
             ) : null}
-            <p className="mt-3 text-xs leading-5 text-[#68756f]">
+            <p className="mt-3 text-xs font-semibold leading-5 text-[#6f695f]">
               실제 서비스에서는 목록에는 동네·단지 중심으로 보여주고, 상세에서
               원문 기준 주소와 첨부 문서를 확인하는 흐름이 좋습니다.
             </p>
           </section>
 
           {item.userMemo ? (
-            <section className="rounded-lg border border-[#dde7e2] bg-white p-5 shadow-sm shadow-[#1a2d2410]">
+            <section className="rounded-lg border border-[#d8cfbf] bg-white p-5 shadow-sm shadow-[#18171310]">
               <h2 className="text-lg font-black">내 메모</h2>
-              <p className="mt-3 whitespace-pre-wrap rounded-md bg-[#f6faf8] p-3 text-sm font-bold leading-6 text-[#34423c]">
+              <p className="mt-3 whitespace-pre-wrap rounded-md bg-[#fffaf1] p-3 text-sm font-bold leading-6 text-[#4f493f]">
                 {item.userMemo}
               </p>
             </section>
           ) : null}
 
-          <section className="rounded-lg border border-[#dde7e2] bg-white p-5 shadow-sm shadow-[#1a2d2410]">
+          <section className="rounded-lg border border-[#d8cfbf] bg-white p-5 shadow-sm shadow-[#18171310]">
             <h2 className="text-lg font-black">비용 감 잡기</h2>
             <div className="mt-4 space-y-3">
               <MiniLine label="입찰가" value={uk(analysis.plannedBid)} />
               <MiniLine label="인수금" value={uk(item.takeoverAmount)} />
               <MiniLine label="취득 비용 추정" value={uk(acquisitionCosts)} />
               <MiniLine label="수리·명도 버퍼" value={uk(repairReserve)} />
-              <div className="border-t border-[#e3ece7] pt-3">
+              <div className="border-t border-[#eee2d1] pt-3">
                 <MiniLine label="총투입 예상" value={uk(totalWithBuffer)} strong />
               </div>
             </div>
@@ -257,8 +257,8 @@ export function PropertyDetailClient({ id }: { id: string }) {
 function ChannelBadge({ channel }: { channel: SaleChannel }) {
   const style =
     channel === "경매"
-      ? "bg-[#e9fbf0] text-[#1b7a4d]"
-      : "bg-[#eaf5ff] text-[#2563a8]";
+      ? "bg-[#dffbe8] text-[#13663d]"
+      : "bg-[#dff4ff] text-[#176785]";
   return (
     <span className={`inline-flex w-fit rounded-md px-2 py-0.5 text-xs font-bold ${style}`}>
       {channel}
@@ -268,9 +268,9 @@ function ChannelBadge({ channel }: { channel: SaleChannel }) {
 
 function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
   const styles = {
-    안정: "bg-[#e9fbf0] text-[#1b7a4d]",
-    주의: "bg-[#fff7da] text-[#916100]",
-    위험: "bg-[#fff0ec] text-[#c2412d]",
+    안정: "bg-white text-[#13663d]",
+    주의: "bg-white text-[#80620a]",
+    위험: "bg-white text-[#b83a24]",
   };
   return (
     <span className={`inline-flex w-fit items-center rounded-md px-2.5 py-1 text-xs font-bold ${styles[level]}`}>
@@ -282,10 +282,10 @@ function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
 function Verdict({ value }: { value: string }) {
   const style =
     value === "입찰 검토"
-      ? "border-[#bdf2d1] bg-[#e9fbf0] text-[#1b7a4d]"
+      ? "border-[#b8f3c8] bg-white text-[#13663d]"
       : value === "가격 조정"
-        ? "border-[#ffe08a] bg-[#fff7da] text-[#916100]"
-        : "border-[#ffc8bd] bg-[#fff0ec] text-[#c2412d]";
+        ? "border-[#ffd979] bg-white text-[#80620a]"
+        : "border-[#ffc2b6] bg-white text-[#b83a24]";
   return (
     <span className={`inline-flex w-fit rounded-md border px-2.5 py-1 text-xs font-bold ${style}`}>
       {value}
@@ -295,9 +295,9 @@ function Verdict({ value }: { value: string }) {
 
 function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
   const color =
-    level === "위험" ? "bg-[#ff6b57]" : level === "주의" ? "bg-[#f5a524]" : "bg-[#22a06b]";
+    level === "위험" ? "bg-[#ff6f61]" : level === "주의" ? "bg-[#ffb84d]" : "bg-[#00a86b]";
   return (
-    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#dfe8e3]">
+    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#18171324]">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   );
@@ -305,18 +305,18 @@ function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-[#e3ece7] bg-[#fbfdfb] p-4">
-      <p className="text-xs font-semibold text-[#68756f]">{label}</p>
-      <p className="mt-1 text-xl font-black text-[#17211d]">{value}</p>
+    <div className="rounded-md border border-[#eee2d1] bg-[#fffaf1] p-4">
+      <p className="text-xs font-bold text-[#70685d]">{label}</p>
+      <p className="mt-1 text-xl font-black text-[#181713]">{value}</p>
     </div>
   );
 }
 
 function CheckCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-md border border-[#e3ece7] bg-[#fbfdfb] p-4">
-      <p className="text-xs font-bold text-[#68756f]">{title}</p>
-      <p className="mt-1 font-black text-[#17211d]">{value}</p>
+    <div className="rounded-md border border-[#eee2d1] bg-[#fffaf1] p-4">
+      <p className="text-xs font-bold text-[#70685d]">{title}</p>
+      <p className="mt-1 font-black text-[#181713]">{value}</p>
     </div>
   );
 }
@@ -332,8 +332,8 @@ function MiniLine({
 }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
-      <span className="font-bold text-[#5b6862]">{label}</span>
-      <span className={strong ? "text-lg font-black text-[#1b7a4d]" : "font-black text-[#17211d]"}>
+      <span className="font-bold text-[#6f695f]">{label}</span>
+      <span className={strong ? "text-lg font-black text-[#13663d]" : "font-black text-[#181713]"}>
         {value}
       </span>
     </div>

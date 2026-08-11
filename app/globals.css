@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f1ea;
-  --foreground: #1d2522;
+  --background: #f7f3ea;
+  --foreground: #181713;
 }
 
 @theme inline {
@@ -23,12 +23,17 @@ input {
   font: inherit;
 }
 
+::selection {
+  background: #d7ff6f;
+  color: #181713;
+}
+
 button {
   cursor: pointer;
 }
 
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid #95d5b2;
+  outline: 3px solid #d7ff6f;
   outline-offset: 2px;
 }
