@@ -513,15 +513,23 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Make the bottom `비교` tab badge more prominent when one or more properties are selected.
-- [ ] Add an empty comparison state that explains the next action in one sentence.
-- [ ] Show the best candidate first with a clearer ranking label.
-- [ ] Add a compact "why ranked here" summary per compared property.
-- [ ] Keep remove actions easy to tap without accidental detail navigation.
+- [x] Make the bottom `비교` tab badge more prominent when one or more properties are selected.
+- [x] Add an empty comparison state that explains the next action in one sentence.
+- [x] Show the best candidate first with a clearer ranking label.
+- [x] Add a compact "why ranked here" summary per compared property.
+- [x] Keep remove actions easy to tap without accidental detail navigation.
 
 Completion criteria:
 
 - Users can understand why one property looks better than another without opening every detail page.
+
+Verification notes:
+
+- The bottom comparison tab now highlights when at least one property is selected.
+- Empty comparison state explains that users should add candidates from the property tab.
+- Ranked comparison cards show `검토 우선 #1` for the best current candidate.
+- Each comparison card includes a compact reason string using verdict, margin, and unknown checklist count.
+- Remove buttons are separated below card content with larger mobile tap targets.
 
 ### 5.3 Rework Detail Page For Mobile Reading
 

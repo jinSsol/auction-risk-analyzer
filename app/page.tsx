@@ -704,6 +704,7 @@ function ComparePanel({
   onRemove: (id: string) => void;
 }) {
   const ranked = [...selected].sort(compareForBasket);
+  const best = ranked[0];
 
   return (
     <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur">
@@ -711,17 +712,29 @@ function ComparePanel({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-semibold text-[#17211D]">비교 바구니</h2>
-            <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                selected.length > 0
+                  ? "bg-[#E7F6EE] text-[#0F766E] ring-1 ring-[#BFE3D0]"
+                  : "bg-[#EEF3F1] text-[#34423C]"
+              }`}
+            >
               {selected.length}/{MAX_COMPARE_COUNT}
             </span>
           </div>
           <p className="text-sm text-[#66736D]">
             2-4개 물건을 총투입금, 권리 미확인, 마진, 판정 기준으로 비교합니다.
           </p>
+          {best ? (
+            <p className="mt-2 text-xs font-semibold text-[#1F8A5B]">
+              현재 1순위: {best.title} · {compareReason(best)}
+            </p>
+          ) : null}
         </div>
         <button
           onClick={onClear}
-          className="h-9 rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
+          disabled={selected.length === 0}
+          className="h-9 rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
         >
           선택 비우기
         </button>
@@ -733,24 +746,43 @@ function ComparePanel({
       ) : null}
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {selected.length === 0 ? (
-          <div className="rounded-lg bg-[#F9FBFA] p-5 text-center text-sm font-medium text-[#66736D] md:col-span-2 xl:col-span-4">
-            비교할 물건을 선택하세요.
+          <div className="rounded-xl border border-dashed border-[#B8C7C0] bg-[#F9FBFA] p-6 text-center md:col-span-2 xl:col-span-4">
+            <p className="text-base font-semibold text-[#17211D]">아직 비교할 물건이 없어요.</p>
+            <p className="mx-auto mt-2 max-w-sm text-sm font-medium leading-6 text-[#66736D]">
+              물건 탭에서 마음에 드는 후보의 비교 담기를 누르면 총투입금과 권리 리스크를 여기서 바로 비교할 수 있습니다.
+            </p>
           </div>
         ) : (
           ranked.map((item, index) => {
             const checklist = summarizeRightsChecklist(item.rightsChecklist);
 
             return (
-            <div key={item.id} className="interactive-card rounded-lg border border-[#E5ECE8] bg-white p-4 hover:border-[#B8C7C0] hover:shadow-[0_10px_24px_rgba(23,33,29,0.07)]">
+            <div
+              key={item.id}
+              className={`interactive-card rounded-lg border bg-white p-4 hover:border-[#B8C7C0] hover:shadow-[0_10px_24px_rgba(23,33,29,0.07)] ${
+                index === 0
+                  ? "border-[#BFE3D0] ring-2 ring-[#E7F6EE]"
+                  : "border-[#E5ECE8]"
+              }`}
+            >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[#17211D] px-2.5 py-1 text-xs font-semibold text-white">
-                    #{index + 1}
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      index === 0
+                        ? "bg-[#0F766E] text-white"
+                        : "bg-[#17211D] text-white"
+                    }`}
+                  >
+                    {index === 0 ? "검토 우선 #1" : `비교 #${index + 1}`}
                   </span>
                   <ChannelBadge channel={item.channel} />
                 </div>
                 <Verdict value={item.analysis.verdict} />
               </div>
+              <p className="mt-3 rounded-lg bg-[#F9FBFA] px-3 py-2 text-xs font-bold leading-5 text-[#34423C]">
+                {compareReason(item)}
+              </p>
               <a
                 href={`/properties/${item.id}`}
                 className="mt-3 block text-sm font-semibold text-[#17211D] transition hover:text-[#0F766E]"
@@ -778,12 +810,14 @@ function ComparePanel({
                 <MiniStat label="리스크" value={`${item.analysis.risk}점`} danger={item.analysis.level === "위험"} />
                 <MiniStat label="상한 기준" value={uk(item.analysis.doNotBidAbove)} />
               </div>
-              <button
-                onClick={() => onRemove(item.id)}
-                className="mt-3 h-9 w-full rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] text-sm font-semibold text-[#34423C] transition hover:border-[#B53A2E] hover:bg-[#FDE8E5] hover:text-[#B53A2E]"
-              >
-                비교에서 제외
-              </button>
+              <div className="mt-3 border-t border-[#E5ECE8] pt-3">
+                <button
+                  onClick={() => onRemove(item.id)}
+                  className="h-10 w-full rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] text-sm font-semibold text-[#34423C] transition hover:border-[#B53A2E] hover:bg-[#FDE8E5] hover:text-[#B53A2E]"
+                >
+                  비교에서 제외
+                </button>
+              </div>
             </div>
             );
           })
@@ -791,6 +825,35 @@ function ComparePanel({
       </div>
     </section>
   );
+}
+
+function compareReason(item: AnalyzedItem) {
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
+  const reasons = [];
+
+  if (item.analysis.verdict === "입찰 검토") {
+    reasons.push("판정 양호");
+  } else if (item.analysis.verdict === "가격 조정") {
+    reasons.push("가격 조정 필요");
+  } else {
+    reasons.push("전문가 검토 권장");
+  }
+
+  if (item.analysis.marginRate >= 12) {
+    reasons.push(`마진 ${percent(item.analysis.marginRate)}`);
+  } else if (item.analysis.marginRate < 0) {
+    reasons.push("마진 음수");
+  } else {
+    reasons.push(`마진 ${percent(item.analysis.marginRate)}`);
+  }
+
+  if (checklist.unknownCount === 0) {
+    reasons.push("권리 미확인 없음");
+  } else {
+    reasons.push(`미확인 ${checklist.unknownCount}개`);
+  }
+
+  return reasons.join(" · ");
 }
 
 function MobileBottomTabs({
@@ -817,6 +880,7 @@ function MobileBottomTabs({
           active={activeTab === "compare"}
           label="비교"
           meta={`${selectedCount}/${MAX_COMPARE_COUNT}`}
+          highlighted={selectedCount > 0}
           onClick={() => onTabChange("compare")}
         />
         <Link
@@ -835,11 +899,13 @@ function MobileTabButton({
   active,
   label,
   meta,
+  highlighted,
   onClick,
 }: {
   active: boolean;
   label: string;
   meta: string;
+  highlighted?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -850,6 +916,8 @@ function MobileTabButton({
       className={`button-lift min-h-14 rounded-xl px-2 text-center text-sm font-semibold transition ${
         active
           ? "bg-[#E7F6EE] text-[#0F766E] ring-1 ring-[#BFE3D0]"
+          : highlighted
+            ? "bg-white text-[#0F766E] ring-2 ring-[#BFE3D0] shadow-[0_8px_20px_rgba(15,118,110,0.12)]"
           : "bg-[#F6F8F7] text-[#34423C] ring-1 ring-[#DDE5E1]"
       }`}
     >
