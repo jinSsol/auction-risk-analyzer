@@ -478,15 +478,22 @@ Goal:
 
 Tasks:
 
-- [ ] Show only the most important scan fields by default: title, district, deadline, verdict, suggested ceiling, and margin.
-- [ ] Move secondary price/risk details behind an expand/collapse area on mobile.
-- [ ] Keep `비교 담기` visible and thumb-friendly.
-- [ ] Strengthen selected state so users can instantly see what is already in the comparison basket.
-- [ ] Preserve the richer desktop card layout.
+- [x] Show only the most important scan fields by default: title, district, deadline, verdict, suggested ceiling, and margin.
+- [x] Move secondary price/risk details behind an expand/collapse area on mobile.
+- [x] Keep `비교 담기` visible and thumb-friendly.
+- [x] Strengthen selected state so users can instantly see what is already in the comparison basket.
+- [x] Preserve the richer desktop card layout.
 
 Completion criteria:
 
 - A user can scan 6-8 properties on a phone without feeling buried in numbers.
+
+Verification notes:
+
+- Mobile listing cards now default to compact scan fields and a two-stat price summary.
+- Secondary market price, minimum price, and risk meter are available through a mobile `더보기` control.
+- Selected comparison cards show a stronger mobile ring and `비교 담김` label.
+- Desktop listing cards keep the richer four-stat and risk-meter layout visible by default.
 
 ### 5.2 Improve Mobile Comparison Tab
 

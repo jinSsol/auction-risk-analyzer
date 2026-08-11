@@ -447,12 +447,16 @@ function ListingCard({
   href: string;
   onToggle: () => void;
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
+  const detailId = `listing-details-${item.id}`;
 
   return (
     <article
       className={`interactive-card reveal-up group relative overflow-hidden rounded-xl border bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:border-[#B8C7C0] hover:shadow-[0_14px_34px_rgba(23,33,29,0.09)] ${
-        selected ? "border-[#1F8A5B] ring-2 ring-[#D8F1E4]" : "border-[#DDE5E1]"
+        selected
+          ? "border-[#0F766E] ring-2 ring-[#9DDBC2] md:ring-[#D8F1E4]"
+          : "border-[#DDE5E1]"
       }`}
     >
       <div className={`absolute inset-y-0 left-0 w-1 ${riskAccent[item.analysis.level]}`} />
@@ -471,20 +475,40 @@ function ListingCard({
             <span className="text-xs font-semibold text-[#66736D]">
               {item.caseNo}
             </span>
+            {selected ? (
+              <span className="rounded-full bg-[#0F766E] px-2.5 py-1 text-xs font-semibold text-white md:hidden">
+                비교 담김
+              </span>
+            ) : null}
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h2 className="text-lg font-semibold text-[#17211D] transition group-hover:text-[#0F766E]">
+              <h2 className="text-base font-semibold leading-snug text-[#17211D] transition group-hover:text-[#0F766E] md:text-lg">
                 {item.title}
               </h2>
               <p className="mt-1 text-sm font-medium text-[#66736D]">
-                {item.district} · {item.area}㎡ · {item.floor} · 마감 {item.auctionDate}
+                {item.district} · 마감 {item.auctionDate}
+                <span className="hidden md:inline">
+                  {" "}· {item.area}㎡ · {item.floor}
+                </span>
               </p>
             </div>
             <Verdict value={item.analysis.verdict} />
           </div>
 
-          <div className="mt-4 grid gap-2 sm:grid-cols-4">
+          <div className="mt-4 grid grid-cols-2 gap-2 md:hidden">
+            <CompactStat label="적정 상한" value={uk(item.analysis.suggested)} strong />
+            <CompactStat
+              label="안전마진"
+              value={percent(item.analysis.marginRate)}
+              danger={item.analysis.marginRate < 10}
+            />
+          </div>
+
+          <div
+            id={detailId}
+            className={`${detailsOpen ? "grid" : "hidden"} mt-4 gap-2 sm:grid-cols-4 md:grid`}
+          >
             <PriceStat label="시세" value={uk(item.market)} />
             <PriceStat label="최저가" value={uk(item.minimum)} sub={percent(item.analysis.marketRatio)} />
             <PriceStat label="적정 상한" value={uk(item.analysis.suggested)} strong />
@@ -497,16 +521,18 @@ function ListingCard({
         </a>
 
         <div className="space-y-3">
-          <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)]">
+          <div
+            className={`${detailsOpen ? "block" : "hidden"} rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:block`}
+          >
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-semibold text-[#66736D]">체크 난이도</span>
               <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
             </div>
             <RiskMeter level={item.analysis.level} score={item.analysis.risk} />
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 md:justify-between">
             <span
-              className={`text-xs font-bold ${
+              className={`min-w-0 text-xs font-bold ${
                 gapToSuggested >= 0 ? "text-[#1F8A5B]" : "text-[#B53A2E]"
               }`}
             >
@@ -514,9 +540,18 @@ function ListingCard({
               {gapToSuggested >= 0 ? " 낮음" : " 높음"}
             </span>
             <button
+              type="button"
+              onClick={() => setDetailsOpen((current) => !current)}
+              aria-expanded={detailsOpen}
+              aria-controls={detailId}
+              className="h-9 rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] px-3 text-sm font-semibold text-[#34423C] transition hover:bg-white md:hidden"
+            >
+              {detailsOpen ? "접기" : "더보기"}
+            </button>
+            <button
               onClick={onToggle}
               aria-pressed={selected}
-              className={`button-lift h-9 rounded-lg px-3 text-sm transition ${
+              className={`button-lift h-10 min-w-28 rounded-lg px-3 text-sm transition md:h-9 md:min-w-0 ${
                 selected
                   ? "bg-[#0F766E] font-semibold text-white shadow-[0_8px_18px_rgba(15,118,110,0.18)]"
                   : "border border-[#DDE5E1] bg-white font-semibold text-[#34423C] hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
@@ -528,6 +563,35 @@ function ListingCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function CompactStat({
+  label,
+  value,
+  strong,
+  danger,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <div className="min-w-0 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] px-3 py-2">
+      <p className="text-[11px] font-bold text-[#66736D]">{label}</p>
+      <p
+        className={`mt-0.5 break-words text-sm font-semibold tabular-nums ${
+          danger
+            ? "text-[#B53A2E]"
+            : strong
+              ? "text-[#1F8A5B]"
+              : "text-[#17211D]"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
   );
 }
 
