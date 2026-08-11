@@ -89,6 +89,12 @@ export default function Home() {
     risky: filtered.filter((item) => item.analysis.level === "위험").length,
     mine: filtered.filter((item) => item.id.startsWith("user-")).length,
   };
+  const activeFilterCount = [
+    channel !== "전체",
+    type !== "전체",
+    level !== "전체",
+    owner !== "전체",
+  ].filter(Boolean).length;
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -103,6 +109,14 @@ export default function Home() {
     window.requestAnimationFrame(() => {
       contentRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
     });
+  }
+
+  function resetFilters() {
+    setQuery("");
+    setChannel("전체");
+    setType("전체");
+    setLevel("전체");
+    setOwner("전체");
   }
 
   return (
@@ -142,48 +156,84 @@ export default function Home() {
       </section>
 
       <section
-        className={`sticky top-0 z-10 border-b border-[#DDE5E1] bg-white/85 backdrop-blur ${
+        className={`sticky top-0 z-10 border-b border-[#DDE5E1] bg-white/90 backdrop-blur ${
           mobileTab === "browse" ? "block" : "hidden md:block"
         }`}
       >
-        <div className="mx-auto grid max-w-7xl gap-3 px-5 py-3 xl:grid-cols-[minmax(280px,1fr)_auto_auto_auto_auto] xl:items-end xl:px-8">
-          <div>
-            <label className="text-xs font-semibold text-[#66736D]">
-              검색
-            </label>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="판교, 온비드, 2025타경, 빌라"
-              className="mt-1 h-10 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#D8F1E4]"
+        <div className="mx-auto max-w-7xl px-5 py-3 xl:px-8">
+          <div className="grid gap-3 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-start">
+            <div className="rounded-xl border border-[#DDE5E1] bg-white shadow-[0_8px_24px_rgba(23,33,29,0.06)]">
+              <label className="sr-only" htmlFor="property-search">
+                물건 검색
+              </label>
+              <div className="flex min-h-12 items-center gap-2 px-3">
+                <span className="h-2 w-2 rounded-full bg-[#1F8A5B] shadow-[0_0_0_5px_rgba(31,138,91,0.12)]" />
+                <input
+                  id="property-search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="지역, 사건번호, 온비드, 아파트"
+                  className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-[#17211D] outline-none placeholder:text-[#9AA6A0]"
+                />
+                {query ? (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="h-8 rounded-full bg-[#EEF3F1] px-3 text-xs font-bold text-[#66736D] transition hover:bg-[#DDE5E1]"
+                  >
+                    지우기
+                  </button>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3 xl:justify-end">
+              <div>
+                <p className="text-xs font-bold text-[#66736D]">검색 결과</p>
+                <p className="text-sm font-semibold text-[#17211D]">{stats.total}건</p>
+              </div>
+              <button
+                type="button"
+                onClick={resetFilters}
+                disabled={!query && activeFilterCount === 0}
+                className="h-10 rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
+              >
+                초기화
+              </button>
+            </div>
+          </div>
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <InlineFilter
+              title="방식"
+              options={["전체", "경매", "공매"]}
+              value={channel}
+              onChange={(value) => setChannel(value as SaleChannel | "전체")}
+            />
+            <InlineFilter
+              title="물건"
+              options={["전체", "아파트", "빌라", "오피스텔"]}
+              value={type}
+              onChange={(value) => setType(value as PropertyType | "전체")}
+            />
+            <InlineFilter
+              title="판단"
+              options={["전체", "검토 쉬움", "주의", "위험"]}
+              value={level === "안정" ? "검토 쉬움" : level}
+              onChange={(value) =>
+                setLevel(value === "검토 쉬움" ? "안정" : (value as RiskLevel | "전체"))
+              }
+            />
+            <InlineFilter
+              title="구분"
+              options={["전체", "내 물건", "샘플"]}
+              value={owner}
+              onChange={(value) => setOwner(value as "전체" | "내 물건" | "샘플")}
             />
           </div>
-          <InlineFilter
-            title="매각 방식"
-            options={["전체", "경매", "공매"]}
-            value={channel}
-            onChange={(value) => setChannel(value as SaleChannel | "전체")}
-          />
-          <InlineFilter
-            title="물건"
-            options={["전체", "아파트", "빌라", "오피스텔"]}
-            value={type}
-            onChange={(value) => setType(value as PropertyType | "전체")}
-          />
-          <InlineFilter
-            title="판단"
-            options={["전체", "검토 쉬움", "주의", "위험"]}
-            value={level === "안정" ? "검토 쉬움" : level}
-            onChange={(value) =>
-              setLevel(value === "검토 쉬움" ? "안정" : (value as RiskLevel | "전체"))
-            }
-          />
-          <InlineFilter
-            title="구분"
-            options={["전체", "내 물건", "샘플"]}
-            value={owner}
-            onChange={(value) => setOwner(value as "전체" | "내 물건" | "샘플")}
-          />
+          {activeFilterCount > 0 ? (
+            <p className="mt-2 text-xs font-semibold text-[#66736D]">
+              필터 {activeFilterCount}개 적용 중
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -355,16 +405,17 @@ function InlineFilter({
   onChange: (value: string) => void;
 }) {
   return (
-    <div>
-      <p className="text-xs font-semibold text-[#66736D]">{title}</p>
-      <div className="mt-1 flex min-h-10 flex-wrap gap-1 rounded-lg border border-[#DDE5E1] bg-[#EEF3F1] p-1">
+    <div className="shrink-0">
+      <p className="mb-1 px-1 text-[11px] font-bold text-[#66736D]">{title}</p>
+      <div className="flex min-h-10 gap-1 rounded-full border border-[#DDE5E1] bg-[#EEF3F1] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
         {options.map((option) => (
           <button
+            type="button"
             key={option}
             onClick={() => onChange(option)}
-            className={`min-h-9 min-w-14 rounded-md px-3 py-1.5 text-sm transition ${
+            className={`min-h-9 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
               value === option
-                ? "bg-white font-semibold text-[#17211D] shadow-[0_4px_12px_rgba(23,33,29,0.08)]"
+                ? "bg-[#17211D] font-semibold text-white shadow-[0_6px_16px_rgba(23,33,29,0.16)]"
                 : "font-medium text-[#66736D] hover:bg-white/70"
             }`}
           >

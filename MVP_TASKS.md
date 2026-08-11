@@ -495,6 +495,20 @@ Verification notes:
 - Selected comparison cards show a stronger mobile ring and `비교 담김` label.
 - Desktop listing cards keep the richer four-stat and risk-meter layout visible by default.
 
+### 5.1.1 Improve Mobile Search And Filters
+
+Tasks:
+
+- [x] Replace the dense filter grid with a larger mobile search bar.
+- [x] Change filter groups into horizontally scrollable chip controls.
+- [x] Show current result count near the search controls.
+- [x] Add a clear reset action for search and active filters.
+- [x] Keep controls touch-friendly on mobile while still usable on desktop.
+
+Completion criteria:
+
+- The search/filter area feels like a mobile product control, not a desktop admin form.
+
 ### 5.2 Improve Mobile Comparison Tab
 
 Tasks:
