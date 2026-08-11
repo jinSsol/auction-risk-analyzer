@@ -364,15 +364,22 @@ Completion criteria:
 
 ### 3.6 Phase 3 Verification
 
-- [ ] Add a user property.
-- [ ] Add comparable sales.
-- [ ] Answer checklist with some `모름`.
-- [ ] Confirm caution points update.
-- [ ] Edit calculator assumptions.
-- [ ] Confirm all-in cost updates.
-- [ ] Add two properties to comparison.
-- [ ] Refresh and confirm saved state remains.
-- [ ] `npm run build`
+- [x] Add a user property.
+- [x] Add comparable sales.
+- [x] Answer checklist with some `모름`.
+- [x] Confirm caution points update.
+- [x] Edit calculator assumptions.
+- [x] Confirm all-in cost updates.
+- [x] Add two properties to comparison.
+- [x] Refresh and confirm saved state remains.
+- [x] `npm run build`
+
+Verification notes:
+
+- Browser-verified a user-created property with 2 comparable sales.
+- Left 3 checklist answers as `모름` and confirmed caution factors appear.
+- Edited repair budget and confirmed all-in cost changed from 103,750만 to 104,550만.
+- Added the user property to a comparison basket with sample properties and confirmed refresh persistence.
 
 ## Deferred Until After MVP
 

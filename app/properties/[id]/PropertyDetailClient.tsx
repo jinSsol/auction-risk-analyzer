@@ -311,9 +311,9 @@ export function PropertyDetailClient({ id }: { id: string }) {
                   전문가 검토 권장
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {analysis.expertTriggers.map((trigger) => (
+                  {analysis.expertTriggers.map((trigger, index) => (
                     <span
-                      key={trigger}
+                      key={`${trigger}-${index}`}
                       className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#B53A2E]"
                     >
                       {trigger}
@@ -328,9 +328,9 @@ export function PropertyDetailClient({ id }: { id: string }) {
                   큰 체크 포인트 없음
                 </span>
               ) : (
-                analysis.flags.map((flag) => (
+                analysis.flags.map((flag, index) => (
                   <span
-                    key={flag}
+                    key={`${flag}-${index}`}
                     className="rounded-full bg-[#FFF4D7] px-3 py-1.5 text-sm font-semibold text-[#8A5B00]"
                   >
                     {flag}
@@ -340,9 +340,9 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
             {analysis.riskFactors.length > 0 ? (
               <div className="mt-5 grid gap-3 md:grid-cols-2">
-                {analysis.riskFactors.map((factor) => (
+                {analysis.riskFactors.map((factor, index) => (
                   <RiskFactorCard
-                    key={`${factor.label}-${factor.points}`}
+                    key={`${factor.label}-${factor.points}-${index}`}
                     label={factor.label}
                     points={factor.points}
                     severity={factor.severity}
