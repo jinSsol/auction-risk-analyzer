@@ -1,0 +1,570 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+
+import {
+  createUserAuctionItem,
+  loadUserAuctionItems,
+  saveUserAuctionItems,
+  upsertUserAuctionItem,
+  type UserAuctionItem,
+} from "../lib/auction-storage";
+import type { AuctionItem, PropertyType, SaleChannel } from "../lib/auction-types";
+
+type FormMode = "create" | "edit";
+type StepId = 0 | 1 | 2 | 3;
+
+type Draft = {
+  channel: SaleChannel;
+  agency: string;
+  caseNo: string;
+  sourceUrl: string;
+  title: string;
+  district: string;
+  address: string;
+  type: PropertyType;
+  area: string;
+  floor: string;
+  auctionDate: string;
+  appraised: string;
+  minimum: string;
+  market: string;
+  lastTrade: string;
+  failedBids: string;
+  tenant: AuctionItem["tenant"];
+  seniorDeposit: string;
+  takeoverAmount: string;
+  liens: boolean;
+  illegalBuilding: boolean;
+  taxRisk: boolean;
+  occupancy: AuctionItem["occupancy"];
+  userMemo: string;
+};
+
+const emptyDraft: Draft = {
+  channel: "경매",
+  agency: "법원경매",
+  caseNo: "",
+  sourceUrl: "",
+  title: "",
+  district: "",
+  address: "",
+  type: "아파트",
+  area: "",
+  floor: "",
+  auctionDate: "",
+  appraised: "",
+  minimum: "",
+  market: "",
+  lastTrade: "",
+  failedBids: "0",
+  tenant: "확인 필요",
+  seniorDeposit: "",
+  takeoverAmount: "",
+  liens: false,
+  illegalBuilding: false,
+  taxRisk: false,
+  occupancy: "협의 필요",
+  userMemo: "",
+};
+
+const steps = ["출처", "기본 정보", "가격", "점유·메모"];
+
+export function PropertyForm({
+  mode,
+  itemId,
+}: {
+  mode: FormMode;
+  itemId?: string;
+}) {
+  const [step, setStep] = useState<StepId>(0);
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
+  const [loaded, setLoaded] = useState(mode === "create");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const items = loadUserAuctionItems();
+      setUserItems(items);
+
+      if (mode === "edit" && itemId) {
+        const item = items.find((candidate) => candidate.id === itemId);
+        if (item) {
+          setDraft(draftFromItem(item));
+        }
+        setLoaded(true);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [itemId, mode]);
+
+  const existingItem = useMemo(
+    () => userItems.find((item) => item.id === itemId),
+    [itemId, userItems]
+  );
+
+  const isMissingEditTarget = mode === "edit" && loaded && !existingItem;
+
+  function update<K extends keyof Draft>(key: K, value: Draft[K]) {
+    setDraft((current) => ({ ...current, [key]: value }));
+    setError("");
+  }
+
+  function goNext() {
+    if (step === 3) return;
+    setStep((current) => (Math.min(3, current + 1) as StepId));
+  }
+
+  function goBack() {
+    if (step === 0) return;
+    setStep((current) => (Math.max(0, current - 1) as StepId));
+  }
+
+  function submit() {
+    const validation = validateDraft(draft);
+    if (validation) {
+      setError(validation);
+      return;
+    }
+
+    const itemInput = itemFromDraft(draft);
+    const savedItem =
+      mode === "edit" && existingItem
+        ? { ...existingItem, ...itemInput, id: existingItem.id, source: "user" as const }
+        : createUserAuctionItem(itemInput);
+    const nextItems = upsertUserAuctionItem(userItems, savedItem);
+    saveUserAuctionItems(nextItems);
+    window.location.assign(`/properties/${savedItem.id}`);
+  }
+
+  if (!loaded) {
+    return (
+      <main className="min-h-screen bg-[#f6f8fb] px-5 py-8 text-[#17211d]">
+        <div className="mx-auto max-w-3xl rounded-lg border border-[#dde7e2] bg-white p-6 text-sm font-bold text-[#68756f]">
+          저장된 물건을 불러오는 중입니다.
+        </div>
+      </main>
+    );
+  }
+
+  if (isMissingEditTarget) {
+    return (
+      <main className="min-h-screen bg-[#f6f8fb] px-5 py-8 text-[#17211d]">
+        <div className="mx-auto max-w-3xl rounded-lg border border-[#dde7e2] bg-white p-6">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/" className="text-sm font-black text-[#1b7a4d]">
+            목록으로
+          </a>
+          <h1 className="mt-4 text-2xl font-black">수정할 수 없는 물건입니다.</h1>
+          <p className="mt-2 text-sm leading-6 text-[#68756f]">
+            직접 등록한 물건만 수정할 수 있습니다. 샘플 물건은 읽기 전용으로
+            유지됩니다.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-[#f6f8fb] text-[#17211d]">
+      <section className="border-b border-[#dde7e2] bg-[#fbfdfb]">
+        <div className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
+          <a
+            href={mode === "edit" && itemId ? `/properties/${itemId}` : "/"}
+            className="inline-flex rounded-md border border-[#cad8d1] bg-white px-3 py-2 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8]"
+          >
+            돌아가기
+          </a>
+          <div className="mt-5">
+            <p className="inline-flex rounded-full bg-[#e9fbf0] px-3 py-1 text-sm font-black text-[#1b7a4d]">
+              {mode === "edit" ? "내 물건 수정" : "새 물건 등록"}
+            </p>
+            <h1 className="mt-3 text-3xl font-black tracking-normal text-[#101b17]">
+              복잡한 공고를 네 단계로 가볍게 정리해요.
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-[#68756f]">
+              모르는 값은 비워도 됩니다. 다만 제목과 예상 시세는 분석을 위해
+              필요합니다.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
+        <div className="rounded-lg border border-[#dde7e2] bg-white p-4 shadow-sm shadow-[#1a2d2410]">
+          <div className="grid gap-2 sm:grid-cols-4">
+            {steps.map((label, index) => (
+              <button
+                key={label}
+                onClick={() => setStep(index as StepId)}
+                className={`rounded-md px-3 py-3 text-left text-sm font-black transition ${
+                  step === index
+                    ? "bg-[#17211d] text-white"
+                    : "bg-[#f6faf8] text-[#5c6963] hover:bg-[#edf5f1]"
+                }`}
+              >
+                <span className="block text-xs opacity-70">Step {index + 1}</span>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-5">
+            {step === 0 ? <SourceStep draft={draft} update={update} /> : null}
+            {step === 1 ? <BasicStep draft={draft} update={update} /> : null}
+            {step === 2 ? <PriceStep draft={draft} update={update} /> : null}
+            {step === 3 ? <RightsStep draft={draft} update={update} /> : null}
+          </div>
+
+          {error ? (
+            <p className="mt-4 rounded-md bg-[#fff0ec] px-3 py-2 text-sm font-bold text-[#c2412d]">
+              {error}
+            </p>
+          ) : null}
+
+          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <button
+              onClick={goBack}
+              disabled={step === 0}
+              className="h-11 rounded-md border border-[#cad8d1] px-4 text-sm font-black text-[#44504b] transition hover:bg-[#f6faf8] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              이전
+            </button>
+            <div className="flex gap-2">
+              {step < 3 ? (
+                <button
+                  onClick={goNext}
+                  className="h-11 rounded-md bg-[#17211d] px-4 text-sm font-black text-white transition hover:bg-[#24332d]"
+                >
+                  다음
+                </button>
+              ) : (
+                <button
+                  onClick={submit}
+                  className="h-11 rounded-md bg-[#1b7a4d] px-4 text-sm font-black text-white transition hover:bg-[#14683f]"
+                >
+                  저장하고 상세 보기
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function SourceStep({ draft, update }: StepProps) {
+  return (
+    <div className="grid gap-4">
+      <Segmented
+        label="매각 방식"
+        options={["경매", "공매"]}
+        value={draft.channel}
+        onChange={(value) => update("channel", value as SaleChannel)}
+      />
+      <Field label="출처">
+        <select
+          value={draft.agency}
+          onChange={(event) => update("agency", event.target.value)}
+          className={inputClass}
+        >
+          {["법원경매", "온비드", "캠코", "직접 입력"].map((agency) => (
+            <option key={agency}>{agency}</option>
+          ))}
+        </select>
+      </Field>
+      <TextInput
+        label="사건번호 또는 공고번호"
+        value={draft.caseNo}
+        onChange={(value) => update("caseNo", value)}
+        placeholder="2026타경1234, 2026-00001-001"
+      />
+      <TextInput
+        label="원문 URL"
+        value={draft.sourceUrl}
+        onChange={(value) => update("sourceUrl", value)}
+        placeholder="https://..."
+      />
+    </div>
+  );
+}
+
+function BasicStep({ draft, update }: StepProps) {
+  return (
+    <div className="grid gap-4">
+      <TextInput
+        label="물건명"
+        value={draft.title}
+        onChange={(value) => update("title", value)}
+        placeholder="예: 강동구 성내동 아파트 59"
+      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextInput label="지역" value={draft.district} onChange={(value) => update("district", value)} placeholder="서울 강동구" />
+        <Field label="물건 종류">
+          <select
+            value={draft.type}
+            onChange={(event) => update("type", event.target.value as PropertyType)}
+            className={inputClass}
+          >
+            {["아파트", "빌라", "오피스텔"].map((type) => (
+              <option key={type}>{type}</option>
+            ))}
+          </select>
+        </Field>
+      </div>
+      <TextInput label="주소" value={draft.address} onChange={(value) => update("address", value)} placeholder="상세 주소 또는 확인 가능한 범위" />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <TextInput label="면적(㎡)" value={draft.area} onChange={(value) => update("area", value)} inputMode="decimal" placeholder="84.9" />
+        <TextInput label="층수" value={draft.floor} onChange={(value) => update("floor", value)} placeholder="12/29층" />
+        <TextInput label="마감일" value={draft.auctionDate} onChange={(value) => update("auctionDate", value)} type="date" />
+      </div>
+    </div>
+  );
+}
+
+function PriceStep({ draft, update }: StepProps) {
+  return (
+    <div className="grid gap-4">
+      <p className="rounded-md bg-[#f6faf8] px-3 py-2 text-sm font-bold text-[#5c6963]">
+        금액은 `만원` 단위로 입력하면 됩니다.
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextInput label="감정가" value={draft.appraised} onChange={(value) => update("appraised", value)} inputMode="numeric" placeholder="125000" />
+        <TextInput label="최저가" value={draft.minimum} onChange={(value) => update("minimum", value)} inputMode="numeric" placeholder="100000" />
+        <TextInput label="예상 시세" value={draft.market} onChange={(value) => update("market", value)} inputMode="numeric" placeholder="132000" />
+        <TextInput label="최근 실거래" value={draft.lastTrade} onChange={(value) => update("lastTrade", value)} inputMode="numeric" placeholder="129500" />
+      </div>
+      <TextInput label="유찰 횟수" value={draft.failedBids} onChange={(value) => update("failedBids", value)} inputMode="numeric" placeholder="0" />
+    </div>
+  );
+}
+
+function RightsStep({ draft, update }: StepProps) {
+  return (
+    <div className="grid gap-4">
+      <Field label="임차인 상태">
+        <select
+          value={draft.tenant}
+          onChange={(event) => update("tenant", event.target.value as AuctionItem["tenant"])}
+          className={inputClass}
+        >
+          {["없음", "전입 있음", "대항력 가능", "확인 필요"].map((tenant) => (
+            <option key={tenant}>{tenant}</option>
+          ))}
+        </select>
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextInput label="선순위 보증금" value={draft.seniorDeposit} onChange={(value) => update("seniorDeposit", value)} inputMode="numeric" placeholder="0" />
+        <TextInput label="인수 추정액" value={draft.takeoverAmount} onChange={(value) => update("takeoverAmount", value)} inputMode="numeric" placeholder="0" />
+      </div>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <Toggle label="유치권" checked={draft.liens} onChange={(value) => update("liens", value)} />
+        <Toggle label="위반건축물" checked={draft.illegalBuilding} onChange={(value) => update("illegalBuilding", value)} />
+        <Toggle label="체납/관리비 리스크" checked={draft.taxRisk} onChange={(value) => update("taxRisk", value)} />
+      </div>
+      <Field label="점유·명도">
+        <select
+          value={draft.occupancy}
+          onChange={(event) => update("occupancy", event.target.value as AuctionItem["occupancy"])}
+          className={inputClass}
+        >
+          {["명도 쉬움", "협의 필요", "명도 난이도 높음"].map((occupancy) => (
+            <option key={occupancy}>{occupancy}</option>
+          ))}
+        </select>
+      </Field>
+      <Field label="메모">
+        <textarea
+          value={draft.userMemo}
+          onChange={(event) => update("userMemo", event.target.value)}
+          rows={4}
+          className={`${inputClass} h-auto resize-none py-3`}
+          placeholder="확인해야 할 서류, 시세 근거, 통화 내용 등을 적어두세요."
+        />
+      </Field>
+    </div>
+  );
+}
+
+type StepProps = {
+  draft: Draft;
+  update: <K extends keyof Draft>(key: K, value: Draft[K]) => void;
+};
+
+const inputClass =
+  "h-11 w-full rounded-md border border-[#cad8d1] bg-[#fbfdfb] px-3 text-sm font-bold text-[#17211d] outline-none transition focus:border-[#22a06b] focus:ring-2 focus:ring-[#a7f3c5]";
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="block">
+      <span className="text-xs font-black text-[#5c6963]">{label}</span>
+      <div className="mt-1">{children}</div>
+    </label>
+  );
+}
+
+function TextInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  inputMode,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  type?: string;
+  inputMode?: "text" | "numeric" | "decimal";
+}) {
+  return (
+    <Field label={label}>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        className={inputClass}
+      />
+    </Field>
+  );
+}
+
+function Segmented({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-black text-[#5c6963]">{label}</p>
+      <div className="mt-1 grid grid-cols-2 gap-2 rounded-md border border-[#dde7e2] bg-[#f6faf8] p-1">
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() => onChange(option)}
+            className={`h-10 rounded text-sm font-black transition ${
+              value === option ? "bg-[#17211d] text-white" : "text-[#55635d] hover:bg-white"
+            }`}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <button
+      onClick={() => onChange(!checked)}
+      className={`flex h-11 items-center justify-between rounded-md border px-3 text-sm font-black transition ${
+        checked
+          ? "border-[#bdf2d1] bg-[#e9fbf0] text-[#1b7a4d]"
+          : "border-[#cad8d1] bg-[#fbfdfb] text-[#5c6963]"
+      }`}
+    >
+      <span>{label}</span>
+      <span>{checked ? "있음" : "없음"}</span>
+    </button>
+  );
+}
+
+function validateDraft(draft: Draft) {
+  if (!draft.title.trim()) return "물건명을 입력해주세요.";
+  if (toNumber(draft.market) <= 0) return "예상 시세는 0보다 크게 입력해주세요.";
+  return "";
+}
+
+function itemFromDraft(draft: Draft): Omit<UserAuctionItem, "id" | "source" | "createdAt" | "updatedAt"> {
+  const market = toNumber(draft.market);
+  const appraised = toNumber(draft.appraised) || market;
+  const minimum = toNumber(draft.minimum) || market;
+  const lastTrade = toNumber(draft.lastTrade) || market;
+  const memo = draft.userMemo.trim();
+
+  return {
+    channel: draft.channel,
+    agency: draft.agency.trim() || "직접 입력",
+    caseNo: draft.caseNo.trim() || "미입력",
+    sourceUrl: draft.sourceUrl.trim(),
+    title: draft.title.trim(),
+    type: draft.type,
+    district: draft.district.trim() || "지역 미입력",
+    address: draft.address.trim() || "주소 확인 필요",
+    appraised,
+    minimum,
+    market,
+    lastTrade,
+    deposit: 0,
+    monthlyRent: 0,
+    area: toNumber(draft.area),
+    floor: draft.floor.trim() || "층수 확인 필요",
+    failedBids: toNumber(draft.failedBids),
+    auctionDate: draft.auctionDate || "날짜 확인 필요",
+    tenant: draft.tenant,
+    seniorDeposit: toNumber(draft.seniorDeposit),
+    takeoverAmount: toNumber(draft.takeoverAmount),
+    liens: draft.liens,
+    illegalBuilding: draft.illegalBuilding,
+    taxRisk: draft.taxRisk,
+    occupancy: draft.occupancy,
+    notes: memo ? [memo] : ["직접 등록한 물건입니다."],
+    userMemo: memo,
+  };
+}
+
+function draftFromItem(item: UserAuctionItem): Draft {
+  return {
+    channel: item.channel,
+    agency: item.agency,
+    caseNo: item.caseNo,
+    sourceUrl: item.sourceUrl ?? "",
+    title: item.title,
+    district: item.district,
+    address: item.address,
+    type: item.type,
+    area: String(item.area || ""),
+    floor: item.floor,
+    auctionDate: item.auctionDate,
+    appraised: String(item.appraised || ""),
+    minimum: String(item.minimum || ""),
+    market: String(item.market || ""),
+    lastTrade: String(item.lastTrade || ""),
+    failedBids: String(item.failedBids || 0),
+    tenant: item.tenant,
+    seniorDeposit: String(item.seniorDeposit || ""),
+    takeoverAmount: String(item.takeoverAmount || ""),
+    liens: item.liens,
+    illegalBuilding: item.illegalBuilding,
+    taxRisk: item.taxRisk,
+    occupancy: item.occupancy,
+    userMemo: item.userMemo ?? item.notes.join("\n"),
+  };
+}
+
+function toNumber(value: string) {
+  const numberValue = Number(value.replaceAll(",", "").trim());
+  return Number.isFinite(numberValue) ? numberValue : 0;
+}

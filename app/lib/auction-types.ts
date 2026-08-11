@@ -7,6 +7,7 @@ export type AuctionItem = {
   channel: SaleChannel;
   agency: string;
   caseNo: string;
+  sourceUrl?: string;
   title: string;
   type: PropertyType;
   district: string;
@@ -29,4 +30,5 @@ export type AuctionItem = {
   taxRisk: boolean;
   occupancy: "명도 쉬움" | "협의 필요" | "명도 난이도 높음";
   notes: string[];
+  userMemo?: string;
 };

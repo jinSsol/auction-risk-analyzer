@@ -13,6 +13,7 @@ export default function Home() {
   const [channel, setChannel] = useState<SaleChannel | "전체">("전체");
   const [type, setType] = useState<PropertyType | "전체">("전체");
   const [level, setLevel] = useState<RiskLevel | "전체">("전체");
+  const [owner, setOwner] = useState<"전체" | "내 물건" | "샘플">("전체");
   const [bidRatio, setBidRatio] = useState(78);
   const [bufferRatio, setBufferRatio] = useState(4);
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
@@ -50,11 +51,17 @@ export default function Home() {
       item.district.includes(query) ||
       item.caseNo.includes(query) ||
       item.channel.includes(query) ||
-      item.agency.includes(query);
+      item.agency.includes(query) ||
+      item.address.includes(query) ||
+      (item.userMemo ?? "").includes(query);
     const matchChannel = channel === "전체" || item.channel === channel;
     const matchType = type === "전체" || item.type === type;
     const matchLevel = level === "전체" || item.analysis.level === level;
-    return matchQuery && matchChannel && matchType && matchLevel;
+    const matchOwner =
+      owner === "전체" ||
+      (owner === "내 물건" && item.id.startsWith("user-")) ||
+      (owner === "샘플" && item.id.startsWith("sample-"));
+    return matchQuery && matchChannel && matchType && matchLevel && matchOwner;
   });
 
   const selected = enriched.filter((item) => selectedIds.includes(item.id));
@@ -65,6 +72,7 @@ export default function Home() {
     stable: filtered.filter((item) => item.analysis.level === "안정").length,
     caution: filtered.filter((item) => item.analysis.level === "주의").length,
     risky: filtered.filter((item) => item.analysis.level === "위험").length,
+    mine: filtered.filter((item) => item.id.startsWith("user-")).length,
   };
 
   function toggleSelected(id: string) {
@@ -91,19 +99,26 @@ export default function Home() {
                 지금은 실시간 연동 전 샘플 데이터입니다. 어려운 권리 용어는
                 체크리스트로 풀고, 시세·인수금·안전마진은 한눈에 비교합니다.
               </p>
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+              <a
+                href="/properties/new"
+                className="mt-4 inline-flex h-11 items-center rounded-md bg-[#17211d] px-4 text-sm font-black text-white transition hover:bg-[#24332d]"
+              >
+                새 물건 등록
+              </a>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[520px]">
               <Metric label="검색 결과" value={`${stats.total}건`} />
               <Metric label="경매" value={`${stats.auction}건`} tone="green" />
               <Metric label="공매" value={`${stats.publicSale}건`} tone="blue" />
-              <Metric label="위험" value={`${stats.risky}건`} tone="red" />
+              <Metric label="내 물건" value={`${stats.mine}건`} tone="amber" />
             </div>
           </div>
         </div>
       </section>
 
       <section className="border-b border-[#dde7e2] bg-white/90">
-        <div className="mx-auto grid max-w-7xl gap-3 px-5 py-4 lg:grid-cols-[minmax(240px,1fr)_auto_auto_auto] lg:items-end lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-3 px-5 py-4 xl:grid-cols-[minmax(240px,1fr)_auto_auto_auto_auto] xl:items-end xl:px-8">
           <div>
             <label className="text-xs font-bold text-[#5c6963]">
               검색
@@ -132,6 +147,12 @@ export default function Home() {
             options={["전체", "안정", "주의", "위험"]}
             value={level}
             onChange={(value) => setLevel(value as RiskLevel | "전체")}
+          />
+          <InlineFilter
+            title="구분"
+            options={["전체", "내 물건", "샘플"]}
+            value={owner}
+            onChange={(value) => setOwner(value as "전체" | "내 물건" | "샘플")}
           />
         </div>
       </section>
@@ -177,7 +198,7 @@ export default function Home() {
             ))}
             {filtered.length === 0 ? (
               <div className="rounded-lg border border-[#dde7e2] bg-white p-8 text-center text-sm font-semibold text-[#68756f]">
-                조건에 맞는 샘플 물건이 없습니다.
+                조건에 맞는 물건이 없습니다.
               </div>
             ) : null}
           </div>
@@ -328,6 +349,11 @@ function ListingCard({
             <span className="rounded-md bg-[#f3f5f2] px-2 py-0.5 text-xs font-bold text-[#65706b]">
               {item.agency}
             </span>
+            {item.id.startsWith("user-") ? (
+              <span className="rounded-md bg-[#17211d] px-2 py-0.5 text-xs font-bold text-white">
+                내 물건
+              </span>
+            ) : null}
             <span className="text-xs font-semibold text-[#68756f]">
               {item.caseNo}
             </span>

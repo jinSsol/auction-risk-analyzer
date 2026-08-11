@@ -36,6 +36,7 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
     channel: item.channel === "공매" ? "공매" : "경매",
     agency: typeof item.agency === "string" ? item.agency : "직접 입력",
     caseNo: typeof item.caseNo === "string" ? item.caseNo : "",
+    sourceUrl: typeof item.sourceUrl === "string" ? item.sourceUrl : "",
     title: item.title,
     type:
       item.type === "빌라" || item.type === "오피스텔" || item.type === "아파트"
@@ -74,6 +75,7 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
     notes: Array.isArray(item.notes)
       ? item.notes.filter((note): note is string => typeof note === "string")
       : [],
+    userMemo: typeof item.userMemo === "string" ? item.userMemo : "",
   };
 }
 

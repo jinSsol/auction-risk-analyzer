@@ -112,9 +112,9 @@ Current issue:
 
 Tasks:
 
-- [ ] Convert property detail rendering to a client-compatible shell.
-- [ ] Resolve sample and user-created items from one merged source.
-- [ ] Show a friendly not-found state for missing user ids.
+- [x] Convert property detail rendering to a client-compatible shell.
+- [x] Resolve sample and user-created items from one merged source.
+- [x] Show a friendly not-found state for missing user ids.
 - [x] Keep sample property detail pages working.
 
 Completion criteria:
@@ -138,9 +138,9 @@ Goal: let users add real candidate properties manually, save them, see them in t
 
 Tasks:
 
-- [ ] Add `새 물건 등록` button near the listing page header.
-- [ ] Add optional `내 물건만 보기` filter.
-- [ ] Visually distinguish sample properties from user-created properties.
+- [x] Add `새 물건 등록` button near the listing page header.
+- [x] Add optional `내 물건만 보기` filter.
+- [x] Visually distinguish sample properties from user-created properties.
 
 Completion criteria:
 
@@ -152,39 +152,39 @@ Recommended flow: four-step wizard.
 
 Step 1: Source
 
-- [ ] Sale channel: `경매`, `공매`
-- [ ] Source: `법원경매`, `온비드`, `캠코`, `직접 입력`
-- [ ] Case number or listing id
-- [ ] Source URL
+- [x] Sale channel: `경매`, `공매`
+- [x] Source: `법원경매`, `온비드`, `캠코`, `직접 입력`
+- [x] Case number or listing id
+- [x] Source URL
 
 Step 2: Basic Property Info
 
-- [ ] Title
-- [ ] District
-- [ ] Address
-- [ ] Property type
-- [ ] Area
-- [ ] Floor
-- [ ] Bid/deadline date
+- [x] Title
+- [x] District
+- [x] Address
+- [x] Property type
+- [x] Area
+- [x] Floor
+- [x] Bid/deadline date
 
 Step 3: Price and Market Info
 
-- [ ] Appraised price
-- [ ] Minimum price
-- [ ] Estimated market price
-- [ ] Recent transaction price
-- [ ] Failed bid count
+- [x] Appraised price
+- [x] Minimum price
+- [x] Estimated market price
+- [x] Recent transaction price
+- [x] Failed bid count
 
 Step 4: Occupancy and Memo
 
-- [ ] Tenant status
-- [ ] Senior deposit
-- [ ] Takeover amount
-- [ ] Lien status
-- [ ] Illegal building status
-- [ ] Tax/fee risk
-- [ ] Occupancy difficulty
-- [ ] User memo
+- [x] Tenant status
+- [x] Senior deposit
+- [x] Takeover amount
+- [x] Lien status
+- [x] Illegal building status
+- [x] Tax/fee risk
+- [x] Occupancy difficulty
+- [x] User memo
 
 Completion criteria:
 
@@ -196,10 +196,10 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Add edit entry point on user-created detail pages.
-- [ ] Add delete action with confirmation.
-- [ ] Prevent deleting bundled sample properties.
-- [ ] Preserve created/updated timestamps.
+- [x] Add edit entry point on user-created detail pages.
+- [x] Add delete action with confirmation.
+- [x] Prevent deleting bundled sample properties.
+- [x] Preserve created/updated timestamps.
 
 Completion criteria:
 
@@ -210,11 +210,11 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Load user-created properties from localStorage on the listing page.
-- [ ] Merge with sample properties.
-- [ ] Sort user-created properties above sample properties or by latest updated date.
-- [ ] Apply existing filters/search to both sample and user-created properties.
-- [ ] Allow user-created properties in comparison basket.
+- [x] Load user-created properties from localStorage on the listing page.
+- [x] Merge with sample properties.
+- [x] Sort user-created properties above sample properties or by latest updated date.
+- [x] Apply existing filters/search to both sample and user-created properties.
+- [x] Allow user-created properties in comparison basket.
 
 Completion criteria:
 
@@ -231,7 +231,7 @@ Completion criteria:
 - [ ] Open detail page.
 - [ ] Edit and save.
 - [ ] Delete and confirm removal.
-- [ ] `npm run build`
+- [x] `npm run build`
 
 ## Phase 3: Market Comps, Checklist, and Calculator
 
