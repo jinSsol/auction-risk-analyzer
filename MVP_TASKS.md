@@ -421,10 +421,10 @@ Completion criteria:
 
 Tasks:
 
-- [ ] Add unit tests for risk scoring.
-- [ ] Add unit tests for checklist unknown/caution effects.
-- [ ] Add unit tests for all-in cost and bid ceiling.
-- [ ] Add tests for comparable-sale verdicts.
+- [x] Add unit tests for risk scoring.
+- [x] Add unit tests for checklist unknown/caution effects.
+- [x] Add unit tests for all-in cost and bid ceiling.
+- [x] Add tests for comparable-sale verdicts.
 
 Completion criteria:
 
