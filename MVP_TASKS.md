@@ -467,6 +467,99 @@ Completion criteria:
 
 - MVP can be shared with first testers with known caveats.
 
+## Phase 5: Mobile UI/UX First Pass
+
+Goal:
+
+- Make the MVP feel like a lightweight mobile product, not a desktop dashboard squeezed onto a phone.
+- Help users quickly screen properties, compare candidates, and enter data with less cognitive load.
+
+### 5.1 Compress Mobile Listing Cards
+
+Tasks:
+
+- [ ] Show only the most important scan fields by default: title, district, deadline, verdict, suggested ceiling, and margin.
+- [ ] Move secondary price/risk details behind an expand/collapse area on mobile.
+- [ ] Keep `비교 담기` visible and thumb-friendly.
+- [ ] Strengthen selected state so users can instantly see what is already in the comparison basket.
+- [ ] Preserve the richer desktop card layout.
+
+Completion criteria:
+
+- A user can scan 6-8 properties on a phone without feeling buried in numbers.
+
+### 5.2 Improve Mobile Comparison Tab
+
+Tasks:
+
+- [ ] Make the bottom `비교` tab badge more prominent when one or more properties are selected.
+- [ ] Add an empty comparison state that explains the next action in one sentence.
+- [ ] Show the best candidate first with a clearer ranking label.
+- [ ] Add a compact "why ranked here" summary per compared property.
+- [ ] Keep remove actions easy to tap without accidental detail navigation.
+
+Completion criteria:
+
+- Users can understand why one property looks better than another without opening every detail page.
+
+### 5.3 Rework Detail Page For Mobile Reading
+
+Tasks:
+
+- [ ] Keep the 5-second decision summary near the top.
+- [ ] Split detail content into mobile-friendly sections: `요약`, `가격`, `권리`, `비용`, `메모`.
+- [ ] Consider sticky or segmented section navigation on mobile.
+- [ ] Make risk reasons and document checks scannable before dense calculation tables.
+- [ ] Keep edit/delete and comparison actions reachable but not visually alarming.
+
+Completion criteria:
+
+- Users can make a first-pass decision on a detail page within one minute on a phone.
+
+### 5.4 Reduce Form Friction
+
+Tasks:
+
+- [ ] Review all required fields and make only truly necessary fields required.
+- [ ] Add clearer progress and section titles for the wizard.
+- [ ] Group advanced/legal fields so beginners can skip unknowns confidently.
+- [ ] Improve numeric input helper text for prices, deposits, and costs.
+- [ ] Add a lightweight save-draft feeling without requiring signup.
+
+Completion criteria:
+
+- A first-time user can add an incomplete property without feeling blocked by legal terms.
+
+### 5.5 Mobile Trust And Safety Copy
+
+Tasks:
+
+- [ ] Add short source/status labels such as `샘플`, `직접 입력`, `확인 필요`.
+- [ ] Make local-browser storage guidance visible but not scary.
+- [ ] Avoid wording that implies legal certainty or guaranteed profit.
+- [ ] Add first-user tester copy for what to verify outside the app.
+- [ ] Keep account signup deferred until cloud sync, alerts, or cross-device saved data is required.
+
+Completion criteria:
+
+- The mobile UI feels approachable while still being careful about risk and uncertainty.
+
+### 5.6 Mobile First-User QA
+
+Tasks:
+
+- [ ] Test the main flow on 390px and 430px mobile widths.
+- [ ] Test add-property flow with incomplete information.
+- [ ] Test comparison with 0, 1, 2, and 4 selected properties.
+- [ ] Check bottom tab safe-area spacing.
+- [ ] Check tap target sizes for filters, compare actions, and form navigation.
+- [ ] Re-run `npm run lint`.
+- [ ] Re-run `npm test`.
+
+Completion criteria:
+
+- Mobile first-pass flows are ready to share with a small tester group.
+
 ## Deferred Until After MVP
 
 - Real court auction data integration

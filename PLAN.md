@@ -202,8 +202,19 @@ Phase A: PWA readiness
 
 - Add app manifest.
 - Add production icons and splash-friendly assets.
-- Polish mobile navigation, safe-area spacing, and touch targets.
+- Polish mobile navigation, safe-area spacing, touch targets, and bottom-tab behavior.
+- Compress listing cards for mobile scanning.
+- Rework detail pages into mobile-readable sections.
+- Reduce manual-entry form friction for incomplete auction/public-sale information.
+- Make comparison feel like a dedicated mobile tab, not a page footer.
 - Add privacy policy, terms, and legal/investment disclaimer pages.
+
+Phase A-1: Mobile UI/UX first pass
+
+- Treat this as the next product-design milestone before store packaging.
+- Prioritize fast property scanning, low-friction comparison, and clearer risk summaries.
+- Keep signup deferred; use browser-local saved data until cloud sync, alerts, or cross-device workflows become necessary.
+- Validate the flow with a small tester script before investing in native packaging.
 
 Phase B: Capacitor shell
 
