@@ -84,12 +84,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F6F8F7] text-[#17211D]">
-      <section className="border-b border-[#DDE5E1] bg-[#F6F8F7]">
+    <main className="app-shell min-h-screen text-[#17211D]">
+      <section className="hero-surface border-b border-[#DDE5E1]">
         <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
-              <p className="inline-flex rounded-full bg-[#E7F6EE] px-3 py-1 text-xs font-semibold text-[#1F8A5B]">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1 text-xs font-semibold text-[#1F8A5B] ring-1 ring-[#BFE3D0] backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#1F8A5B] shadow-[0_0_0_4px_rgba(31,138,91,0.12)]" />
                 권리 리스크 · 입찰가 분석
               </p>
               <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
@@ -102,9 +103,10 @@ export default function Home() {
               {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a
                 href="/properties/new"
-                className="mt-5 inline-flex h-11 items-center rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white transition hover:bg-[#26332E]"
+                className="button-lift mt-5 inline-flex h-11 items-center rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] hover:bg-[#26332E]"
               >
                 새 물건 등록
+                <span className="ml-2 text-base leading-none">+</span>
               </a>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[520px]">
@@ -159,7 +161,7 @@ export default function Home() {
 
       <section className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
         <div className="space-y-5">
-          <div className="grid gap-3 rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] md:grid-cols-[1fr_1fr_auto] md:items-center">
+          <div className="interactive-card grid gap-3 rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur md:grid-cols-[1fr_1fr_auto] md:items-center">
             <RangeControl
               label="예상 입찰가"
               value={bidRatio}
@@ -178,7 +180,7 @@ export default function Home() {
               onChange={setBufferRatio}
               tone="amber"
             />
-            <div className="rounded-lg bg-[#17211D] px-4 py-3 text-sm text-white">
+            <div className="rounded-lg bg-[#17211D] px-4 py-3 text-sm text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
               <p className="font-semibold">계산 기준</p>
               <p className="mt-1 text-[#d9eee5]">
                 시세 할인 - 인수금 - 비용 버퍼
@@ -227,7 +229,8 @@ function Metric({
     red: "bg-[#FDE8E5] text-[#B53A2E]",
   };
   return (
-    <div className={`rounded-xl border border-[#DDE5E1] p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] ${tones[tone]}`}>
+    <div className={`interactive-card relative overflow-hidden rounded-xl border border-[#DDE5E1] p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_28px_rgba(23,33,29,0.08)] ${tones[tone]}`}>
+      <span className="absolute inset-x-0 top-0 h-1 bg-current opacity-25" />
       <p className="text-xs font-semibold text-current opacity-70">{label}</p>
       <p className="mt-2 text-2xl font-bold">{value}</p>
     </div>
@@ -255,7 +258,7 @@ function InlineFilter({
             onClick={() => onChange(option)}
             className={`min-w-14 rounded-md px-3 py-1.5 text-sm transition ${
               value === option
-                ? "bg-white font-semibold text-[#17211D] shadow-[0_1px_2px_rgba(23,33,29,0.08)]"
+                ? "bg-white font-semibold text-[#17211D] shadow-[0_4px_12px_rgba(23,33,29,0.08)]"
                 : "font-medium text-[#66736D] hover:bg-white/70"
             }`}
           >
@@ -341,7 +344,12 @@ function ListingCard({
   const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
 
   return (
-    <article className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] transition hover:border-[#B8C7C0] hover:shadow-[0_8px_24px_rgba(23,33,29,0.08)]">
+    <article
+      className={`interactive-card reveal-up group relative overflow-hidden rounded-xl border bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:border-[#B8C7C0] hover:shadow-[0_14px_34px_rgba(23,33,29,0.09)] ${
+        selected ? "border-[#1F8A5B] ring-2 ring-[#D8F1E4]" : "border-[#DDE5E1]"
+      }`}
+    >
+      <div className={`absolute inset-y-0 left-0 w-1 ${riskAccent[item.analysis.level]}`} />
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-center">
         <a href={href} className="min-w-0 text-left">
           <div className="flex flex-wrap items-center gap-2">
@@ -360,7 +368,7 @@ function ListingCard({
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h2 className="text-lg font-semibold text-[#17211D]">
+              <h2 className="text-lg font-semibold text-[#17211D] transition group-hover:text-[#0F766E]">
                 {item.title}
               </h2>
               <p className="mt-1 text-sm font-medium text-[#66736D]">
@@ -383,7 +391,7 @@ function ListingCard({
         </a>
 
         <div className="space-y-3">
-          <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
+          <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)]">
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs font-semibold text-[#66736D]">체크 난이도</span>
               <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
@@ -401,13 +409,14 @@ function ListingCard({
             </span>
             <button
               onClick={onToggle}
-              className={`h-9 rounded-lg px-3 text-sm transition ${
+              aria-pressed={selected}
+              className={`button-lift h-9 rounded-lg px-3 text-sm transition ${
                 selected
-                  ? "bg-[#0F766E] font-semibold text-white"
+                  ? "bg-[#0F766E] font-semibold text-white shadow-[0_8px_18px_rgba(15,118,110,0.18)]"
                   : "border border-[#DDE5E1] bg-white font-semibold text-[#34423C] hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
               }`}
             >
-              {selected ? "비교중" : "비교 담기"}
+              {selected ? "비교중 ✓" : "비교 담기"}
             </button>
           </div>
         </div>
@@ -415,6 +424,12 @@ function ListingCard({
     </article>
   );
 }
+
+const riskAccent: Record<RiskLevel, string> = {
+  안정: "bg-[#1F8A5B]",
+  주의: "bg-[#B7791F]",
+  위험: "bg-[#DC2626]",
+};
 
 function PriceStat({
   label,
@@ -453,7 +468,7 @@ function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
     level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#B7791F]" : "bg-[#1F8A5B]";
   return (
     <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#DDE5E1]">
-      <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
+      <div className={`risk-fill h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   );
 }
@@ -466,7 +481,7 @@ function ComparePanel({
   onClear: () => void;
 }) {
   return (
-    <section className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+    <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-[#17211D]">비교 바구니</h2>
@@ -488,7 +503,7 @@ function ComparePanel({
           </div>
         ) : (
           selected.map((item) => (
-            <div key={item.id} className="rounded-lg border border-[#E5ECE8] bg-white p-4">
+            <div key={item.id} className="interactive-card rounded-lg border border-[#E5ECE8] bg-white p-4 hover:border-[#B8C7C0] hover:shadow-[0_10px_24px_rgba(23,33,29,0.07)]">
               <div className="flex items-center justify-between gap-2">
                 <ChannelBadge channel={item.channel} />
                 <Verdict value={item.analysis.verdict} />

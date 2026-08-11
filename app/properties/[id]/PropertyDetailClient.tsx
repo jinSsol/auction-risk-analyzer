@@ -74,14 +74,14 @@ export function PropertyDetailClient({ id }: { id: string }) {
   const totalWithBuffer = analysis.allIn + acquisitionCosts + repairReserve;
 
   return (
-    <main className="min-h-screen bg-[#F6F8F7] text-[#17211D]">
-      <section className="border-b border-[#DDE5E1] bg-[#F6F8F7]">
+    <main className="app-shell min-h-screen text-[#17211D]">
+      <section className="hero-surface border-b border-[#DDE5E1]">
         <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-2">
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
-            className="inline-flex rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
+              className="button-lift inline-flex rounded-lg border border-[#DDE5E1] bg-white/85 px-3 py-2 text-sm font-semibold text-[#34423C] backdrop-blur transition hover:bg-white"
             >
               목록으로
             </a>
@@ -89,13 +89,13 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <div className="flex gap-2">
                 <a
                   href={`/properties/${item.id}/edit`}
-                  className="inline-flex rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
+                  className="button-lift inline-flex rounded-lg border border-[#DDE5E1] bg-white/85 px-3 py-2 text-sm font-semibold text-[#34423C] backdrop-blur transition hover:bg-white"
                 >
                   수정
                 </a>
                 <button
                   onClick={deleteCurrentItem}
-                  className="rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] px-3 py-2 text-sm font-semibold text-[#B53A2E] transition hover:bg-[#FBD6CF]"
+                  className="button-lift rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] px-3 py-2 text-sm font-semibold text-[#B53A2E] transition hover:bg-[#FBD6CF]"
                 >
                   삭제
                 </button>
@@ -127,7 +127,8 @@ export function PropertyDetailClient({ id }: { id: string }) {
               </p>
             </div>
 
-            <div className="rounded-xl border border-[#BFE3D0] bg-white p-5 shadow-[0_8px_24px_rgba(31,138,91,0.08)]">
+            <div className="interactive-card reveal-up relative overflow-hidden rounded-xl border border-[#BFE3D0] bg-white/92 p-5 shadow-[0_16px_36px_rgba(31,138,91,0.11)] backdrop-blur">
+              <div className={`absolute inset-y-0 left-0 w-1 ${riskAccent[analysis.level]}`} />
               <p className="text-xs font-semibold text-[#1F8A5B]">분석 요약</p>
               <div className="mt-3 flex items-center justify-between gap-3">
                 <Verdict value={analysis.verdict} />
@@ -147,7 +148,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[1fr_360px] lg:px-8">
         <div className="space-y-5">
-          <section className="rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">가격 한눈에 보기</h2>
@@ -167,7 +168,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </section>
 
-          <section className="rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-xl font-semibold">입찰 전 체크리스트</h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <CheckCard title="임차인 상태" value={item.tenant} />
@@ -179,7 +180,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </section>
 
-          <section className="rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-xl font-semibold">조심해서 볼 포인트</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {analysis.flags.length === 0 ? (
@@ -205,8 +206,8 @@ export function PropertyDetailClient({ id }: { id: string }) {
           </section>
         </div>
 
-        <aside className="space-y-5">
-          <section className="rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+        <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-lg font-semibold">주소 정보</h2>
             <p className="mt-3 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm font-medium leading-6 text-[#34423C]">
               {item.address}
@@ -216,7 +217,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 href={item.sourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
+                className="button-lift mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
               >
                 원문 보기
               </a>
@@ -228,7 +229,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
           </section>
 
           {item.userMemo ? (
-            <section className="rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+            <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
               <h2 className="text-lg font-semibold">내 메모</h2>
               <p className="mt-3 whitespace-pre-wrap rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm font-medium leading-6 text-[#34423C]">
                 {item.userMemo}
@@ -236,7 +237,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </section>
           ) : null}
 
-          <section className="rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-lg font-semibold">총투입 비용</h2>
             <div className="mt-4 space-y-3">
               <MiniLine label="입찰가" value={uk(analysis.plannedBid)} />
@@ -298,10 +299,16 @@ function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
     level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#B7791F]" : "bg-[#1F8A5B]";
   return (
     <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#17211D24]">
-      <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
+      <div className={`risk-fill h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   );
 }
+
+const riskAccent: Record<RiskLevel, string> = {
+  안정: "bg-[#1F8A5B]",
+  주의: "bg-[#B7791F]",
+  위험: "bg-[#DC2626]",
+};
 
 function Info({ label, value }: { label: string; value: string }) {
   return (

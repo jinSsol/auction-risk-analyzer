@@ -107,6 +107,7 @@ export function PropertyForm({
   );
 
   const isMissingEditTarget = mode === "edit" && loaded && !existingItem;
+  const progress = ((step + 1) / steps.length) * 100;
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -169,17 +170,18 @@ export function PropertyForm({
   }
 
   return (
-    <main className="min-h-screen bg-[#F6F8F7] text-[#17211D]">
-      <section className="border-b border-[#DDE5E1] bg-[#F6F8F7]">
+    <main className="app-shell min-h-screen text-[#17211D]">
+      <section className="hero-surface border-b border-[#DDE5E1]">
         <div className="mx-auto max-w-4xl px-5 py-6 lg:px-8">
           <a
             href={mode === "edit" && itemId ? `/properties/${itemId}` : "/"}
-            className="inline-flex rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA]"
+            className="button-lift inline-flex rounded-lg border border-[#DDE5E1] bg-white/85 px-3 py-2 text-sm font-semibold text-[#34423C] backdrop-blur transition hover:bg-white"
           >
             돌아가기
           </a>
           <div className="mt-5">
-            <p className="inline-flex rounded-full bg-[#E7F6EE] px-3 py-1 text-xs font-semibold text-[#1F8A5B]">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1 text-xs font-semibold text-[#1F8A5B] ring-1 ring-[#BFE3D0] backdrop-blur">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#1F8A5B] shadow-[0_0_0_4px_rgba(31,138,91,0.12)]" />
               {mode === "edit" ? "내 물건 수정" : "새 물건 등록"}
             </p>
             <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-normal text-[#17211D]">
@@ -194,16 +196,18 @@ export function PropertyForm({
       </section>
 
       <section className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
-        <div className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] md:p-5">
+        <div className="interactive-card rounded-xl border border-[#DDE5E1] bg-white/94 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur md:p-5">
           <div className="grid gap-2 sm:grid-cols-4">
             {steps.map((label, index) => (
               <button
                 key={label}
                 onClick={() => setStep(index as StepId)}
-                className={`rounded-lg border px-3 py-3 text-left text-sm transition ${
+                className={`button-lift rounded-lg border px-3 py-3 text-left text-sm transition ${
                   step === index
-                    ? "border-[#1F8A5B] bg-[#E7F6EE] font-semibold text-[#1F8A5B]"
-                    : "border-[#DDE5E1] bg-white font-medium text-[#66736D] hover:bg-[#F9FBFA]"
+                    ? "border-[#1F8A5B] bg-[#E7F6EE] font-semibold text-[#1F8A5B] shadow-[0_8px_18px_rgba(31,138,91,0.1)]"
+                    : index < step
+                      ? "border-[#BFE3D0] bg-white font-semibold text-[#1F8A5B] hover:bg-[#F9FBFA]"
+                      : "border-[#DDE5E1] bg-white font-medium text-[#66736D] hover:bg-[#F9FBFA]"
                 }`}
               >
                 <span className="block text-xs opacity-70">Step {index + 1}</span>
@@ -211,8 +215,14 @@ export function PropertyForm({
               </button>
             ))}
           </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF3F1]">
+            <div
+              className="risk-fill h-full rounded-full bg-[#1F8A5B]"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
 
-          <div className="mt-5">
+          <div className="reveal-up mt-5" key={step}>
             {step === 0 ? <SourceStep draft={draft} update={update} /> : null}
             {step === 1 ? <BasicStep draft={draft} update={update} /> : null}
             {step === 2 ? <PriceStep draft={draft} update={update} /> : null}
@@ -229,7 +239,7 @@ export function PropertyForm({
             <button
               onClick={goBack}
               disabled={step === 0}
-              className="h-11 rounded-lg border border-[#DDE5E1] bg-white px-4 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-not-allowed disabled:opacity-40"
+              className="button-lift h-11 rounded-lg border border-[#DDE5E1] bg-white px-4 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-not-allowed disabled:opacity-40"
             >
               이전
             </button>
@@ -237,14 +247,14 @@ export function PropertyForm({
               {step < 3 ? (
                 <button
                   onClick={goNext}
-                  className="h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white transition hover:bg-[#26332E]"
+                  className="button-lift h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E]"
                 >
                   다음
                 </button>
               ) : (
                 <button
                   onClick={submit}
-                  className="h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white transition hover:bg-[#26332E]"
+                  className="button-lift h-11 rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E]"
                 >
                   저장하고 상세 보기
                 </button>
@@ -457,7 +467,7 @@ function Segmented({
             onClick={() => onChange(option)}
             className={`h-10 rounded-md text-sm transition ${
               value === option
-                ? "bg-white font-semibold text-[#17211D] shadow-[0_1px_2px_rgba(23,33,29,0.08)]"
+                ? "bg-white font-semibold text-[#17211D] shadow-[0_4px_12px_rgba(23,33,29,0.08)]"
                 : "font-medium text-[#66736D] hover:bg-white/70"
             }`}
           >
@@ -481,7 +491,7 @@ function Toggle({
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={`flex h-11 items-center justify-between rounded-lg border px-3 text-sm font-semibold transition ${
+      className={`button-lift flex h-11 items-center justify-between rounded-lg border px-3 text-sm font-semibold transition ${
         checked
           ? "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]"
           : "border-[#DDE5E1] bg-white text-[#66736D] hover:bg-[#F9FBFA]"
