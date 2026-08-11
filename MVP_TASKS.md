@@ -460,6 +460,8 @@ Tasks:
 - [ ] Write MVP release notes.
 - [ ] Re-run deployed URL smoke test.
 - [ ] Decide PWA readiness scope.
+- [x] Keep account signup out of MVP unless cloud sync, alerts, or cross-device saved data become release requirements.
+- [x] Move mobile comparison access into a bottom-tab pattern so users can switch between listings and comparison without hunting down the basket.
 
 Completion criteria:
 

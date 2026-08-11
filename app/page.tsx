@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { items } from "./auction-data";
 import { analyze, percent, uk, type AnalyzedItem } from "./lib/auction-analysis";
@@ -12,6 +13,7 @@ import type { PropertyType, RiskLevel, SaleChannel } from "./lib/auction-types";
 const DEFAULT_COMPARE_IDS = ["sample-4", "sample-6", "sample-7"];
 const COMPARISON_STORAGE_KEY = "auction-risk-analyzer:comparison:v1";
 const MAX_COMPARE_COUNT = 4;
+type MobileTab = "browse" | "compare";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -24,6 +26,8 @@ export default function Home() {
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_COMPARE_IDS);
   const [comparisonReady, setComparisonReady] = useState(false);
+  const [mobileTab, setMobileTab] = useState<MobileTab>("browse");
+  const contentRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -94,8 +98,15 @@ export default function Home() {
     );
   }
 
+  function changeMobileTab(tab: MobileTab) {
+    setMobileTab(tab);
+    window.requestAnimationFrame(() => {
+      contentRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  }
+
   return (
-    <main className="app-shell min-h-screen text-[#17211D]">
+    <main className="app-shell min-h-screen pb-24 text-[#17211D] md:pb-0">
       <section className="hero-surface border-b border-[#DDE5E1]">
         <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
@@ -130,7 +141,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="sticky top-0 z-10 border-b border-[#DDE5E1] bg-white/85 backdrop-blur">
+      <section
+        className={`sticky top-0 z-10 border-b border-[#DDE5E1] bg-white/85 backdrop-blur ${
+          mobileTab === "browse" ? "block" : "hidden md:block"
+        }`}
+      >
         <div className="mx-auto grid max-w-7xl gap-3 px-5 py-3 xl:grid-cols-[minmax(280px,1fr)_auto_auto_auto_auto] xl:items-end xl:px-8">
           <div>
             <label className="text-xs font-semibold text-[#66736D]">
@@ -172,9 +187,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
+      <section ref={contentRef} className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
         <div className="space-y-5">
-          <div className="interactive-card grid gap-3 rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur md:grid-cols-[1fr_1fr_auto] md:items-center">
+          <div
+            className={`interactive-card gap-3 rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur md:grid md:grid-cols-[1fr_1fr_auto] md:items-center ${
+              mobileTab === "browse" ? "grid" : "hidden"
+            }`}
+          >
             <RangeControl
               label="예상 입찰가"
               value={bidRatio}
@@ -201,7 +220,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid gap-3">
+          <div
+            className={`gap-3 md:grid ${
+              mobileTab === "browse" ? "grid" : "hidden"
+            }`}
+          >
             {filtered.map((item) => (
               <ListingCard
                 key={item.id}
@@ -218,15 +241,28 @@ export default function Home() {
             ) : null}
           </div>
 
-          <ComparePanel
-            selected={selected}
-            onClear={() => setSelectedIds([])}
-            onRemove={(id) =>
-              setSelectedIds((current) => current.filter((itemId) => itemId !== id))
-            }
-          />
+          <div
+            className={`md:block ${
+              mobileTab === "compare" ? "block" : "hidden"
+            }`}
+          >
+            <ComparePanel
+              selected={selected}
+              onClear={() => setSelectedIds([])}
+              onRemove={(id) =>
+                setSelectedIds((current) => current.filter((itemId) => itemId !== id))
+              }
+            />
+          </div>
         </div>
       </section>
+
+      <MobileBottomTabs
+        activeTab={mobileTab}
+        selectedCount={selected.length}
+        resultCount={stats.total}
+        onTabChange={changeMobileTab}
+      />
     </main>
   );
 }
@@ -639,6 +675,72 @@ function ComparePanel({
         )}
       </div>
     </section>
+  );
+}
+
+function MobileBottomTabs({
+  activeTab,
+  selectedCount,
+  resultCount,
+  onTabChange,
+}: {
+  activeTab: MobileTab;
+  selectedCount: number;
+  resultCount: number;
+  onTabChange: (tab: MobileTab) => void;
+}) {
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#DDE5E1] bg-white/94 px-4 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2 shadow-[0_-14px_32px_rgba(23,33,29,0.12)] backdrop-blur md:hidden">
+      <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
+        <MobileTabButton
+          active={activeTab === "browse"}
+          label="물건"
+          meta={`${resultCount}건`}
+          onClick={() => onTabChange("browse")}
+        />
+        <MobileTabButton
+          active={activeTab === "compare"}
+          label="비교"
+          meta={`${selectedCount}/${MAX_COMPARE_COUNT}`}
+          onClick={() => onTabChange("compare")}
+        />
+        <Link
+          href="/properties/new"
+          className="button-lift flex min-h-14 flex-col items-center justify-center rounded-xl bg-[#17211D] px-2 text-center text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.18)]"
+        >
+          등록
+          <span className="mt-0.5 text-[11px] font-bold text-[#D9EEE5]">새 물건</span>
+        </Link>
+      </div>
+    </nav>
+  );
+}
+
+function MobileTabButton({
+  active,
+  label,
+  meta,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  meta: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`button-lift min-h-14 rounded-xl px-2 text-center text-sm font-semibold transition ${
+        active
+          ? "bg-[#E7F6EE] text-[#0F766E] ring-1 ring-[#BFE3D0]"
+          : "bg-[#F6F8F7] text-[#34423C] ring-1 ring-[#DDE5E1]"
+      }`}
+    >
+      <span className="block">{label}</span>
+      <span className="mt-0.5 block text-[11px] font-bold opacity-70">{meta}</span>
+    </button>
   );
 }
 
