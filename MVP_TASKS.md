@@ -535,15 +535,23 @@ Verification notes:
 
 Tasks:
 
-- [ ] Keep the 5-second decision summary near the top.
-- [ ] Split detail content into mobile-friendly sections: `요약`, `가격`, `권리`, `비용`, `메모`.
-- [ ] Consider sticky or segmented section navigation on mobile.
-- [ ] Make risk reasons and document checks scannable before dense calculation tables.
-- [ ] Keep edit/delete and comparison actions reachable but not visually alarming.
+- [x] Keep the 5-second decision summary near the top.
+- [x] Split detail content into mobile-friendly sections: `요약`, `가격`, `권리`, `비용`, `메모`.
+- [x] Consider sticky or segmented section navigation on mobile.
+- [x] Make risk reasons and document checks scannable before dense calculation tables.
+- [x] Keep edit/delete and comparison actions reachable but not visually alarming.
 
 Completion criteria:
 
 - Users can make a first-pass decision on a detail page within one minute on a phone.
+
+Verification notes:
+
+- Added a sticky mobile section nav for `요약`, `가격`, `권리`, `비용`, and `메모`.
+- Detail content now follows a mobile reading order: decision summary, price context, rights checks, bid costs, memo/source guidance.
+- The 5-second decision summary remains directly below the hero content.
+- Mobile memo/source guidance is available in the main reading flow while the desktop sidebar remains desktop-only.
+- Edit action is reachable in the mobile memo section for user-created properties without making delete visually dominant.
 
 ### 5.4 Reduce Form Friction
 

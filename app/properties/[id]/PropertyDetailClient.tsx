@@ -157,9 +157,29 @@ export function PropertyDetailClient({ id }: { id: string }) {
         </div>
       </section>
 
+      <nav className="sticky top-0 z-20 border-b border-[#DDE5E1] bg-white/90 px-5 py-2 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {[
+            ["#summary", "요약"],
+            ["#price", "가격"],
+            ["#rights", "권리"],
+            ["#costs", "비용"],
+            ["#memo", "메모"],
+          ].map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="shrink-0 rounded-full border border-[#DDE5E1] bg-[#F9FBFA] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[1fr_360px] lg:px-8">
         <div className="space-y-5">
-          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+          <section id="summary" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold text-[#1F8A5B]">
@@ -232,7 +252,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </section>
 
-          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+          <section id="price" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold">가격 한눈에 보기</h2>
@@ -249,37 +269,6 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <Info label="최저가" value={uk(item.minimum)} />
               <Info label="예상 입찰" value={uk(analysis.plannedBid)} />
               <Info label="총투입 예상" value={uk(analysis.allIn)} />
-            </div>
-          </section>
-
-          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-semibold">입찰 계산기</h2>
-                <p className="mt-1 text-sm text-[#66736D]">
-                  입찰가와 추가 비용을 합산해 넘지 말아야 할 금액을 계산합니다.
-                </p>
-              </div>
-              <span className="rounded-full bg-[#E7F6EE] px-3 py-1 text-sm font-semibold text-[#1F8A5B]">
-                목표 마진 {percent(analysis.desiredMarginRate)}
-              </span>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <Info label="보수 상한" value={uk(analysis.conservativeBidCeiling)} />
-              <Info label="넘지 말아야 할 금액" value={uk(analysis.doNotBidAbove)} />
-              <Info label="총투입금" value={uk(analysis.allIn)} />
-              <Info
-                label="예상 마진"
-                value={`${uk(analysis.margin)} · ${percent(analysis.marginRate)}`}
-              />
-            </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <CostLine label="예상 입찰가" value={uk(analysis.plannedBid)} />
-              <CostLine label="인수 추정액" value={uk(analysis.takeoverAmount)} />
-              <CostLine label="취득세·수수료" value={uk(analysis.acquisitionTaxAndFees)} />
-              <CostLine label="수리 예산" value={uk(analysis.repairBudget)} />
-              <CostLine label="명도·이사 협의비" value={uk(analysis.evictionBudget)} />
-              <CostLine label="체납·관리비 추정" value={uk(analysis.unpaidFees)} />
             </div>
           </section>
 
@@ -322,7 +311,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             )}
           </section>
 
-          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+          <section id="rights" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-xl font-semibold">입찰 전 체크리스트</h2>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <CheckCard title="임차인 상태" value={item.tenant} />
@@ -437,9 +426,98 @@ export function PropertyDetailClient({ id }: { id: string }) {
               ))}
             </ul>
           </section>
+
+          <section id="costs" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">입찰 계산기</h2>
+                <p className="mt-1 text-sm text-[#66736D]">
+                  입찰가와 추가 비용을 합산해 넘지 말아야 할 금액을 계산합니다.
+                </p>
+              </div>
+              <span className="rounded-full bg-[#E7F6EE] px-3 py-1 text-sm font-semibold text-[#1F8A5B]">
+                목표 마진 {percent(analysis.desiredMarginRate)}
+              </span>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <Info label="보수 상한" value={uk(analysis.conservativeBidCeiling)} />
+              <Info label="넘지 말아야 할 금액" value={uk(analysis.doNotBidAbove)} />
+              <Info label="총투입금" value={uk(analysis.allIn)} />
+              <Info
+                label="예상 마진"
+                value={`${uk(analysis.margin)} · ${percent(analysis.marginRate)}`}
+              />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <CostLine label="예상 입찰가" value={uk(analysis.plannedBid)} />
+              <CostLine label="인수 추정액" value={uk(analysis.takeoverAmount)} />
+              <CostLine label="취득세·수수료" value={uk(analysis.acquisitionTaxAndFees)} />
+              <CostLine label="수리 예산" value={uk(analysis.repairBudget)} />
+              <CostLine label="명도·이사 협의비" value={uk(analysis.evictionBudget)} />
+              <CostLine label="체납·관리비 추정" value={uk(analysis.unpaidFees)} />
+            </div>
+          </section>
+
+          <section id="memo" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)] lg:hidden">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">메모와 확인 안내</h2>
+                <p className="mt-1 text-sm leading-6 text-[#66736D]">
+                  최종 판단 전에 원문 주소, 저장 방식, 확인 문서를 한 번 더 확인하세요.
+                </p>
+              </div>
+              {isUserItem ? (
+                <a
+                  href={`/properties/${item.id}/edit`}
+                  className="button-lift rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+                >
+                  수정
+                </a>
+              ) : null}
+            </div>
+            <div className="mt-5 grid gap-3">
+              <GuidanceLine
+                label="분석 보조"
+                value="이 화면은 법률·투자 자문이 아니라 입력값을 정리해 보는 참고 도구입니다."
+              />
+              <GuidanceLine
+                label="최종 문서"
+                value="등기사항전부증명서, 매각물건명세서, 현황조사서, 공매 공고문 원문 확인이 필요합니다."
+              />
+              <GuidanceLine
+                label="저장 방식"
+                value="직접 등록한 물건과 비교 바구니는 현재 브라우저에만 저장됩니다."
+              />
+            </div>
+            <div className="mt-5 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
+              <p className="text-xs font-semibold text-[#66736D]">주소 정보</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-[#34423C]">
+                {item.address}
+              </p>
+              {item.sourceUrl ? (
+                <a
+                  href={item.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="button-lift mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+                >
+                  원문 보기
+                </a>
+              ) : null}
+            </div>
+            {item.userMemo ? (
+              <p className="mt-5 whitespace-pre-wrap rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm font-medium leading-6 text-[#34423C]">
+                {item.userMemo}
+              </p>
+            ) : (
+              <p className="mt-5 rounded-lg border border-dashed border-[#B8C7C0] bg-[#F9FBFA] p-3 text-sm font-medium leading-6 text-[#66736D]">
+                아직 직접 남긴 메모가 없습니다.
+              </p>
+            )}
+          </section>
         </div>
 
-        <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+        <aside className="hidden space-y-5 lg:sticky lg:top-24 lg:block lg:self-start">
           <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
             <h2 className="text-lg font-semibold">확인 안내</h2>
             <div className="mt-4 space-y-3">
