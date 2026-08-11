@@ -1,4 +1,4 @@
-import type { AuctionItem, ComparableSale } from "./auction-types";
+import type { AuctionItem, BidCalculatorInputs, ComparableSale } from "./auction-types";
 import { normalizeRightsChecklist } from "./rights-checklist";
 
 export const USER_ITEMS_STORAGE_KEY = "auction-risk-analyzer:user-items:v1";
@@ -46,6 +46,24 @@ function normalizeComparableSale(value: unknown, index: number): ComparableSale 
   };
 }
 
+function normalizeBidCalculator(
+  value: unknown,
+  fallbackTakeoverAmount: number
+): BidCalculatorInputs {
+  const input =
+    value && typeof value === "object" ? (value as Partial<BidCalculatorInputs>) : {};
+
+  return {
+    plannedBid: numberOrZero(input.plannedBid),
+    takeoverAmount: numberOrZero(input.takeoverAmount) || fallbackTakeoverAmount,
+    acquisitionTaxAndFees: numberOrZero(input.acquisitionTaxAndFees),
+    repairBudget: numberOrZero(input.repairBudget),
+    evictionBudget: numberOrZero(input.evictionBudget),
+    unpaidFees: numberOrZero(input.unpaidFees),
+    desiredMarginRate: numberOrZero(input.desiredMarginRate),
+  };
+}
+
 function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
   if (!value || typeof value !== "object") return null;
 
@@ -53,6 +71,8 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
   if (typeof item.id !== "string" || !item.id.startsWith("user-")) return null;
   if (item.source !== "user") return null;
   if (typeof item.title !== "string" || item.title.trim().length === 0) return null;
+
+  const takeoverAmount = numberOrZero(item.takeoverAmount);
 
   return {
     id: item.id,
@@ -88,7 +108,7 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
         ? item.tenant
         : "확인 필요",
     seniorDeposit: numberOrZero(item.seniorDeposit),
-    takeoverAmount: numberOrZero(item.takeoverAmount),
+    takeoverAmount,
     liens: Boolean(item.liens),
     illegalBuilding: Boolean(item.illegalBuilding),
     taxRisk: Boolean(item.taxRisk),
@@ -109,6 +129,7 @@ function normalizeUserAuctionItem(value: unknown): UserAuctionItem | null {
           .slice(0, 3)
       : [],
     rightsChecklist: normalizeRightsChecklist(item.rightsChecklist),
+    bidCalculator: normalizeBidCalculator(item.bidCalculator, takeoverAmount),
   };
 }
 

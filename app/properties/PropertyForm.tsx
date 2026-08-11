@@ -18,6 +18,7 @@ import {
 } from "../lib/rights-checklist";
 import type {
   AuctionItem,
+  BidCalculatorInputs,
   ComparableSale,
   PropertyType,
   RightsChecklistAnswer,
@@ -56,6 +57,7 @@ type Draft = {
   userMemo: string;
   comparableSales: ComparableSaleDraft[];
   rightsChecklist: RightsChecklistAnswers;
+  bidCalculator: BidCalculatorDraft;
 };
 
 type ComparableSaleDraft = {
@@ -66,6 +68,16 @@ type ComparableSaleDraft = {
   floor: string;
   price: string;
   memo: string;
+};
+
+type BidCalculatorDraft = {
+  plannedBid: string;
+  takeoverAmount: string;
+  acquisitionTaxAndFees: string;
+  repairBudget: string;
+  evictionBudget: string;
+  unpaidFees: string;
+  desiredMarginRate: string;
 };
 
 const emptyDraft: Draft = {
@@ -95,6 +107,7 @@ const emptyDraft: Draft = {
   userMemo: "",
   comparableSales: createEmptyComparableSaleDrafts(),
   rightsChecklist: createDefaultRightsChecklist(),
+  bidCalculator: createEmptyBidCalculatorDraft(),
 };
 
 const steps = ["출처", "기본 정보", "가격", "점유·메모"];
@@ -378,6 +391,14 @@ function PriceStep({ draft, update }: StepProps) {
     );
   }
 
+  function updateBidCalculator<K extends keyof BidCalculatorDraft>(
+    key: K,
+    value: BidCalculatorDraft[K]
+  ) {
+    update("bidCalculator", { ...draft.bidCalculator, [key]: value });
+    if (key === "takeoverAmount") update("takeoverAmount", value);
+  }
+
   return (
     <div className="grid gap-4">
       <p className="rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-medium text-[#255C99]">
@@ -390,6 +411,73 @@ function PriceStep({ draft, update }: StepProps) {
         <TextInput label="최근 실거래" value={draft.lastTrade} onChange={(value) => update("lastTrade", value)} inputMode="numeric" placeholder="129500" />
       </div>
       <TextInput label="유찰 횟수" value={draft.failedBids} onChange={(value) => update("failedBids", value)} inputMode="numeric" placeholder="0" />
+      <section className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold text-[#17211D]">
+              고급 입찰 계산기
+            </h2>
+            <p className="mt-1 text-xs leading-5 text-[#66736D]">
+              입찰가 외 취득비, 수리비, 명도비, 체납 비용과 목표 안전마진을
+              넣으면 상세에서 총투입금과 상한가를 다시 계산합니다.
+            </p>
+          </div>
+          <span className="rounded-full bg-[#E7F0FF] px-2.5 py-1 text-xs font-semibold text-[#255C99]">
+            만원 단위
+          </span>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <TextInput
+            label="예상 입찰가"
+            value={draft.bidCalculator.plannedBid}
+            onChange={(value) => updateBidCalculator("plannedBid", value)}
+            inputMode="numeric"
+            placeholder="예: 98000"
+          />
+          <TextInput
+            label="인수 추정액"
+            value={draft.bidCalculator.takeoverAmount}
+            onChange={(value) => updateBidCalculator("takeoverAmount", value)}
+            inputMode="numeric"
+            placeholder="0"
+          />
+          <TextInput
+            label="취득세·수수료"
+            value={draft.bidCalculator.acquisitionTaxAndFees}
+            onChange={(value) => updateBidCalculator("acquisitionTaxAndFees", value)}
+            inputMode="numeric"
+            placeholder="비우면 입찰가의 3.5%"
+          />
+          <TextInput
+            label="수리 예산"
+            value={draft.bidCalculator.repairBudget}
+            onChange={(value) => updateBidCalculator("repairBudget", value)}
+            inputMode="numeric"
+            placeholder="예: 1500"
+          />
+          <TextInput
+            label="명도·이사 협의비"
+            value={draft.bidCalculator.evictionBudget}
+            onChange={(value) => updateBidCalculator("evictionBudget", value)}
+            inputMode="numeric"
+            placeholder="예: 500"
+          />
+          <TextInput
+            label="체납·관리비 추정"
+            value={draft.bidCalculator.unpaidFees}
+            onChange={(value) => updateBidCalculator("unpaidFees", value)}
+            inputMode="numeric"
+            placeholder="예: 200"
+          />
+          <TextInput
+            label="목표 안전마진(%)"
+            value={draft.bidCalculator.desiredMarginRate}
+            onChange={(value) => updateBidCalculator("desiredMarginRate", value)}
+            inputMode="numeric"
+            placeholder="12"
+          />
+        </div>
+      </section>
       <div className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
@@ -425,6 +513,11 @@ function RightsStep({ draft, update }: StepProps) {
     update("rightsChecklist", { ...draft.rightsChecklist, [id]: answer });
   }
 
+  function updateTakeoverAmount(value: string) {
+    update("takeoverAmount", value);
+    update("bidCalculator", { ...draft.bidCalculator, takeoverAmount: value });
+  }
+
   return (
     <div className="grid gap-4">
       <Field label="임차인 상태">
@@ -440,7 +533,7 @@ function RightsStep({ draft, update }: StepProps) {
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <TextInput label="선순위 보증금" value={draft.seniorDeposit} onChange={(value) => update("seniorDeposit", value)} inputMode="numeric" placeholder="0" />
-        <TextInput label="인수 추정액" value={draft.takeoverAmount} onChange={(value) => update("takeoverAmount", value)} inputMode="numeric" placeholder="0" />
+        <TextInput label="인수 추정액" value={draft.takeoverAmount} onChange={updateTakeoverAmount} inputMode="numeric" placeholder="0" />
       </div>
       <div className="grid gap-2 sm:grid-cols-3">
         <Toggle label="유치권" checked={draft.liens} onChange={(value) => update("liens", value)} />
@@ -765,6 +858,7 @@ function itemFromDraft(draft: Draft): Omit<UserAuctionItem, "id" | "source" | "c
     userMemo: memo,
     comparableSales: comparableSalesFromDraft(draft.comparableSales),
     rightsChecklist: draft.rightsChecklist,
+    bidCalculator: bidCalculatorFromDraft(draft.bidCalculator),
   };
 }
 
@@ -796,6 +890,7 @@ function draftFromItem(item: UserAuctionItem): Draft {
     userMemo: item.userMemo ?? item.notes.join("\n"),
     comparableSales: comparableSalesToDraft(item.comparableSales ?? []),
     rightsChecklist: item.rightsChecklist ?? createDefaultRightsChecklist(),
+    bidCalculator: bidCalculatorToDraft(item.bidCalculator, item.takeoverAmount),
   };
 }
 
@@ -809,6 +904,49 @@ function createEmptyComparableSaleDrafts(): ComparableSaleDraft[] {
     price: "",
     memo: "",
   }));
+}
+
+function createEmptyBidCalculatorDraft(): BidCalculatorDraft {
+  return {
+    plannedBid: "",
+    takeoverAmount: "",
+    acquisitionTaxAndFees: "",
+    repairBudget: "",
+    evictionBudget: "",
+    unpaidFees: "",
+    desiredMarginRate: "12",
+  };
+}
+
+function bidCalculatorFromDraft(draft: BidCalculatorDraft): BidCalculatorInputs {
+  return {
+    plannedBid: toNumber(draft.plannedBid),
+    takeoverAmount: toNumber(draft.takeoverAmount),
+    acquisitionTaxAndFees: toNumber(draft.acquisitionTaxAndFees),
+    repairBudget: toNumber(draft.repairBudget),
+    evictionBudget: toNumber(draft.evictionBudget),
+    unpaidFees: toNumber(draft.unpaidFees),
+    desiredMarginRate: toNumber(draft.desiredMarginRate) || 12,
+  };
+}
+
+function bidCalculatorToDraft(
+  calculator: BidCalculatorInputs | undefined,
+  takeoverAmount: number
+): BidCalculatorDraft {
+  return {
+    plannedBid: calculator?.plannedBid ? String(calculator.plannedBid) : "",
+    takeoverAmount: String(calculator?.takeoverAmount || takeoverAmount || ""),
+    acquisitionTaxAndFees: calculator?.acquisitionTaxAndFees
+      ? String(calculator.acquisitionTaxAndFees)
+      : "",
+    repairBudget: calculator?.repairBudget ? String(calculator.repairBudget) : "",
+    evictionBudget: calculator?.evictionBudget
+      ? String(calculator.evictionBudget)
+      : "",
+    unpaidFees: calculator?.unpaidFees ? String(calculator.unpaidFees) : "",
+    desiredMarginRate: String(calculator?.desiredMarginRate || 12),
+  };
 }
 
 function comparableSalesFromDraft(sales: ComparableSaleDraft[]): ComparableSale[] {

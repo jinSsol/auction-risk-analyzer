@@ -81,13 +81,40 @@ export function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number
   const level: RiskLevel =
     cappedRisk >= 65 ? "위험" : cappedRisk >= 38 ? "주의" : "안정";
   const baseDiscount = level === "위험" ? 0.72 : level === "주의" ? 0.8 : 0.87;
-  const buffer = item.market * (bufferRatio / 100);
-  const suggested = Math.max(
+  const calculator = item.bidCalculator;
+  const takeoverAmount = calculator?.takeoverAmount ?? item.takeoverAmount;
+  const plannedBid =
+    calculator && calculator.plannedBid > 0
+      ? calculator.plannedBid
+      : Math.round(item.market * (bidRatio / 100));
+  const desiredMarginRate =
+    calculator && calculator.desiredMarginRate > 0
+      ? calculator.desiredMarginRate
+      : 12;
+  const acquisitionTaxAndFees =
+    calculator && calculator.acquisitionTaxAndFees > 0
+      ? calculator.acquisitionTaxAndFees
+      : Math.round(plannedBid * 0.035);
+  const repairBudget =
+    calculator && calculator.repairBudget > 0
+      ? calculator.repairBudget
+      : Math.round(item.market * (bufferRatio / 100));
+  const evictionBudget = calculator?.evictionBudget ?? 0;
+  const unpaidFees = calculator?.unpaidFees ?? 0;
+  const extraCosts =
+    acquisitionTaxAndFees + repairBudget + evictionBudget + unpaidFees;
+  const conservativeBidCeiling = Math.max(
     0,
-    Math.round(item.market * baseDiscount - item.takeoverAmount - buffer)
+    Math.round(item.market * baseDiscount - takeoverAmount - extraCosts)
   );
-  const plannedBid = Math.round(item.market * (bidRatio / 100));
-  const allIn = plannedBid + item.takeoverAmount;
+  const doNotBidAbove = Math.max(
+    0,
+    Math.round(
+      item.market * (1 - desiredMarginRate / 100) - takeoverAmount - extraCosts
+    )
+  );
+  const suggested = Math.min(conservativeBidCeiling, doNotBidAbove);
+  const allIn = plannedBid + takeoverAmount + extraCosts;
   const margin = item.market - allIn;
   const marginRate = (margin / item.market) * 100;
   const minGap = plannedBid - item.minimum;
@@ -106,7 +133,16 @@ export function analyze(item: AuctionItem, bidRatio: number, bufferRatio: number
     risk: cappedRisk,
     level,
     suggested,
+    conservativeBidCeiling,
+    doNotBidAbove,
     plannedBid,
+    takeoverAmount,
+    acquisitionTaxAndFees,
+    repairBudget,
+    evictionBudget,
+    unpaidFees,
+    extraCosts,
+    desiredMarginRate,
     allIn,
     margin,
     marginRate,

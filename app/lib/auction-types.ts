@@ -27,6 +27,16 @@ export type ComparableSale = {
   memo: string;
 };
 
+export type BidCalculatorInputs = {
+  plannedBid: number;
+  takeoverAmount: number;
+  acquisitionTaxAndFees: number;
+  repairBudget: number;
+  evictionBudget: number;
+  unpaidFees: number;
+  desiredMarginRate: number;
+};
+
 export type AuctionItem = {
   id: string;
   channel: SaleChannel;
@@ -58,4 +68,5 @@ export type AuctionItem = {
   userMemo?: string;
   comparableSales?: ComparableSale[];
   rightsChecklist?: RightsChecklistAnswers;
+  bidCalculator?: BidCalculatorInputs;
 };

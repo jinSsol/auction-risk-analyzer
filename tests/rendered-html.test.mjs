@@ -51,6 +51,9 @@ test("server-renders sample property detail pages", async () => {
   assert.match(html, /추천 상한가/);
   assert.match(html, /시세 근거/);
   assert.match(html, /시세 근거 부족/);
+  assert.match(html, /입찰 계산기/);
+  assert.match(html, /넘지 말아야 할 금액/);
+  assert.match(html, /목표 마진/);
   assert.match(html, /입찰 전 체크리스트/);
   assert.match(html, /권리분석 질문/);
   assert.match(html, /아직 확인할 것/);

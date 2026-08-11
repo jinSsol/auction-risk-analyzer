@@ -324,21 +324,21 @@ Completion criteria:
 
 Inputs:
 
-- [ ] Planned bid
-- [ ] Takeover amount
-- [ ] Acquisition tax/fees
-- [ ] Repair budget
-- [ ] Moving/eviction budget
-- [ ] Unpaid management/tax estimate
-- [ ] Desired safety margin
+- [x] Planned bid
+- [x] Takeover amount
+- [x] Acquisition tax/fees
+- [x] Repair budget
+- [x] Moving/eviction budget
+- [x] Unpaid management/tax estimate
+- [x] Desired safety margin
 
 Outputs:
 
-- [ ] Conservative bid ceiling
-- [ ] All-in cost
-- [ ] Expected margin
-- [ ] Margin rate
-- [ ] "Do not bid above" threshold
+- [x] Conservative bid ceiling
+- [x] All-in cost
+- [x] Expected margin
+- [x] Margin rate
+- [x] "Do not bid above" threshold
 
 Completion criteria:
 

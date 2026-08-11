@@ -73,9 +73,6 @@ export function PropertyDetailClient({ id }: { id: string }) {
   }
 
   const analysis = analyze(item, 78, 4);
-  const acquisitionCosts = Math.round(analysis.plannedBid * 0.035);
-  const repairReserve = Math.round(item.market * 0.04);
-  const totalWithBuffer = analysis.allIn + acquisitionCosts + repairReserve;
   const comparableAnalysis = analyzeComparableSales(item);
   const rightsSummary = summarizeRightsChecklist(item.rightsChecklist);
 
@@ -170,7 +167,38 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <Info label="예상 시세" value={uk(item.market)} />
               <Info label="최저가" value={uk(item.minimum)} />
               <Info label="예상 입찰" value={uk(analysis.plannedBid)} />
-              <Info label="총투입 예상" value={uk(totalWithBuffer)} />
+              <Info label="총투입 예상" value={uk(analysis.allIn)} />
+            </div>
+          </section>
+
+          <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">입찰 계산기</h2>
+                <p className="mt-1 text-sm text-[#66736D]">
+                  입찰가와 추가 비용을 합산해 넘지 말아야 할 금액을 계산합니다.
+                </p>
+              </div>
+              <span className="rounded-full bg-[#E7F6EE] px-3 py-1 text-sm font-semibold text-[#1F8A5B]">
+                목표 마진 {percent(analysis.desiredMarginRate)}
+              </span>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <Info label="보수 상한" value={uk(analysis.conservativeBidCeiling)} />
+              <Info label="넘지 말아야 할 금액" value={uk(analysis.doNotBidAbove)} />
+              <Info label="총투입금" value={uk(analysis.allIn)} />
+              <Info
+                label="예상 마진"
+                value={`${uk(analysis.margin)} · ${percent(analysis.marginRate)}`}
+              />
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2">
+              <CostLine label="예상 입찰가" value={uk(analysis.plannedBid)} />
+              <CostLine label="인수 추정액" value={uk(analysis.takeoverAmount)} />
+              <CostLine label="취득세·수수료" value={uk(analysis.acquisitionTaxAndFees)} />
+              <CostLine label="수리 예산" value={uk(analysis.repairBudget)} />
+              <CostLine label="명도·이사 협의비" value={uk(analysis.evictionBudget)} />
+              <CostLine label="체납·관리비 추정" value={uk(analysis.unpaidFees)} />
             </div>
           </section>
 
@@ -365,11 +393,17 @@ export function PropertyDetailClient({ id }: { id: string }) {
             <h2 className="text-lg font-semibold">총투입 비용</h2>
             <div className="mt-4 space-y-3">
               <MiniLine label="입찰가" value={uk(analysis.plannedBid)} />
-              <MiniLine label="인수금" value={uk(item.takeoverAmount)} />
-              <MiniLine label="취득 비용 추정" value={uk(acquisitionCosts)} />
-              <MiniLine label="수리·명도 버퍼" value={uk(repairReserve)} />
+              <MiniLine label="인수금" value={uk(analysis.takeoverAmount)} />
+              <MiniLine label="취득 비용" value={uk(analysis.acquisitionTaxAndFees)} />
+              <MiniLine label="수리 예산" value={uk(analysis.repairBudget)} />
+              <MiniLine label="명도·이사 비용" value={uk(analysis.evictionBudget)} />
+              <MiniLine label="체납·관리비" value={uk(analysis.unpaidFees)} />
               <div className="border-t border-[#E5ECE8] pt-3">
-                <MiniLine label="총투입 예상" value={uk(totalWithBuffer)} strong />
+                <MiniLine label="총투입 예상" value={uk(analysis.allIn)} strong />
+              </div>
+              <div className="border-t border-[#E5ECE8] pt-3">
+                <MiniLine label="상한 기준" value={uk(analysis.doNotBidAbove)} />
+                <MiniLine label="예상 마진" value={percent(analysis.marginRate)} strong />
               </div>
             </div>
           </section>
@@ -440,6 +474,15 @@ function Info({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-4">
       <p className="text-xs font-semibold text-[#66736D]">{label}</p>
       <p className="mt-1 text-xl font-semibold tabular-nums text-[#17211D]">{value}</p>
+    </div>
+  );
+}
+
+function CostLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 text-sm">
+      <span className="font-medium text-[#66736D]">{label}</span>
+      <span className="font-semibold tabular-nums text-[#17211D]">{value}</span>
     </div>
   );
 }
