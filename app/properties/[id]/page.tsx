@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  analyze,
-  items,
-  percent,
-  type RiskLevel,
-  type SaleChannel,
-  uk,
-} from "../../auction-data";
+import { items } from "../../auction-data";
+import { analyze, percent, uk } from "../../lib/auction-analysis";
+import type { RiskLevel, SaleChannel } from "../../lib/auction-types";
 
 export function generateStaticParams() {
-  return items.map((item) => ({ id: String(item.id) }));
+  return items.map((item) => ({ id: item.id }));
 }
 
 export default async function PropertyDetail({
@@ -19,7 +14,7 @@ export default async function PropertyDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const item = items.find((candidate) => String(candidate.id) === id);
+  const item = items.find((candidate) => candidate.id === id);
 
   if (!item) {
     notFound();

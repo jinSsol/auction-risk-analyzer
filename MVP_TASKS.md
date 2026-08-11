@@ -24,10 +24,10 @@ Goal: prepare the codebase so sample properties and user-created properties can 
 
 ### 1.1 Remove Data and Logic Duplication
 
-- [ ] Remove duplicated types, sample data, `uk`, `percent`, and `analyze` from `app/page.tsx`.
-- [ ] Use shared imports from `app/auction-data.ts` or newly separated `app/lib/*` modules.
-- [ ] Confirm listing and detail pages use the same analysis function.
-- [ ] Keep sample data behavior unchanged after refactor.
+- [x] Remove duplicated types, sample data, `uk`, `percent`, and `analyze` from `app/page.tsx`.
+- [x] Use shared imports from `app/auction-data.ts` or newly separated `app/lib/*` modules.
+- [x] Confirm listing and detail pages use the same analysis function.
+- [x] Keep sample data behavior unchanged after refactor.
 
 Completion criteria:
 
@@ -50,10 +50,10 @@ app/
 
 Tasks:
 
-- [ ] Move shared types to `auction-types.ts`.
-- [ ] Move risk and bid calculation to `auction-analysis.ts`.
-- [ ] Keep sample items in `auction-data.ts` or rename to `sample-items.ts`.
-- [ ] Add a merge helper for sample items plus user-created items.
+- [x] Move shared types to `auction-types.ts`.
+- [x] Move risk and bid calculation to `auction-analysis.ts`.
+- [x] Keep sample items in `auction-data.ts` or rename to `sample-items.ts`.
+- [x] Add a merge helper for sample items plus user-created items.
 
 Completion criteria:
 
@@ -66,11 +66,11 @@ Goal: support both sample and user-created properties safely.
 
 Tasks:
 
-- [ ] Change `AuctionItem.id` from `number` to `string`.
-- [ ] Rename sample ids to `sample-1`, `sample-2`, etc.
-- [ ] Plan user ids as `user-${crypto.randomUUID()}` or equivalent.
-- [ ] Update listing links to `/properties/sample-1` style paths.
-- [ ] Update comparison basket state from `number[]` to `string[]`.
+- [x] Change `AuctionItem.id` from `number` to `string`.
+- [x] Rename sample ids to `sample-1`, `sample-2`, etc.
+- [x] Plan user ids as `user-${crypto.randomUUID()}` or equivalent.
+- [x] Update listing links to `/properties/sample-1` style paths.
+- [x] Update comparison basket state from `number[]` to `string[]`.
 
 Completion criteria:
 
@@ -90,12 +90,12 @@ auction-risk-analyzer:user-items:v1
 
 Tasks:
 
-- [ ] Add `auction-storage.ts`.
-- [ ] Define stored item schema with `source: "user"`, `createdAt`, `updatedAt`.
-- [ ] Add safe load behavior for missing data.
-- [ ] Add safe load behavior for broken JSON.
-- [ ] Add create, update, delete helpers.
-- [ ] Add minimal validation/normalization for numeric fields.
+- [x] Add `auction-storage.ts`.
+- [x] Define stored item schema with `source: "user"`, `createdAt`, `updatedAt`.
+- [x] Add safe load behavior for missing data.
+- [x] Add safe load behavior for broken JSON.
+- [x] Add create, update, delete helpers.
+- [x] Add minimal validation/normalization for numeric fields.
 
 Completion criteria:
 
@@ -115,7 +115,7 @@ Tasks:
 - [ ] Convert property detail rendering to a client-compatible shell.
 - [ ] Resolve sample and user-created items from one merged source.
 - [ ] Show a friendly not-found state for missing user ids.
-- [ ] Keep sample property detail pages working.
+- [x] Keep sample property detail pages working.
 
 Completion criteria:
 
@@ -124,11 +124,11 @@ Completion criteria:
 
 ### 1.6 Phase 1 Verification
 
-- [ ] `npm run build`
-- [ ] Listing page loads.
-- [ ] Sample detail page loads.
-- [ ] Comparison basket works with string ids.
-- [ ] No duplicated analysis logic remains.
+- [x] `npm run build`
+- [x] Listing page loads.
+- [x] Sample detail page loads.
+- [x] Comparison basket works with string ids.
+- [x] No duplicated analysis logic remains.
 
 ## Phase 2: Manual Property Creation
 
