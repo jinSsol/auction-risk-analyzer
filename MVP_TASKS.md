@@ -601,17 +601,26 @@ Verification notes:
 
 Tasks:
 
-- [ ] Test the main flow on 390px and 430px mobile widths.
-- [ ] Test add-property flow with incomplete information.
-- [ ] Test comparison with 0, 1, 2, and 4 selected properties.
-- [ ] Check bottom tab safe-area spacing.
-- [ ] Check tap target sizes for filters, compare actions, and form navigation.
-- [ ] Re-run `npm run lint`.
-- [ ] Re-run `npm test`.
+- [x] Test the main flow on 390px and 430px mobile widths.
+- [x] Test add-property flow with incomplete information.
+- [x] Test comparison with 0, 1, 2, and 4 selected properties.
+- [x] Check bottom tab safe-area spacing.
+- [x] Check tap target sizes for filters, compare actions, and form navigation.
+- [x] Re-run `npm run lint`.
+- [x] Re-run `npm test`.
 
 Completion criteria:
 
 - Mobile first-pass flows are ready to share with a small tester group.
+
+Verification notes:
+
+- Mobile browser QA checked listing, detail, registration, and comparison views at 390px and 430px widths.
+- No horizontal overflow was found after rechecking the listing, detail, registration, and comparison flows.
+- Add-property copy and grouped optional sections support saving incomplete candidate information.
+- Comparison states were exercised from empty/low-count through full 4-item comparison, with bottom tab navigation intact.
+- Tap target QA found small range controls and comparison title links; both were expanded to mobile-friendly hit areas.
+- Safety wording was tightened from `추천 상한가` to `검토 상한가` on the detail page.
 
 ## Deferred Until After MVP
 

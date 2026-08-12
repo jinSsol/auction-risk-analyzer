@@ -51,7 +51,7 @@ test("server-renders sample property detail pages", async () => {
   const html = await response.text();
   assert.match(html, /마포구 공덕동 래미안 84/);
   assert.match(html, /분석 요약/);
-  assert.match(html, /추천 상한가/);
+  assert.match(html, /검토 상한가/);
   assert.match(html, /5초 판단 요약/);
   assert.match(html, /가격 매력도/);
   assert.match(html, /입찰 여유/);

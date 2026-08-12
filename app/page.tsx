@@ -467,7 +467,7 @@ function RangeControl({
         max={max}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className={`mt-3 w-full ${
+        className={`mt-2 h-11 w-full cursor-pointer touch-pan-x ${
           tone === "green" ? "accent-[#1F8A5B]" : "accent-[#1F8A5B]"
         }`}
       />
@@ -815,7 +815,7 @@ function ComparePanel({
               </p>
               <a
                 href={`/properties/${item.id}`}
-                className="mt-3 block text-sm font-semibold text-[#17211D] transition hover:text-[#0F766E]"
+                className="mt-2 flex min-h-11 items-center text-sm font-semibold text-[#17211D] transition hover:text-[#0F766E]"
               >
                 {item.title}
               </a>

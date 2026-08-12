@@ -145,7 +145,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 <RiskBadge level={analysis.level} score={analysis.risk} />
               </div>
               <div className="mt-4 flex items-end justify-between gap-3">
-                <span className="text-sm font-medium text-[#34423C]">추천 상한가</span>
+                <span className="text-sm font-medium text-[#34423C]">검토 상한가</span>
                 <span className="break-words text-2xl font-semibold tabular-nums text-[#17211D] sm:text-3xl">
                   {uk(analysis.suggested)}
                 </span>
@@ -210,7 +210,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <DecisionStat
                 label="입찰 여유"
                 value={bidHeadroom >= 0 ? `${uk(bidHeadroom)} 여유` : `${uk(Math.abs(bidHeadroom))} 초과`}
-                helper={`추천 상한 ${uk(analysis.suggested)} 기준`}
+                helper={`검토 상한 ${uk(analysis.suggested)} 기준`}
                 tone={bidHeadroom >= 0 ? "good" : "danger"}
               />
               <DecisionStat
