@@ -83,6 +83,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
     .filter((factor) => factor.severity === "danger")
     .concat(analysis.riskFactors.filter((factor) => factor.severity !== "danger"))
     .slice(0, 3);
+  const statusLabels = detailStatusLabels(item, rightsSummary.unknownCount);
 
   return (
     <main className="app-shell min-h-screen text-[#17211D]">
@@ -118,11 +119,9 @@ export function PropertyDetailClient({ id }: { id: string }) {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <ChannelBadge channel={item.channel} />
-                {isUserItem ? (
-                  <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
-                    내 물건
-                  </span>
-                ) : null}
+                {statusLabels.map((label) => (
+                  <StatusBadge key={label} label={label} />
+                ))}
                 <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
                   {item.agency}
                 </span>
@@ -488,6 +487,10 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 label="저장 방식"
                 value="직접 등록한 물건과 비교 바구니는 현재 브라우저에만 저장됩니다."
               />
+              <GuidanceLine
+                label="처음 공유 전 확인"
+                value="주소, 점유자, 선순위 권리, 체납/관리비, 공매 인도 조건은 앱 밖 원문과 현장 정보로 다시 확인하세요."
+              />
             </div>
             <div className="mt-5 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
               <p className="text-xs font-semibold text-[#66736D]">주소 정보</p>
@@ -532,6 +535,10 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <GuidanceLine
                 label="저장 방식"
                 value="직접 등록한 물건과 비교 바구니는 현재 브라우저에만 저장됩니다."
+              />
+              <GuidanceLine
+                label="처음 공유 전 확인"
+                value="주소, 점유자, 선순위 권리, 체납/관리비, 공매 인도 조건은 앱 밖 원문과 현장 정보로 다시 확인하세요."
               />
             </div>
           </section>
@@ -598,6 +605,36 @@ function ChannelBadge({ channel }: { channel: SaleChannel }) {
   return (
     <span className={`inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
       {channel}
+    </span>
+  );
+}
+
+function detailStatusLabels(item: AuctionItem, unknownCount: number) {
+  const labels = [item.id.startsWith("user-") ? "직접 입력" : "샘플"];
+
+  if (
+    unknownCount > 0 ||
+    item.address.includes("확인 필요") ||
+    item.floor.includes("확인 필요") ||
+    item.auctionDate.includes("확인 필요")
+  ) {
+    labels.push("확인 필요");
+  }
+
+  return labels;
+}
+
+function StatusBadge({ label }: { label: string }) {
+  const style =
+    label === "확인 필요"
+      ? "bg-[#FFF4D7] text-[#8A5B00]"
+      : label === "직접 입력"
+        ? "bg-[#EEF3F1] text-[#34423C]"
+        : "bg-[#E7F0FF] text-[#255C99]";
+
+  return (
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
+      {label}
     </span>
   );
 }

@@ -579,15 +579,23 @@ Verification notes:
 
 Tasks:
 
-- [ ] Add short source/status labels such as `샘플`, `직접 입력`, `확인 필요`.
-- [ ] Make local-browser storage guidance visible but not scary.
-- [ ] Avoid wording that implies legal certainty or guaranteed profit.
-- [ ] Add first-user tester copy for what to verify outside the app.
-- [ ] Keep account signup deferred until cloud sync, alerts, or cross-device saved data is required.
+- [x] Add short source/status labels such as `샘플`, `직접 입력`, `확인 필요`.
+- [x] Make local-browser storage guidance visible but not scary.
+- [x] Avoid wording that implies legal certainty or guaranteed profit.
+- [x] Add first-user tester copy for what to verify outside the app.
+- [x] Keep account signup deferred until cloud sync, alerts, or cross-device saved data is required.
 
 Completion criteria:
 
 - The mobile UI feels approachable while still being careful about risk and uncertainty.
+
+Verification notes:
+
+- Listing and detail pages now show status labels for sample data, directly entered data, and items needing verification.
+- Local browser storage copy now frames no-signup persistence as an MVP convenience instead of a scary limitation.
+- Detail guidance includes a first-user verification checklist for address, occupancy, senior rights, unpaid fees, and public-sale delivery conditions.
+- Copy continues to describe the product as a decision-support/reference tool, not legal or investment advice.
+- Signup remains deferred until cloud sync, alerts, or cross-device workflows become required.
 
 ### 5.6 Mobile First-User QA
 

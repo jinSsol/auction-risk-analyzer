@@ -238,6 +238,10 @@ export function PropertyForm({
               필수는 물건명과 예상 시세뿐입니다. 모르는 값은 비워두거나
               확인 필요로 남겨도 됩니다. 직접 등록한 물건은 현재 브라우저에 저장됩니다.
             </p>
+            <p className="mt-2 text-xs font-semibold leading-5 text-[#66736D]">
+              지금은 회원가입 없이 빠르게 기록하는 MVP입니다. 여러 기기 동기화와
+              알림이 필요해질 때 계정 기능을 붙일 예정입니다.
+            </p>
           </div>
         </div>
       </section>
@@ -294,8 +298,8 @@ export function PropertyForm({
             <div className="mt-4 rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] p-4 text-sm leading-6 text-[#66736D]">
               <p className="font-semibold text-[#17211D]">저장 전 확인</p>
               <p className="mt-1">
-                이 내용은 현재 브라우저에만 저장됩니다. 다른 기기나 시크릿
-                브라우저에서는 다시 등록해야 보일 수 있습니다.
+                이 내용은 현재 브라우저에만 저장됩니다. 가입 없이 빠르게 써보는
+                MVP라서 다른 기기나 시크릿 브라우저에서는 다시 등록해야 보일 수 있습니다.
               </p>
               <p className="mt-1">
                 분석 결과는 입력값을 정리한 참고 자료이며 법률·투자 자문이

@@ -487,6 +487,37 @@ function ChannelBadge({ channel }: { channel: SaleChannel }) {
   );
 }
 
+function statusLabelsFor(item: AnalyzedItem) {
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
+  const labels = [item.id.startsWith("user-") ? "직접 입력" : "샘플"];
+
+  if (
+    checklist.unknownCount > 0 ||
+    item.address.includes("확인 필요") ||
+    item.floor.includes("확인 필요") ||
+    item.auctionDate.includes("확인 필요")
+  ) {
+    labels.push("확인 필요");
+  }
+
+  return labels;
+}
+
+function StatusBadge({ label }: { label: string }) {
+  const style =
+    label === "확인 필요"
+      ? "bg-[#FFF4D7] text-[#8A5B00]"
+      : label === "직접 입력"
+        ? "bg-[#EEF3F1] text-[#34423C]"
+        : "bg-[#E7F0FF] text-[#255C99]";
+
+  return (
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
+      {label}
+    </span>
+  );
+}
+
 function ListingCard({
   item,
   selected,
@@ -501,6 +532,7 @@ function ListingCard({
   const [detailsOpen, setDetailsOpen] = useState(false);
   const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
   const detailId = `listing-details-${item.id}`;
+  const statusLabels = statusLabelsFor(item);
 
   return (
     <article
@@ -518,11 +550,9 @@ function ListingCard({
             <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
               {item.agency}
             </span>
-            {item.id.startsWith("user-") ? (
-              <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
-                내 물건
-              </span>
-            ) : null}
+            {statusLabels.map((label) => (
+              <StatusBadge key={label} label={label} />
+            ))}
             <span className="text-xs font-semibold text-[#66736D]">
               {item.caseNo}
             </span>
