@@ -111,6 +111,12 @@ const emptyDraft: Draft = {
 };
 
 const steps = ["출처", "기본 정보", "가격", "점유·메모"];
+const stepDescriptions = [
+  "공고를 어디서 봤는지만 가볍게 남겨두세요.",
+  "물건명과 대략적인 위치만 있어도 시작할 수 있어요.",
+  "예상 시세만 필수입니다. 나머지는 나중에 채워도 됩니다.",
+  "모르면 모름으로 두고, 확인할 내용을 메모로 남기세요.",
+];
 
 export function PropertyForm({
   mode,
@@ -229,8 +235,8 @@ export function PropertyForm({
               공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요.
             </h1>
             <p className="mt-3 text-sm leading-6 text-[#66736D]">
-              모르는 값은 비워도 됩니다. 다만 제목과 예상 시세는 분석을 위해
-              필요합니다. 직접 등록한 물건은 현재 브라우저에 저장됩니다.
+              필수는 물건명과 예상 시세뿐입니다. 모르는 값은 비워두거나
+              확인 필요로 남겨도 됩니다. 직접 등록한 물건은 현재 브라우저에 저장됩니다.
             </p>
           </div>
         </div>
@@ -262,6 +268,14 @@ export function PropertyForm({
               style={{ width: `${progress}%` }}
             />
           </div>
+          <div className="mt-4 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
+            <p className="text-sm font-semibold text-[#17211D]">
+              {steps[step]} 단계
+            </p>
+            <p className="mt-1 text-xs font-medium leading-5 text-[#66736D]">
+              {stepDescriptions[step]}
+            </p>
+          </div>
 
           <div className="reveal-up mt-5" key={step}>
             {step === 0 ? <SourceStep draft={draft} update={update} /> : null}
@@ -286,6 +300,9 @@ export function PropertyForm({
               <p className="mt-1">
                 분석 결과는 입력값을 정리한 참고 자료이며 법률·투자 자문이
                 아닙니다. 입찰 전 원문 서류와 전문가 확인을 함께 진행하세요.
+              </p>
+              <p className="mt-1 font-semibold text-[#1F8A5B]">
+                저장 후에도 언제든 수정할 수 있습니다.
               </p>
             </div>
           ) : null}
@@ -347,12 +364,14 @@ function SourceStep({ draft, update }: StepProps) {
         value={draft.caseNo}
         onChange={(value) => update("caseNo", value)}
         placeholder="2026타경1234, 2026-00001-001"
+        helper="모르면 비워도 됩니다. 나중에 원문을 보며 채워 넣으세요."
       />
       <TextInput
         label="원문 URL"
         value={draft.sourceUrl}
         onChange={(value) => update("sourceUrl", value)}
         placeholder="https://..."
+        helper="공고 링크를 붙여두면 나중에 서류 확인으로 돌아가기 쉽습니다."
       />
     </div>
   );
@@ -366,9 +385,11 @@ function BasicStep({ draft, update }: StepProps) {
         value={draft.title}
         onChange={(value) => update("title", value)}
         placeholder="예: 강동구 성내동 아파트 59"
+        required
+        helper="목록과 상세 화면에 표시되는 이름입니다."
       />
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextInput label="지역" value={draft.district} onChange={(value) => update("district", value)} placeholder="서울 강동구" />
+        <TextInput label="지역" value={draft.district} onChange={(value) => update("district", value)} placeholder="서울 강동구" helper="동네나 구 단위만 입력해도 괜찮습니다." />
         <Field label="물건 종류">
           <select
             value={draft.type}
@@ -381,7 +402,7 @@ function BasicStep({ draft, update }: StepProps) {
           </select>
         </Field>
       </div>
-      <TextInput label="주소" value={draft.address} onChange={(value) => update("address", value)} placeholder="상세 주소 또는 확인 가능한 범위" />
+      <TextInput label="주소" value={draft.address} onChange={(value) => update("address", value)} placeholder="상세 주소 또는 확인 가능한 범위" helper="정확한 주소를 모르면 확인 가능한 범위만 적어두세요." />
       <div className="grid gap-4 sm:grid-cols-3">
         <TextInput label="면적(㎡)" value={draft.area} onChange={(value) => update("area", value)} inputMode="decimal" placeholder="84.9" />
         <TextInput label="층수" value={draft.floor} onChange={(value) => update("floor", value)} placeholder="12/29층" />
@@ -415,30 +436,37 @@ function PriceStep({ draft, update }: StepProps) {
 
   return (
     <div className="grid gap-4">
-      <p className="rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-medium text-[#255C99]">
-        금액은 `만원` 단위로 입력하면 됩니다.
+      <p className="rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-medium leading-6 text-[#255C99]">
+        금액은 만원 단위로 입력하면 됩니다. 예를 들어 10억은 100000으로 적어요.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <TextInput label="감정가" value={draft.appraised} onChange={(value) => update("appraised", value)} inputMode="numeric" placeholder="125000" />
-        <TextInput label="최저가" value={draft.minimum} onChange={(value) => update("minimum", value)} inputMode="numeric" placeholder="100000" />
-        <TextInput label="예상 시세" value={draft.market} onChange={(value) => update("market", value)} inputMode="numeric" placeholder="132000" />
-        <TextInput label="최근 실거래" value={draft.lastTrade} onChange={(value) => update("lastTrade", value)} inputMode="numeric" placeholder="129500" />
+        <TextInput label="감정가" value={draft.appraised} onChange={(value) => update("appraised", value)} inputMode="numeric" placeholder="125000" helper="비우면 예상 시세와 같은 값으로 저장됩니다." />
+        <TextInput label="최저가" value={draft.minimum} onChange={(value) => update("minimum", value)} inputMode="numeric" placeholder="100000" helper="비우면 예상 시세와 같은 값으로 저장됩니다." />
+        <TextInput label="예상 시세" value={draft.market} onChange={(value) => update("market", value)} inputMode="numeric" placeholder="132000" required helper="분석 계산에 필요한 유일한 필수 금액입니다." />
+        <TextInput label="최근 실거래" value={draft.lastTrade} onChange={(value) => update("lastTrade", value)} inputMode="numeric" placeholder="129500" helper="모르면 비워도 됩니다." />
       </div>
       <TextInput label="유찰 횟수" value={draft.failedBids} onChange={(value) => update("failedBids", value)} inputMode="numeric" placeholder="0" />
-      <section className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold text-[#17211D]">
-              고급 입찰 계산기
-            </h2>
-            <p className="mt-1 text-xs leading-5 text-[#66736D]">
-              입찰가 외 취득비, 수리비, 명도비, 체납 비용과 목표 안전마진을
-              넣으면 상세에서 총투입금과 상한가를 다시 계산합니다.
-            </p>
+      <details className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+        <summary className="cursor-pointer list-none">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold text-[#17211D]">
+                고급 입찰 계산기
+              </h2>
+              <p className="mt-1 text-xs leading-5 text-[#66736D]">
+                총투입금까지 보고 싶을 때만 열어서 입력하세요.
+              </p>
+            </div>
+            <span className="rounded-full bg-[#E7F0FF] px-2.5 py-1 text-xs font-semibold text-[#255C99]">
+              선택 입력
+            </span>
           </div>
-          <span className="rounded-full bg-[#E7F0FF] px-2.5 py-1 text-xs font-semibold text-[#255C99]">
-            만원 단위
-          </span>
+        </summary>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <p className="mt-4 text-xs leading-5 text-[#66736D]">
+            입찰가 외 취득비, 수리비, 명도비, 체납 비용과 목표 안전마진을
+            넣으면 상세에서 총투입금과 상한가를 다시 계산합니다.
+          </p>
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <TextInput
@@ -491,19 +519,26 @@ function PriceStep({ draft, update }: StepProps) {
             placeholder="12"
           />
         </div>
-      </section>
-      <div className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold text-[#17211D]">비교 실거래</h2>
-            <p className="mt-1 text-xs leading-5 text-[#66736D]">
-              비슷한 단지·면적의 최근 거래를 최대 3개까지 남겨두면 상세에서
-              입력 시세의 근거를 비교합니다.
-            </p>
+      </details>
+      <details className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
+        <summary className="cursor-pointer list-none">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold text-[#17211D]">비교 실거래</h2>
+              <p className="mt-1 text-xs leading-5 text-[#66736D]">
+                시세 근거를 남기고 싶을 때만 열어서 입력하세요.
+              </p>
+            </div>
+            <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
+              선택 입력
+            </span>
           </div>
-          <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
-            선택 입력
-          </span>
+        </summary>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <p className="mt-4 text-xs leading-5 text-[#66736D]">
+            비슷한 단지·면적의 최근 거래를 최대 3개까지 남겨두면 상세에서
+            입력 시세의 근거를 비교합니다.
+          </p>
         </div>
         <div className="mt-4 grid gap-3">
           {draft.comparableSales.map((sale, index) => (
@@ -515,7 +550,7 @@ function PriceStep({ draft, update }: StepProps) {
             />
           ))}
         </div>
-      </div>
+      </details>
     </div>
   );
 }
@@ -574,26 +609,30 @@ function RightsStep({ draft, update }: StepProps) {
           placeholder="확인해야 할 서류, 시세 근거, 통화 내용 등을 적어두세요."
         />
       </Field>
-      <section className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-semibold text-[#17211D]">
-              권리분석 질문
-            </h2>
-            <p className="mt-1 text-xs leading-5 text-[#66736D]">
-              법률 용어를 몰라도 문서에서 확인한 내용대로 답하면 됩니다. 모르면
-              `모름`으로 남겨두세요.
-            </p>
+      <details className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
+        <summary className="cursor-pointer list-none">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-[#17211D]">
+                권리분석 질문
+              </h2>
+              <p className="mt-1 text-xs leading-5 text-[#66736D]">
+                처음 등록할 때는 닫아둬도 됩니다. 모르는 답은 모름으로 유지하세요.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
+                확인 {checklistSummary.completedCount}/{checklistSummary.totalCount}
+              </span>
+              <span className="rounded-full bg-[#FFF4D7] px-2.5 py-1 text-xs font-semibold text-[#8A5B00]">
+                모름 {checklistSummary.unknownCount}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
-              확인 {checklistSummary.completedCount}/{checklistSummary.totalCount}
-            </span>
-            <span className="rounded-full bg-[#FFF4D7] px-2.5 py-1 text-xs font-semibold text-[#8A5B00]">
-              모름 {checklistSummary.unknownCount}
-            </span>
-          </div>
-        </div>
+        </summary>
+        <p className="mt-4 text-xs leading-5 text-[#66736D]">
+          법률 용어를 몰라도 문서에서 확인한 내용대로 답하면 됩니다.
+        </p>
         <div className="mt-4 grid gap-3">
           {RIGHTS_CHECKLIST_ITEMS.map((item) => (
             <RightsChecklistCard
@@ -604,7 +643,7 @@ function RightsStep({ draft, update }: StepProps) {
             />
           ))}
         </div>
-      </section>
+      </details>
     </div>
   );
 }
@@ -727,11 +766,37 @@ function RightsChecklistCard({
 const inputClass =
   "h-11 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#D8F1E4]";
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field({
+  label,
+  children,
+  required,
+  helper,
+}: {
+  label: string;
+  children: ReactNode;
+  required?: boolean;
+  helper?: string;
+}) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold text-[#66736D]">{label}</span>
+      <span className="flex items-center gap-2 text-xs font-semibold text-[#66736D]">
+        {label}
+        <span
+          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+            required
+              ? "bg-[#FDE8E5] text-[#B53A2E]"
+              : "bg-[#EEF3F1] text-[#66736D]"
+          }`}
+        >
+          {required ? "필수" : "선택"}
+        </span>
+      </span>
       <div className="mt-1">{children}</div>
+      {helper ? (
+        <span className="mt-1 block text-xs font-medium leading-5 text-[#8A9690]">
+          {helper}
+        </span>
+      ) : null}
     </label>
   );
 }
@@ -743,6 +808,8 @@ function TextInput({
   placeholder,
   type = "text",
   inputMode,
+  required,
+  helper,
 }: {
   label: string;
   value: string;
@@ -750,9 +817,11 @@ function TextInput({
   placeholder?: string;
   type?: string;
   inputMode?: "text" | "numeric" | "decimal";
+  required?: boolean;
+  helper?: string;
 }) {
   return (
-    <Field label={label}>
+    <Field label={label} required={required} helper={helper}>
       <input
         type={type}
         inputMode={inputMode}

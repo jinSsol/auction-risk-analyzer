@@ -557,15 +557,23 @@ Verification notes:
 
 Tasks:
 
-- [ ] Review all required fields and make only truly necessary fields required.
-- [ ] Add clearer progress and section titles for the wizard.
-- [ ] Group advanced/legal fields so beginners can skip unknowns confidently.
-- [ ] Improve numeric input helper text for prices, deposits, and costs.
-- [ ] Add a lightweight save-draft feeling without requiring signup.
+- [x] Review all required fields and make only truly necessary fields required.
+- [x] Add clearer progress and section titles for the wizard.
+- [x] Group advanced/legal fields so beginners can skip unknowns confidently.
+- [x] Improve numeric input helper text for prices, deposits, and costs.
+- [x] Add a lightweight save-draft feeling without requiring signup.
 
 Completion criteria:
 
 - A first-time user can add an incomplete property without feeling blocked by legal terms.
+
+Verification notes:
+
+- The form now explains that only property title and estimated market price are required.
+- Each step shows a short title and helper sentence below the progress bar.
+- Advanced bid calculator, comparable-sales inputs, and rights-analysis questions are tucked into optional expandable sections.
+- Price inputs explain the `만원` unit with a concrete example.
+- Save confirmation copy now tells users they can edit the saved property later without requiring signup.
 
 ### 5.5 Mobile Trust And Safety Copy
 
