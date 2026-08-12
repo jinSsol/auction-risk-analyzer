@@ -30,8 +30,8 @@ test("server-renders the auction listing workspace", async () => {
   const html = await response.text();
   assert.match(html, /<title>경매 권리분석 워크벤치<\/title>/i);
   assert.match(html, /권리 리스크 · 입찰가 분석/);
-  assert.match(html, /경매·공매 물건의 권리 리스크와 입찰 상한을 한 화면에서 비교하세요/);
-  assert.match(html, /지금은 실시간 연동 전 샘플 데이터입니다/);
+  assert.match(html, /어려운 경매 물건도 앱처럼 가볍게 비교하세요/);
+  assert.match(html, /샘플 데이터를 기준으로 권리 미확인, 총투입금, 입찰 상한을 먼저 정리합니다/);
   assert.match(html, /href="\/properties\/sample-1"/);
   assert.match(html, /href="\/properties\/sample-7"/);
   assert.match(html, /href="\/properties\/new"/);

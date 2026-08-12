@@ -95,6 +95,13 @@ export default function Home() {
     level !== "전체",
     owner !== "전체",
   ].filter(Boolean).length;
+  const urgentItems = filtered.filter((item) => item.analysis.level !== "안정").length;
+  const reviewItems = filtered.filter(
+    (item) => summarizeRightsChecklist(item.rightsChecklist).unknownCount > 0
+  ).length;
+  const bestPreview = [...enriched].sort(
+    (left, right) => left.analysis.risk - right.analysis.risk
+  )[0];
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -120,66 +127,111 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell min-h-screen pb-24 text-[#17211D] md:pb-0">
-      <section className="hero-surface border-b border-[#DDE5E1]">
-        <div className="mx-auto max-w-7xl px-5 py-8 lg:px-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-            <div className="max-w-3xl">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1 text-xs font-semibold text-[#1F8A5B] ring-1 ring-[#BFE3D0] backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#1F8A5B] shadow-[0_0_0_4px_rgba(31,138,91,0.12)]" />
+    <main className="app-shell min-h-screen pb-24 text-[#152033] md:pb-0">
+      <section className="hero-surface relative overflow-hidden rounded-b-[34px]">
+        <div className="mx-auto grid max-w-7xl gap-7 px-5 pb-8 pt-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8 lg:pb-12">
+          <div className="min-w-0">
+            <div className="flex items-center justify-between gap-3 text-white/80">
+              <p className="text-xs font-bold">9:41</p>
+              <div className="flex items-center gap-2 text-xs font-bold">
+                <span>경매</span>
+                <span>공매</span>
+                <span className="rounded-full bg-white/18 px-2 py-1 text-white">MVP</span>
+              </div>
+            </div>
+
+            <div className="mt-8 max-w-2xl">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/18 backdrop-blur">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#60A5FA]" />
                 권리 리스크 · 입찰가 분석
               </p>
-              <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
-                경매·공매 물건의 권리 리스크와 입찰 상한을 한 화면에서 비교하세요.
+              <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-normal text-white md:text-5xl">
+                어려운 경매 물건도 앱처럼 가볍게 비교하세요.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#66736D]">
-                지금은 실시간 연동 전 샘플 데이터입니다. 어려운 권리 용어는
-                체크리스트로 풀고, 시세·인수금·안전마진은 한눈에 비교합니다.
+              <p className="mt-4 max-w-xl text-base leading-7 text-[#DCEBFF]">
+                샘플 데이터를 기준으로 권리 미확인, 총투입금, 입찰 상한을 먼저
+                정리합니다. 실전 판단 전 공식 문서 확인은 꼭 필요합니다.
               </p>
-              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <a
-                href="/properties/new"
-                className="button-lift mt-5 inline-flex h-11 items-center rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] hover:bg-[#26332E]"
-              >
-                새 물건 등록
-                <span className="ml-2 text-base leading-none">+</span>
-              </a>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[520px]">
-              <Metric label="검색 결과" value={`${stats.total}건`} />
-              <Metric label="경매" value={`${stats.auction}건`} tone="green" />
-              <Metric label="공매" value={`${stats.publicSale}건`} tone="blue" />
-              <Metric label="내 물건" value={`${stats.mine}건`} tone="amber" />
+
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              <HeroMetric label="검토 물건" value={`${stats.total}건`} />
+              <HeroMetric label="주의 이상" value={`${urgentItems}건`} tone="warn" />
+              <HeroMetric label="확인 필요" value={`${reviewItems}건`} tone="soft" />
+            </div>
+          </div>
+
+          <div className="hidden lg:flex lg:justify-end">
+            <div className="phone-mock w-[300px] overflow-hidden bg-[#F8FBFF] text-[#152033]">
+              <div className="phone-notch mx-auto h-5 w-28" />
+              <div className="bg-[#162A63] px-5 pb-5 pt-2 text-white">
+                <p className="text-xs font-semibold text-[#AFC8FF]">오늘의 검토 후보</p>
+                <h2 className="mt-2 text-lg font-semibold leading-snug">
+                  {bestPreview?.title ?? "경매·공매 리스크 워크벤치"}
+                </h2>
+                <div className="mt-3 flex gap-2">
+                  <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-bold">
+                    {bestPreview ? bestPreview.channel : "경매"}
+                  </span>
+                  <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-bold">
+                    {bestPreview ? bestPreview.analysis.verdict : "입찰 검토"}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3 p-4">
+                <div className="grid grid-cols-3 gap-2">
+                  <PhoneMiniStat label="리스크" value={bestPreview ? `${bestPreview.analysis.risk}점` : "18점"} />
+                  <PhoneMiniStat label="상한" value={bestPreview ? uk(bestPreview.analysis.suggested) : "8.6억"} />
+                  <PhoneMiniStat label="마진" value={bestPreview ? percent(bestPreview.analysis.marginRate) : "15%"} />
+                </div>
+                <div className="rounded-2xl border border-[#E0E8F4] bg-white p-3 shadow-[0_10px_24px_rgba(21,32,51,0.08)]">
+                  <p className="text-xs font-bold text-[#64748B]">체크리스트</p>
+                  <div className="mt-3 space-y-2">
+                    <PhoneCheckLine label="주소·면적 확인" />
+                    <PhoneCheckLine label="점유·임차 확인" muted />
+                    <PhoneCheckLine label="체납·인수금 확인" muted />
+                  </div>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {["검색", "권리", "비용", "비교"].map((label) => (
+                    <div key={label} className="rounded-2xl bg-[#EAF2FF] py-2 text-center text-[11px] font-bold text-[#2563EB]">
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       <section
-        className={`sticky top-0 z-10 border-b border-[#DDE5E1] bg-white/90 backdrop-blur ${
+        className={`sticky top-0 z-10 bg-white/82 shadow-[0_12px_30px_rgba(21,32,51,0.08)] backdrop-blur ${
           mobileTab === "browse" ? "block" : "hidden md:block"
         }`}
       >
         <div className="mx-auto max-w-7xl px-5 py-3 xl:px-8">
           <div className="grid gap-3 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-start">
-            <div className="rounded-xl border border-[#DDE5E1] bg-white shadow-[0_8px_24px_rgba(23,33,29,0.06)]">
+            <div className="app-card rounded-[22px]">
               <label className="sr-only" htmlFor="property-search">
                 물건 검색
               </label>
-              <div className="flex min-h-12 items-center gap-2 px-3">
-                <span className="h-2 w-2 rounded-full bg-[#1F8A5B] shadow-[0_0_0_5px_rgba(31,138,91,0.12)]" />
+              <div className="flex min-h-14 items-center gap-3 px-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EAF2FF] text-sm font-black text-[#2563EB]">
+                  Q
+                </span>
                 <input
                   id="property-search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="지역, 사건번호, 온비드, 아파트"
-                  className="h-11 min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-[#17211D] outline-none placeholder:text-[#9AA6A0]"
+                  className="h-12 min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-[#152033] outline-none placeholder:text-[#94A3B8]"
                 />
                 {query ? (
                   <button
                     type="button"
                     onClick={() => setQuery("")}
-                    className="h-8 rounded-full bg-[#EEF3F1] px-3 text-xs font-bold text-[#66736D] transition hover:bg-[#DDE5E1]"
+                    className="h-9 rounded-full bg-[#EEF4FF] px-3 text-xs font-bold text-[#475569] transition hover:bg-[#DBEAFE]"
                   >
                     지우기
                   </button>
@@ -188,14 +240,14 @@ export default function Home() {
             </div>
             <div className="flex items-center justify-between gap-3 xl:justify-end">
               <div>
-                <p className="text-xs font-bold text-[#66736D]">검색 결과</p>
-                <p className="text-sm font-semibold text-[#17211D]">{stats.total}건</p>
+                <p className="text-xs font-bold text-[#64748B]">검색 결과</p>
+                <p className="text-sm font-semibold text-[#152033]">{stats.total}건</p>
               </div>
               <button
                 type="button"
                 onClick={resetFilters}
                 disabled={!query && activeFilterCount === 0}
-                className="h-10 rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
+                className="h-11 rounded-2xl border border-[#D8E2F0] bg-white px-4 text-sm font-semibold text-[#334155] transition hover:bg-[#F8FBFF] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
               >
                 초기화
               </button>
@@ -230,7 +282,7 @@ export default function Home() {
             />
           </div>
           {activeFilterCount > 0 ? (
-            <p className="mt-2 text-xs font-semibold text-[#66736D]">
+            <p className="mt-2 text-xs font-semibold text-[#64748B]">
               필터 {activeFilterCount}개 적용 중
             </p>
           ) : null}
@@ -240,7 +292,7 @@ export default function Home() {
       <section ref={contentRef} className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
         <div className="space-y-5">
           <div
-            className={`interactive-card gap-3 rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur md:grid md:grid-cols-[1fr_1fr_auto] md:items-center ${
+            className={`app-card interactive-card gap-3 rounded-[24px] p-4 backdrop-blur md:grid md:grid-cols-[1fr_1fr_auto] md:items-center ${
               mobileTab === "browse" ? "grid" : "hidden"
             }`}
           >
@@ -262,9 +314,9 @@ export default function Home() {
               onChange={setBufferRatio}
               tone="amber"
             />
-            <div className="rounded-lg bg-[#17211D] px-4 py-3 text-sm text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+            <div className="rounded-[20px] bg-[#162A63] px-4 py-3 text-sm text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
               <p className="font-semibold">계산 기준</p>
-              <p className="mt-1 text-[#d9eee5]">
+              <p className="mt-1 text-[#DCEBFF]">
                 시세 할인 - 인수금 - 비용 버퍼
               </p>
             </div>
@@ -285,7 +337,7 @@ export default function Home() {
               />
             ))}
             {filtered.length === 0 ? (
-              <div className="rounded-lg border border-[#DDE5E1] bg-white p-8 text-center text-sm font-semibold text-[#66736D]">
+              <div className="rounded-[24px] border border-[#D8E2F0] bg-white p-8 text-center text-sm font-semibold text-[#64748B]">
                 조건에 맞는 물건이 없습니다.
               </div>
             ) : null}
@@ -368,27 +420,49 @@ function basketScore(item: AnalyzedItem) {
   );
 }
 
-function Metric({
+function HeroMetric({
   label,
   value,
-  tone = "neutral",
+  tone = "default",
 }: {
   label: string;
   value: string;
-  tone?: "neutral" | "green" | "blue" | "amber" | "red";
+  tone?: "default" | "warn" | "soft";
 }) {
-  const tones = {
-    neutral: "bg-white text-[#17211D]",
-    green: "bg-[#E7F6EE] text-[#1F8A5B]",
-    blue: "bg-[#E7F0FF] text-[#255C99]",
-    amber: "bg-[#FFF4D7] text-[#8A5B00]",
-    red: "bg-[#FDE8E5] text-[#B53A2E]",
+  const styles = {
+    default: "bg-white/16 text-white",
+    warn: "bg-[#FFEDD5]/22 text-white",
+    soft: "bg-[#DBEAFE]/20 text-white",
   };
+
   return (
-    <div className={`interactive-card relative overflow-hidden rounded-xl border border-[#DDE5E1] p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_28px_rgba(23,33,29,0.08)] ${tones[tone]}`}>
-      <span className="absolute inset-x-0 top-0 h-1 bg-current opacity-25" />
-      <p className="text-xs font-semibold text-current opacity-70">{label}</p>
-      <p className="mt-2 text-2xl font-bold">{value}</p>
+    <div className={`rounded-[22px] px-3 py-3 ring-1 ring-white/14 backdrop-blur ${styles[tone]}`}>
+      <p className="text-[11px] font-bold text-white/70">{label}</p>
+      <p className="mt-1 text-xl font-semibold tabular-nums">{value}</p>
+    </div>
+  );
+}
+
+function PhoneMiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-white px-2 py-3 text-center shadow-[0_8px_18px_rgba(21,32,51,0.06)]">
+      <p className="text-[10px] font-bold text-[#64748B]">{label}</p>
+      <p className="mt-1 truncate text-xs font-black text-[#152033]">{value}</p>
+    </div>
+  );
+}
+
+function PhoneCheckLine({ label, muted }: { label: string; muted?: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={`h-5 w-5 rounded-full border ${
+          muted ? "border-[#CBD5E1] bg-[#F8FAFC]" : "border-[#93C5FD] bg-[#DBEAFE]"
+        }`}
+      />
+      <span className={`text-xs font-bold ${muted ? "text-[#94A3B8]" : "text-[#334155]"}`}>
+        {label}
+      </span>
     </div>
   );
 }
@@ -406,8 +480,8 @@ function InlineFilter({
 }) {
   return (
     <div className="shrink-0">
-      <p className="mb-1 px-1 text-[11px] font-bold text-[#66736D]">{title}</p>
-      <div className="flex min-h-10 gap-1 rounded-full border border-[#DDE5E1] bg-[#EEF3F1] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
+      <p className="mb-1 px-1 text-[11px] font-bold text-[#64748B]">{title}</p>
+      <div className="flex min-h-11 gap-1 rounded-full border border-[#D8E2F0] bg-[#EEF4FF] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
         {options.map((option) => (
           <button
             type="button"
@@ -415,8 +489,8 @@ function InlineFilter({
             onClick={() => onChange(option)}
             className={`min-h-9 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
               value === option
-                ? "bg-[#17211D] font-semibold text-white shadow-[0_6px_16px_rgba(23,33,29,0.16)]"
-                : "font-medium text-[#66736D] hover:bg-white/70"
+                ? "bg-[#2563EB] font-semibold text-white shadow-[0_8px_18px_rgba(37,99,235,0.22)]"
+                : "font-medium text-[#64748B] hover:bg-white/78"
             }`}
           >
             {option}
@@ -448,14 +522,14 @@ function RangeControl({
     <div>
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-[#17211D]">{label}</p>
-          <p className="text-xs font-medium text-[#66736D]">{suffix}</p>
+          <p className="text-sm font-semibold text-[#152033]">{label}</p>
+          <p className="text-xs font-medium text-[#64748B]">{suffix}</p>
         </div>
         <span
           className={`rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums ${
             tone === "green"
-              ? "bg-[#E7F6EE] text-[#1F8A5B]"
-              : "bg-[#FFF4D7] text-[#8A5B00]"
+              ? "bg-[#EAF2FF] text-[#2563EB]"
+              : "bg-[#FFF4D7] text-[#9A5B13]"
           }`}
         >
           {value}%
@@ -468,7 +542,7 @@ function RangeControl({
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className={`mt-2 h-11 w-full cursor-pointer touch-pan-x ${
-          tone === "green" ? "accent-[#1F8A5B]" : "accent-[#1F8A5B]"
+          tone === "green" ? "accent-[#2563EB]" : "accent-[#F97316]"
         }`}
       />
     </div>
@@ -478,8 +552,8 @@ function RangeControl({
 function ChannelBadge({ channel }: { channel: SaleChannel }) {
   const style =
     channel === "경매"
-      ? "bg-[#E7F6EE] text-[#1F8A5B]"
-      : "bg-[#E7F0FF] text-[#255C99]";
+      ? "bg-[#EAF2FF] text-[#2563EB]"
+      : "bg-[#F0F9FF] text-[#0369A1]";
   return (
     <span className={`inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
       {channel}
@@ -506,10 +580,10 @@ function statusLabelsFor(item: AnalyzedItem) {
 function StatusBadge({ label }: { label: string }) {
   const style =
     label === "확인 필요"
-      ? "bg-[#FFF4D7] text-[#8A5B00]"
+      ? "bg-[#FFF4D7] text-[#9A5B13]"
       : label === "직접 입력"
-        ? "bg-[#EEF3F1] text-[#34423C]"
-        : "bg-[#E7F0FF] text-[#255C99]";
+        ? "bg-[#F1F5F9] text-[#475569]"
+        : "bg-[#EAF2FF] text-[#2563EB]";
 
   return (
     <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
@@ -536,10 +610,10 @@ function ListingCard({
 
   return (
     <article
-      className={`interactive-card reveal-up group relative overflow-hidden rounded-xl border bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:border-[#B8C7C0] hover:shadow-[0_14px_34px_rgba(23,33,29,0.09)] ${
+      className={`app-card interactive-card reveal-up group relative overflow-hidden rounded-[26px] p-4 hover:border-[#B7C8E8] hover:shadow-[0_20px_44px_rgba(21,32,51,0.12)] ${
         selected
-          ? "border-[#0F766E] ring-2 ring-[#9DDBC2] md:ring-[#D8F1E4]"
-          : "border-[#DDE5E1]"
+          ? "border-[#2563EB] ring-2 ring-[#BFDBFE] md:ring-[#DBEAFE]"
+          : "border-[#D8E2F0]"
       }`}
     >
       <div className={`absolute inset-y-0 left-0 w-1 ${riskAccent[item.analysis.level]}`} />
@@ -547,27 +621,27 @@ function ListingCard({
         <a href={href} className="min-w-0 text-left">
           <div className="flex flex-wrap items-center gap-2">
             <ChannelBadge channel={item.channel} />
-            <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
+            <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-xs font-semibold text-[#475569]">
               {item.agency}
             </span>
             {statusLabels.map((label) => (
               <StatusBadge key={label} label={label} />
             ))}
-            <span className="text-xs font-semibold text-[#66736D]">
+            <span className="text-xs font-semibold text-[#64748B]">
               {item.caseNo}
             </span>
             {selected ? (
-              <span className="rounded-full bg-[#0F766E] px-2.5 py-1 text-xs font-semibold text-white md:hidden">
+              <span className="rounded-full bg-[#2563EB] px-2.5 py-1 text-xs font-semibold text-white md:hidden">
                 비교 담김
               </span>
             ) : null}
           </div>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <h2 className="text-base font-semibold leading-snug text-[#17211D] transition group-hover:text-[#0F766E] md:text-lg">
+              <h2 className="text-base font-semibold leading-snug text-[#152033] transition group-hover:text-[#2563EB] md:text-lg">
                 {item.title}
               </h2>
-              <p className="mt-1 text-sm font-medium text-[#66736D]">
+              <p className="mt-1 text-sm font-medium text-[#64748B]">
                 {item.district} · 마감 {item.auctionDate}
                 <span className="hidden md:inline">
                   {" "}· {item.area}㎡ · {item.floor}
@@ -603,10 +677,10 @@ function ListingCard({
 
         <div className="space-y-3">
           <div
-            className={`${detailsOpen ? "block" : "hidden"} rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:block`}
+            className={`${detailsOpen ? "block" : "hidden"} rounded-[20px] border border-[#D8E2F0] bg-[#F8FBFF] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:block`}
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold text-[#66736D]">체크 난이도</span>
+              <span className="text-xs font-semibold text-[#64748B]">체크 난이도</span>
               <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
             </div>
             <RiskMeter level={item.analysis.level} score={item.analysis.risk} />
@@ -614,7 +688,7 @@ function ListingCard({
           <div className="flex flex-wrap items-center justify-between gap-2 md:justify-between">
             <span
               className={`min-w-0 text-xs font-bold ${
-                gapToSuggested >= 0 ? "text-[#1F8A5B]" : "text-[#B53A2E]"
+                gapToSuggested >= 0 ? "text-[#2563EB]" : "text-[#B42318]"
               }`}
             >
               현재 예상가가 상한보다 {uk(Math.abs(gapToSuggested))}
@@ -625,7 +699,7 @@ function ListingCard({
               onClick={() => setDetailsOpen((current) => !current)}
               aria-expanded={detailsOpen}
               aria-controls={detailId}
-              className="h-9 rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] px-3 text-sm font-semibold text-[#34423C] transition hover:bg-white md:hidden"
+              className="h-9 rounded-2xl border border-[#D8E2F0] bg-[#F8FBFF] px-3 text-sm font-semibold text-[#334155] transition hover:bg-white md:hidden"
             >
               {detailsOpen ? "접기" : "더보기"}
             </button>
@@ -634,8 +708,8 @@ function ListingCard({
               aria-pressed={selected}
               className={`button-lift h-10 min-w-28 rounded-lg px-3 text-sm transition md:h-9 md:min-w-0 ${
                 selected
-                  ? "bg-[#0F766E] font-semibold text-white shadow-[0_8px_18px_rgba(15,118,110,0.18)]"
-                  : "border border-[#DDE5E1] bg-white font-semibold text-[#34423C] hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+                  ? "bg-[#2563EB] font-semibold text-white shadow-[0_10px_22px_rgba(37,99,235,0.22)]"
+                  : "border border-[#D8E2F0] bg-white font-semibold text-[#334155] hover:border-[#2563EB] hover:text-[#2563EB]"
               }`}
             >
               {selected ? "비교중 ✓" : "비교 담기"}
@@ -659,15 +733,15 @@ function CompactStat({
   danger?: boolean;
 }) {
   return (
-    <div className="min-w-0 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] px-3 py-2">
-      <p className="text-[11px] font-bold text-[#66736D]">{label}</p>
+    <div className="min-w-0 rounded-[18px] border border-[#D8E2F0] bg-[#F8FBFF] px-3 py-2">
+      <p className="text-[11px] font-bold text-[#64748B]">{label}</p>
       <p
         className={`mt-0.5 break-words text-sm font-semibold tabular-nums ${
           danger
-            ? "text-[#B53A2E]"
+            ? "text-[#B42318]"
             : strong
-              ? "text-[#1F8A5B]"
-              : "text-[#17211D]"
+              ? "text-[#2563EB]"
+              : "text-[#152033]"
         }`}
       >
         {value}
@@ -677,8 +751,8 @@ function CompactStat({
 }
 
 const riskAccent: Record<RiskLevel, string> = {
-  안정: "bg-[#1F8A5B]",
-  주의: "bg-[#B7791F]",
+  안정: "bg-[#2563EB]",
+  주의: "bg-[#F97316]",
   위험: "bg-[#DC2626]",
 };
 
@@ -696,29 +770,29 @@ function PriceStat({
   danger?: boolean;
 }) {
   return (
-    <div className="min-w-0 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
-      <p className="text-xs font-semibold text-[#66736D]">{label}</p>
+    <div className="min-w-0 rounded-[18px] border border-[#D8E2F0] bg-[#F8FBFF] p-3">
+      <p className="text-xs font-semibold text-[#64748B]">{label}</p>
       <p
         className={`mt-1 break-words text-base font-semibold tabular-nums ${
           danger
-            ? "text-[#B53A2E]"
+            ? "text-[#B42318]"
             : strong
-              ? "text-[#1F8A5B]"
-              : "text-[#17211D]"
+              ? "text-[#2563EB]"
+              : "text-[#152033]"
         }`}
       >
         {value}
       </p>
-      {sub ? <p className="mt-0.5 text-xs font-medium text-[#8A9690]">{sub}</p> : null}
+      {sub ? <p className="mt-0.5 text-xs font-medium text-[#94A3B8]">{sub}</p> : null}
     </div>
   );
 }
 
 function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
   const color =
-    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#B7791F]" : "bg-[#1F8A5B]";
+    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#F97316]" : "bg-[#2563EB]";
   return (
-    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#DDE5E1]">
+    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#D8E2F0]">
       <div className={`risk-fill h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   );
@@ -737,26 +811,26 @@ function ComparePanel({
   const best = ranked[0];
 
   return (
-    <section className="interactive-card rounded-xl border border-[#DDE5E1] bg-white/92 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur">
+    <section className="app-card interactive-card rounded-[26px] p-4 backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold text-[#17211D]">비교 바구니</h2>
+            <h2 className="text-lg font-semibold text-[#152033]">비교 바구니</h2>
             <span
               className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
                 selected.length > 0
-                  ? "bg-[#E7F6EE] text-[#0F766E] ring-1 ring-[#BFE3D0]"
-                  : "bg-[#EEF3F1] text-[#34423C]"
+                  ? "bg-[#EAF2FF] text-[#2563EB] ring-1 ring-[#BFDBFE]"
+                  : "bg-[#F1F5F9] text-[#475569]"
               }`}
             >
               {selected.length}/{MAX_COMPARE_COUNT}
             </span>
           </div>
-          <p className="text-sm text-[#66736D]">
+          <p className="text-sm text-[#64748B]">
             2-4개 물건을 총투입금, 권리 미확인, 마진, 판정 기준으로 비교합니다.
           </p>
           {best ? (
-            <p className="mt-2 text-xs font-semibold text-[#1F8A5B]">
+            <p className="mt-2 text-xs font-semibold text-[#2563EB]">
               현재 1순위: {best.title} · {compareReason(best)}
             </p>
           ) : null}
@@ -764,21 +838,21 @@ function ComparePanel({
         <button
           onClick={onClear}
           disabled={selected.length === 0}
-          className="h-9 rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-semibold text-[#34423C] transition hover:bg-[#F9FBFA] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
+          className="h-10 rounded-2xl border border-[#D8E2F0] bg-white px-3 text-sm font-semibold text-[#334155] transition hover:bg-[#F8FBFF] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
         >
           선택 비우기
         </button>
       </div>
       {selected.length === 1 ? (
-        <p className="mt-3 rounded-lg border border-[#CFE3F8] bg-[#E7F0FF] px-3 py-2 text-sm font-semibold text-[#255C99]">
+        <p className="mt-3 rounded-2xl border border-[#BFDBFE] bg-[#EAF2FF] px-3 py-2 text-sm font-semibold text-[#2563EB]">
           하나 더 담으면 총투입금과 권리 리스크를 나란히 비교할 수 있습니다.
         </p>
       ) : null}
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {selected.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-[#B8C7C0] bg-[#F9FBFA] p-6 text-center md:col-span-2 xl:col-span-4">
-            <p className="text-base font-semibold text-[#17211D]">아직 비교할 물건이 없어요.</p>
-            <p className="mx-auto mt-2 max-w-sm text-sm font-medium leading-6 text-[#66736D]">
+          <div className="rounded-[22px] border border-dashed border-[#B7C8E8] bg-[#F8FBFF] p-6 text-center md:col-span-2 xl:col-span-4">
+            <p className="text-base font-semibold text-[#152033]">아직 비교할 물건이 없어요.</p>
+            <p className="mx-auto mt-2 max-w-sm text-sm font-medium leading-6 text-[#64748B]">
               물건 탭에서 마음에 드는 후보의 비교 담기를 누르면 총투입금과 권리 리스크를 여기서 바로 비교할 수 있습니다.
             </p>
           </div>
@@ -789,10 +863,10 @@ function ComparePanel({
             return (
             <div
               key={item.id}
-              className={`interactive-card rounded-lg border bg-white p-4 hover:border-[#B8C7C0] hover:shadow-[0_10px_24px_rgba(23,33,29,0.07)] ${
+              className={`interactive-card rounded-[22px] border bg-white p-4 hover:border-[#B7C8E8] hover:shadow-[0_14px_30px_rgba(21,32,51,0.09)] ${
                 index === 0
-                  ? "border-[#BFE3D0] ring-2 ring-[#E7F6EE]"
-                  : "border-[#E5ECE8]"
+                  ? "border-[#BFDBFE] ring-2 ring-[#EAF2FF]"
+                  : "border-[#D8E2F0]"
               }`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -800,8 +874,8 @@ function ComparePanel({
                   <span
                     className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
                       index === 0
-                        ? "bg-[#0F766E] text-white"
-                        : "bg-[#17211D] text-white"
+                        ? "bg-[#2563EB] text-white"
+                        : "bg-[#162A63] text-white"
                     }`}
                   >
                     {index === 0 ? "검토 우선 #1" : `비교 #${index + 1}`}
@@ -810,16 +884,16 @@ function ComparePanel({
                 </div>
                 <Verdict value={item.analysis.verdict} />
               </div>
-              <p className="mt-3 rounded-lg bg-[#F9FBFA] px-3 py-2 text-xs font-bold leading-5 text-[#34423C]">
+              <p className="mt-3 rounded-2xl bg-[#F8FBFF] px-3 py-2 text-xs font-bold leading-5 text-[#334155]">
                 {compareReason(item)}
               </p>
               <a
                 href={`/properties/${item.id}`}
-                className="mt-2 flex min-h-11 items-center text-sm font-semibold text-[#17211D] transition hover:text-[#0F766E]"
+                className="mt-2 flex min-h-11 items-center text-sm font-semibold text-[#152033] transition hover:text-[#2563EB]"
               >
                 {item.title}
               </a>
-              <p className="mt-1 text-xs font-medium text-[#66736D]">
+              <p className="mt-1 text-xs font-medium text-[#64748B]">
                 {item.district} · {item.area}㎡ · {item.auctionDate}
               </p>
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
@@ -840,10 +914,10 @@ function ComparePanel({
                 <MiniStat label="리스크" value={`${item.analysis.risk}점`} danger={item.analysis.level === "위험"} />
                 <MiniStat label="상한 기준" value={uk(item.analysis.doNotBidAbove)} />
               </div>
-              <div className="mt-3 border-t border-[#E5ECE8] pt-3">
+              <div className="mt-3 border-t border-[#E2E8F0] pt-3">
                 <button
                   onClick={() => onRemove(item.id)}
-                  className="h-10 w-full rounded-lg border border-[#DDE5E1] bg-[#F9FBFA] text-sm font-semibold text-[#34423C] transition hover:border-[#B53A2E] hover:bg-[#FDE8E5] hover:text-[#B53A2E]"
+                  className="h-10 w-full rounded-2xl border border-[#D8E2F0] bg-[#F8FBFF] text-sm font-semibold text-[#334155] transition hover:border-[#FCA5A5] hover:bg-[#FEE2E2] hover:text-[#B42318]"
                 >
                   비교에서 제외
                 </button>
@@ -898,7 +972,7 @@ function MobileBottomTabs({
   onTabChange: (tab: MobileTab) => void;
 }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#DDE5E1] bg-white/94 px-4 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2 shadow-[0_-14px_32px_rgba(23,33,29,0.12)] backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-30 bg-white/92 px-4 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2 shadow-[0_-18px_40px_rgba(21,32,51,0.14)] backdrop-blur md:hidden">
       <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
         <MobileTabButton
           active={activeTab === "browse"}
@@ -915,10 +989,10 @@ function MobileBottomTabs({
         />
         <Link
           href="/properties/new"
-          className="button-lift flex min-h-14 flex-col items-center justify-center rounded-xl bg-[#17211D] px-2 text-center text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.18)]"
+          className="button-lift flex min-h-14 flex-col items-center justify-center rounded-[20px] bg-[#2563EB] px-2 text-center text-sm font-semibold text-white shadow-[0_12px_26px_rgba(37,99,235,0.24)]"
         >
           등록
-          <span className="mt-0.5 text-[11px] font-bold text-[#D9EEE5]">새 물건</span>
+          <span className="mt-0.5 text-[11px] font-bold text-[#DBEAFE]">새 물건</span>
         </Link>
       </div>
     </nav>
@@ -943,12 +1017,12 @@ function MobileTabButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`button-lift min-h-14 rounded-xl px-2 text-center text-sm font-semibold transition ${
+      className={`button-lift min-h-14 rounded-[20px] px-2 text-center text-sm font-semibold transition ${
         active
-          ? "bg-[#E7F6EE] text-[#0F766E] ring-1 ring-[#BFE3D0]"
+          ? "bg-[#EAF2FF] text-[#2563EB] ring-1 ring-[#BFDBFE]"
           : highlighted
-            ? "bg-white text-[#0F766E] ring-2 ring-[#BFE3D0] shadow-[0_8px_20px_rgba(15,118,110,0.12)]"
-          : "bg-[#F6F8F7] text-[#34423C] ring-1 ring-[#DDE5E1]"
+            ? "bg-white text-[#2563EB] ring-2 ring-[#BFDBFE] shadow-[0_10px_22px_rgba(37,99,235,0.14)]"
+          : "bg-[#F8FBFF] text-[#334155] ring-1 ring-[#D8E2F0]"
       }`}
     >
       <span className="block">{label}</span>
@@ -968,8 +1042,8 @@ function MiniStat({
 }) {
   return (
     <div>
-      <p className="text-xs font-bold text-[#66736D]">{label}</p>
-      <p className={`mt-0.5 break-words font-semibold tabular-nums ${danger ? "text-[#B53A2E]" : "text-[#17211D]"}`}>
+      <p className="text-xs font-bold text-[#64748B]">{label}</p>
+      <p className={`mt-0.5 break-words font-semibold tabular-nums ${danger ? "text-[#B42318]" : "text-[#152033]"}`}>
         {value}
       </p>
     </div>
@@ -978,9 +1052,9 @@ function MiniStat({
 
 function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
   const styles = {
-    안정: "bg-[#E7F6EE] text-[#1F8A5B]",
-    주의: "bg-[#FFF4D7] text-[#8A5B00]",
-    위험: "bg-[#FDE8E5] text-[#B53A2E]",
+    안정: "bg-[#EAF2FF] text-[#2563EB]",
+    주의: "bg-[#FFF4D7] text-[#9A5B13]",
+    위험: "bg-[#FEE2E2] text-[#B42318]",
   };
   const label = level === "안정" ? "검토 쉬움" : level;
   return (
@@ -993,10 +1067,10 @@ function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
 function Verdict({ value }: { value: string }) {
   const style =
     value === "입찰 검토"
-      ? "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]"
+      ? "border-[#BFDBFE] bg-[#EAF2FF] text-[#2563EB]"
       : value === "가격 조정"
-        ? "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]"
-        : "border-[#F2B8AE] bg-[#FDE8E5] text-[#B53A2E]";
+        ? "border-[#F3D083] bg-[#FFF4D7] text-[#9A5B13]"
+        : "border-[#FCA5A5] bg-[#FEE2E2] text-[#B42318]";
   return (
     <span className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${style}`}>
       {value}

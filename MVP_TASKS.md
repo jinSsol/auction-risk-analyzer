@@ -622,6 +622,82 @@ Verification notes:
 - Tap target QA found small range controls and comparison title links; both were expanded to mobile-friendly hit areas.
 - Safety wording was tightened from `추천 상한가` to `검토 상한가` on the detail page.
 
+## Phase 6: Mobile App Style Redesign
+
+Goal: translate the reference mobile-app visual direction into a trustworthy auction/public-sale risk tool.
+
+### 6.1 Redesign Home Screen In App Style
+
+Tasks:
+
+- [x] Shift the home visual system toward navy/blue app-style surfaces.
+- [x] Add a compact mobile-app style hero with summary metrics.
+- [x] Keep risk and uncertainty signals visible before decorative content.
+- [x] Restyle search, filters, listing cards, comparison panel, and bottom tabs without changing core behavior.
+- [x] Re-run lint and render tests.
+
+Completion criteria:
+
+- The home screen feels closer to a modern mobile app while preserving cautious auction-risk wording.
+
+Verification notes:
+
+- Home now uses a dark blue app header, rounded white cards, soft shadows, and a desktop phone-style preview.
+- Listing cards keep source, status, verdict, price, risk, and comparison actions in the same behavior flow.
+- Risk colors remain distinct from the primary blue palette: caution uses orange and danger uses red.
+- Browser QA checked 390px, 430px, and desktop widths with no horizontal overflow or tiny tap targets found.
+
+### 6.2 Extract Shared Visual Components
+
+Tasks:
+
+- [ ] Move duplicated badges, verdict, risk meter, and mini-stat components into shared UI files.
+- [ ] Align home and detail status colors after extraction.
+- [ ] Add focused tests if extracted components affect rendered copy.
+
+Completion criteria:
+
+- Future design changes can be applied consistently across home and detail pages.
+
+### 6.3 Redesign Detail Screen In App Style
+
+Tasks:
+
+- [ ] Add an app-style detail header with judgment summary first.
+- [ ] Restyle section navigation and analysis cards to match the home redesign.
+- [ ] Keep rights-analysis and official-document warnings prominent.
+- [ ] Verify mobile reading order and tap targets.
+
+Completion criteria:
+
+- The detail page feels like the same app as the redesigned home screen.
+
+### 6.4 Redesign Registration Flow In App Style
+
+Tasks:
+
+- [ ] Restyle the wizard shell, progress indicator, inputs, segmented controls, and optional sections.
+- [ ] Preserve incomplete-save behavior and local-browser storage copy.
+- [ ] Verify date, number, details/summary, and step navigation accessibility.
+
+Completion criteria:
+
+- Manual registration feels lighter without weakening data-quality guidance.
+
+### 6.5 Redesign QA And Polish
+
+Tasks:
+
+- [ ] Check mobile widths after home, detail, and registration redesigns.
+- [ ] Check desktop layout for oversized mobile-app styling.
+- [ ] Re-run `npm run lint`.
+- [ ] Re-run `npm test`.
+- [ ] Deploy the completed redesign phase.
+
+Completion criteria:
+
+- The redesigned app is ready to continue into live data integration planning.
+
 ## Phase 7: Live Data Integration Planning
 
 Goal: decide how real auction/public-sale data should enter the product before building scrapers or API adapters.
