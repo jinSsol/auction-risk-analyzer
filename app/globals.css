@@ -32,7 +32,7 @@ input {
 }
 
 ::selection {
-  background: #f7dfb7;
+  background: #d7e4dc;
   color: #173b35;
 }
 
@@ -42,14 +42,14 @@ button {
 
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid #f2c980;
+  outline: 3px solid #cfe1d8;
   outline-offset: 2px;
 }
 
 .app-shell {
   background:
-    linear-gradient(155deg, rgba(246, 193, 119, 0.2), transparent 34%),
-    linear-gradient(30deg, rgba(23, 59, 53, 0.1), transparent 31%),
+    linear-gradient(155deg, rgba(23, 59, 53, 0.09), transparent 34%),
+    linear-gradient(30deg, rgba(65, 111, 103, 0.1), transparent 31%),
     #faf8f3;
 }
 

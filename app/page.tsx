@@ -132,7 +132,7 @@ export default function Home() {
 
             <div className="mt-8 max-w-2xl">
               <p className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/18 backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#F6C177]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#CFE1D8]" />
                 오늘의 권리분석 루틴
               </p>
               <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-normal text-white md:text-5xl">
@@ -155,7 +155,7 @@ export default function Home() {
             <div className="phone-mock w-[300px] overflow-hidden bg-[#FFFDF8] text-[#1F2A24]">
               <div className="phone-notch mx-auto h-5 w-28" />
               <div className="bg-[#173B35] px-5 pb-5 pt-2 text-white">
-                <p className="text-xs font-semibold text-[#F7DFB7]">3분 검토 루틴</p>
+                <p className="text-xs font-semibold text-[#DDEBE5]">3분 검토 루틴</p>
                 <h2 className="mt-2 text-lg font-semibold leading-snug">
                   {bestPreview?.title ?? "경매·공매 리스크 워크벤치"}
                 </h2>
@@ -302,7 +302,7 @@ export default function Home() {
               min={0}
               max={12}
               onChange={setBufferRatio}
-              tone="amber"
+              tone="sage"
             />
             <div className="rounded-[20px] bg-[#173B35] px-4 py-3 text-sm text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
               <p className="font-semibold">계산 기준</p>
@@ -421,7 +421,7 @@ function HeroMetric({
 }) {
   const styles = {
     default: "bg-white/16 text-white",
-    warn: "bg-[#F7DFB7]/22 text-white",
+    warn: "bg-[#DDEBE5]/18 text-white",
     soft: "bg-[#EAF3EE]/20 text-white",
   };
 
@@ -447,7 +447,7 @@ function PhoneCheckLine({ label, muted }: { label: string; muted?: boolean }) {
     <div className="flex items-center gap-2">
       <span
         className={`h-5 w-5 rounded-full border ${
-          muted ? "border-[#D7CDC0] bg-[#FBF8F1]" : "border-[#D9B36D] bg-[#EAF3EE]"
+          muted ? "border-[#D7CDC0] bg-[#FBF8F1]" : "border-[#416F67] bg-[#EAF3EE]"
         }`}
       />
       <span className={`text-xs font-bold ${muted ? "text-[#9A958B]" : "text-[#34423C]"}`}>
@@ -505,7 +505,7 @@ function RangeControl({
   suffix: string;
   min: number;
   max: number;
-  tone: "green" | "amber";
+  tone: "green" | "sage";
   onChange: (value: number) => void;
 }) {
   return (
@@ -519,7 +519,7 @@ function RangeControl({
           className={`rounded-full px-2.5 py-1 text-sm font-semibold tabular-nums ${
             tone === "green"
               ? "bg-[#EEF5F1] text-[#173B35]"
-              : "bg-[#FFF4D7] text-[#9A5B13]"
+              : "bg-[#EEF3E8] text-[#566A4B]"
           }`}
         >
           {value}%
@@ -532,7 +532,7 @@ function RangeControl({
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
         className={`mt-2 h-11 w-full cursor-pointer touch-pan-x ${
-          tone === "green" ? "accent-[#173B35]" : "accent-[#F97316]"
+          tone === "green" ? "accent-[#173B35]" : "accent-[#416F67]"
         }`}
       />
     </div>
@@ -570,7 +570,7 @@ function statusLabelsFor(item: AnalyzedItem) {
 function StatusBadge({ label }: { label: string }) {
   const style =
     label === "확인 필요"
-      ? "bg-[#FFF4D7] text-[#9A5B13]"
+      ? "bg-[#EEF3E8] text-[#566A4B]"
       : label === "직접 입력"
         ? "bg-[#F7F2E8] text-[#56635C]"
         : "bg-[#EEF5F1] text-[#173B35]";
@@ -742,7 +742,7 @@ function CompactStat({
 
 const riskAccent: Record<RiskLevel, string> = {
   안정: "bg-[#173B35]",
-  주의: "bg-[#F97316]",
+  주의: "bg-[#6B7F5D]",
   위험: "bg-[#DC2626]",
 };
 
@@ -780,7 +780,7 @@ function PriceStat({
 
 function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
   const color =
-    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#F97316]" : "bg-[#173B35]";
+    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#6B7F5D]" : "bg-[#173B35]";
   return (
     <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E5DED3]">
       <div className={`risk-fill h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
@@ -1022,7 +1022,7 @@ function MobileTabButton({
       }`}
     >
       {highlighted && !active ? (
-        <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#F97316] ring-2 ring-white" />
+        <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#416F67] ring-2 ring-white" />
       ) : null}
       <TabIcon type={icon} active={active || Boolean(highlighted)} />
       <span className="mt-1 block">{label}</span>
@@ -1076,7 +1076,7 @@ function MiniStat({
 function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
   const styles = {
     안정: "bg-[#EEF5F1] text-[#173B35]",
-    주의: "bg-[#FFF4D7] text-[#9A5B13]",
+    주의: "bg-[#EEF3E8] text-[#566A4B]",
     위험: "bg-[#FEE2E2] text-[#B42318]",
   };
   const label = level === "안정" ? "검토 쉬움" : level;
@@ -1092,7 +1092,7 @@ function Verdict({ value }: { value: string }) {
     value === "입찰 검토"
       ? "border-[#D7E4DC] bg-[#EEF5F1] text-[#173B35]"
       : value === "가격 조정"
-        ? "border-[#F3D083] bg-[#FFF4D7] text-[#9A5B13]"
+        ? "border-[#CBD9C2] bg-[#EEF3E8] text-[#566A4B]"
         : "border-[#FCA5A5] bg-[#FEE2E2] text-[#B42318]";
   return (
     <span className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${style}`}>

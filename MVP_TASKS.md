@@ -644,7 +644,7 @@ Verification notes:
 
 - Home now uses a dark blue app header, rounded white cards, soft shadows, and a desktop phone-style preview.
 - Listing cards keep source, status, verdict, price, risk, and comparison actions in the same behavior flow.
-- Risk colors remain distinct from the primary blue palette: caution uses orange and danger uses red.
+- Risk colors remain distinct from the primary blue palette: caution uses muted sage and danger uses red.
 - Browser QA checked 390px, 430px, and desktop widths with no horizontal overflow or tiny tap targets found.
 
 ### 6.2 Confirm B+A Direction And Reframe Home
@@ -652,7 +652,7 @@ Verification notes:
 Tasks:
 
 - [x] Lock the B+A direction: friendly legal coach plus clean fintech order.
-- [x] Shift the palette from generic blue app styling to warm off-white, deep green, ink, and apricot accents.
+- [x] Shift the palette from generic blue app styling to warm off-white, deep green, ink, and muted sage accents.
 - [x] Rewrite the first-screen copy around a guided rights-analysis routine.
 - [x] Update the desktop phone preview and mobile bottom tabs to match the softer app tone.
 - [x] Re-run lint, render tests, and mobile layout QA.
@@ -664,7 +664,7 @@ Completion criteria:
 Verification notes:
 
 - Home hero now leads with "오늘의 권리분석 루틴" and a 3-step checking flow.
-- Primary actions and active mobile tabs use deep green, while warning/danger signals stay orange/red.
+- Primary actions and active mobile tabs use deep green, while caution/danger signals stay sage/red.
 - Browser QA checked mobile and desktop widths after the palette/copy shift.
 
 ### 6.3 Extract Shared Visual Components
