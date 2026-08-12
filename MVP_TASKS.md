@@ -622,11 +622,222 @@ Verification notes:
 - Tap target QA found small range controls and comparison title links; both were expanded to mobile-friendly hit areas.
 - Safety wording was tightened from `추천 상한가` to `검토 상한가` on the detail page.
 
+## Phase 6: First-User Test Readiness
+
+Goal: prepare the MVP for a small first-user test before connecting live data.
+
+### 6.1 Create First-User Test Checklist
+
+Tasks:
+
+- [x] Define the tester profile and session setup.
+- [x] Write the core test scenarios for listing, detail, registration, and comparison.
+- [x] Add observation prompts for confusing language, missing data, and trust concerns.
+- [x] Define pass/fail signals for whether the MVP is understandable.
+- [x] Capture the known limitations testers should not mistake for bugs.
+
+Completion criteria:
+
+- A tester can run through the MVP with a clear script and record useful feedback.
+
+Verification notes:
+
+- Added `FIRST_USER_TEST_PLAN.md` with tester profile, setup, five scenarios, observation prompts, pass signals, known limitations, and MVP readiness criteria.
+- The plan covers listing scan, detail review, incomplete manual registration, comparison basket, and trust/safety checks.
+- The plan explicitly tells moderators to frame bundled listings as sample data and local saved items as browser-only storage.
+
+### 6.2 Add Lightweight Feedback Collection
+
+Tasks:
+
+- [ ] Add a simple feedback entry point in the mobile UI.
+- [ ] Let users record what felt confusing, risky, or missing.
+- [ ] Include a copy-friendly summary so feedback can be sent manually before backend storage exists.
+- [ ] Keep feedback local-only until account/cloud sync is introduced.
+- [ ] Add tests for the feedback page or component if it becomes part of the app UI.
+
+Completion criteria:
+
+- First testers can leave structured feedback without needing signup.
+
+### 6.3 Improve First-Run Onboarding
+
+Tasks:
+
+- [ ] Add a short first-run explanation for sample data and manual entry.
+- [ ] Guide users toward `새 물건 등록`, `상세 보기`, and `비교 바구니`.
+- [ ] Avoid tutorial-heavy copy that blocks experienced users.
+- [ ] Make the first-run state dismissible and local-browser persisted.
+- [ ] Recheck mobile spacing after onboarding is added.
+
+Completion criteria:
+
+- New users understand what to try first within 30 seconds.
+
+### 6.4 Improve Data Input Quality
+
+Tasks:
+
+- [ ] Add guidance for partial addresses and hidden/uncertain addresses.
+- [ ] Add examples for court case numbers and Onbid/KAMCO listing numbers.
+- [ ] Normalize common spacing/formatting issues where safe.
+- [ ] Make unknown occupancy, senior rights, and fee fields explicit instead of blank-looking.
+- [ ] Identify fields that should later be parsed from connected sources.
+
+Completion criteria:
+
+- User-created items are more consistent even before live data integration.
+
+### 6.5 Final MVP Risk Copy Audit
+
+Tasks:
+
+- [ ] Re-scan UI copy for legal/investment certainty.
+- [ ] Replace remaining `추천`, `확정`, `안전` language where it could overpromise.
+- [ ] Add concise decision-support disclaimer where users make bid decisions.
+- [ ] Ensure public-sale delivery and court-auction occupancy risks are distinguished.
+- [ ] Re-run render tests for key pages.
+
+Completion criteria:
+
+- The app feels helpful without implying legal, price, or profit certainty.
+
+## Phase 7: Live Data Integration Planning
+
+Goal: decide how real auction/public-sale data should enter the product before building scrapers or API adapters.
+
+### 7.1 Source And Legal Feasibility Review
+
+Tasks:
+
+- [ ] Review Court Auction, Onbid, KAMCO, and public data source access paths.
+- [ ] Check API availability, terms, robots/crawling limits, and rate limits.
+- [ ] Identify fields that can be legally stored, refreshed, and displayed.
+- [ ] Decide which source becomes the first production integration.
+
+Completion criteria:
+
+- The first live-data source is chosen with clear constraints and risks.
+
+### 7.2 Live Data Model Design
+
+Tasks:
+
+- [ ] Separate source fields from user-entered fields.
+- [ ] Add freshness metadata such as `fetchedAt`, `sourceUpdatedAt`, and `staleAfter`.
+- [ ] Define confidence levels for address, price, occupancy, and rights fields.
+- [ ] Plan merge behavior when user edits connected data.
+
+Completion criteria:
+
+- The app can support sample, user-entered, and connected items without muddy ownership.
+
+### 7.3 Integration Architecture Spike
+
+Tasks:
+
+- [ ] Decide whether ingestion runs as server route, scheduled job, or external worker.
+- [ ] Choose initial storage approach for connected items.
+- [ ] Define retry, dedupe, and source-change handling.
+- [ ] Add a small adapter interface for future source implementations.
+
+Completion criteria:
+
+- Developers know where source connectors live and how data flows into the app.
+
+## Phase 8: Public-Sale Integration First Pass
+
+Goal: connect a limited public-sale source before tackling more complex court auction data.
+
+### 8.1 Onbid/KAMCO Listing Import MVP
+
+Tasks:
+
+- [ ] Import listing id, title, region, type, appraised/minimum price, deadline, and source URL.
+- [ ] Mark imported data with freshness and source labels.
+- [ ] Handle missing address and missing occupancy data as `확인 필요`.
+- [ ] Add import error states that do not break the listing page.
+
+Completion criteria:
+
+- A small set of public-sale items can appear beside sample and user-created items.
+
+### 8.2 Public-Sale Detail Normalization
+
+Tasks:
+
+- [ ] Normalize public-sale-specific delivery, occupancy, and tax/fee fields.
+- [ ] Distinguish public-sale risks from court-auction rights risks.
+- [ ] Preserve the original source URL for verification.
+- [ ] Add tests for imported public-sale item analysis.
+
+Completion criteria:
+
+- Public-sale items can be analyzed without pretending they are court auctions.
+
+## Phase 9: Court Auction Integration First Pass
+
+Goal: connect limited court-auction listing data after the ingestion model is proven.
+
+### 9.1 Court Auction Listing Import MVP
+
+Tasks:
+
+- [ ] Import case number, title, region, property type, appraised price, minimum price, and sale date.
+- [ ] Handle partial/hidden addresses safely.
+- [ ] Track failed bid count and sale schedule changes.
+- [ ] Add source freshness and manual verification labels.
+
+Completion criteria:
+
+- Court auction items can be listed, filtered, and opened from connected data.
+
+### 9.2 Court Auction Detail Risk Fields
+
+Tasks:
+
+- [ ] Map occupancy, lease, senior rights, lien, illegal building, and fee-risk signals where available.
+- [ ] Treat unavailable legal fields as `미확인`, not safe.
+- [ ] Add source-specific copy for what users must verify in official documents.
+- [ ] Add tests for high-risk and unknown-risk court auction cases.
+
+Completion criteria:
+
+- Court auction connected data supports cautious first-pass rights analysis.
+
+## Phase 10: Market Price And Transaction Data
+
+Goal: add market context only after auction/public-sale item ingestion is stable.
+
+### 10.1 Transaction Data Source Review
+
+Tasks:
+
+- [ ] Review public transaction data options and private API alternatives.
+- [ ] Decide region, property type, and recency coverage for MVP.
+- [ ] Define licensing, attribution, and caching constraints.
+- [ ] Decide whether estimates should be exact, range-based, or confidence-scored.
+
+Completion criteria:
+
+- The app has a compliant plan for displaying market evidence.
+
+### 10.2 Market Comparison MVP
+
+Tasks:
+
+- [ ] Connect recent transaction candidates by area, type, district, and date.
+- [ ] Show match confidence and reasons for weak evidence.
+- [ ] Keep user-entered recent transaction price as an override.
+- [ ] Feed market confidence into bid/risk explanations without overstating precision.
+- [ ] Add tests for strong, weak, and missing comparable-sale evidence.
+
+Completion criteria:
+
+- Users can compare auction/public-sale pricing against visible market evidence.
+
 ## Deferred Until After MVP
 
-- Real court auction data integration
-- Real Onbid/KAMCO integration
-- Real transaction API integration
 - OCR/document extraction
 - Account login
 - Cloud sync
