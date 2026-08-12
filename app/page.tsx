@@ -973,7 +973,7 @@ function MobileBottomTabs({
 }) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+8px)] md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-3 items-end rounded-[28px] border border-white/70 bg-white/92 px-3 pb-2 pt-3 shadow-[0_-18px_42px_rgba(21,32,51,0.16)] backdrop-blur">
+      <div className="mx-auto grid max-w-md grid-cols-3 items-end rounded-[30px] border border-white/80 bg-white/94 px-3 pb-2 pt-3 shadow-[0_-16px_38px_rgba(43,65,104,0.14)] backdrop-blur">
         <MobileTabButton
           active={activeTab === "browse"}
           label="물건"
@@ -983,9 +983,9 @@ function MobileBottomTabs({
         />
         <Link
           href="/properties/new"
-          className="button-lift -mt-8 flex min-h-[76px] flex-col items-center justify-start text-center text-xs font-bold text-[#2563EB]"
+          className="button-lift -mt-8 flex min-h-[76px] flex-col items-center justify-start text-center text-xs font-black text-[#2563EB]"
         >
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563EB] text-3xl font-light leading-none text-white shadow-[0_16px_32px_rgba(37,99,235,0.28)] ring-4 ring-white">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563EB] text-3xl font-light leading-none text-white shadow-[0_14px_28px_rgba(37,99,235,0.24)] ring-4 ring-white">
             +
           </span>
           <span className="mt-1.5">등록</span>
@@ -1023,7 +1023,7 @@ function MobileTabButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`relative flex min-h-[62px] flex-col items-center justify-center rounded-2xl px-2 text-center text-xs font-bold transition ${
+      className={`relative flex min-h-[62px] flex-col items-center justify-center rounded-3xl px-2 text-center text-xs font-black transition ${
         active
           ? "text-[#2563EB]"
           : highlighted
@@ -1031,9 +1031,6 @@ function MobileTabButton({
           : "text-[#64748B]"
       }`}
     >
-      {active ? (
-        <span className="absolute top-0 h-1 w-7 rounded-full bg-[#2563EB]" />
-      ) : null}
       {highlighted && !active ? (
         <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#F97316] ring-2 ring-white" />
       ) : null}
@@ -1046,21 +1043,22 @@ function MobileTabButton({
 
 function TabIcon({ type, active }: { type: "browse" | "compare"; active: boolean }) {
   const color = active ? "bg-[#2563EB]" : "bg-[#94A3B8]";
+  const shell = active ? "bg-[#EAF2FF]" : "bg-transparent";
 
   if (type === "browse") {
     return (
-      <span className="relative flex h-6 w-6 items-end justify-center" aria-hidden="true">
-        <span className={`absolute bottom-1 h-3.5 w-4 rounded-[5px] ${color}`} />
-        <span className={`absolute bottom-3 h-3 w-3 rotate-45 rounded-[3px] ${color}`} />
-        <span className="absolute bottom-1.5 h-2 w-1.5 rounded-t-full bg-white/90" />
+      <span className={`relative flex h-9 w-9 items-end justify-center rounded-full ${shell}`} aria-hidden="true">
+        <span className={`absolute bottom-2.5 h-3.5 w-4 rounded-[5px] ${color}`} />
+        <span className={`absolute bottom-4.5 h-3 w-3 rotate-45 rounded-[3px] ${color}`} />
+        <span className="absolute bottom-3 h-2 w-1.5 rounded-t-full bg-white/90" />
       </span>
     );
   }
 
   return (
-    <span className="relative flex h-6 w-6 items-center justify-center" aria-hidden="true">
-      <span className={`absolute left-1 top-1.5 h-4 w-2 rounded-full ${color}`} />
-      <span className={`absolute right-1 bottom-1.5 h-4 w-2 rounded-full ${color}`} />
+    <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
+      <span className={`absolute left-2.5 top-2.5 h-4 w-2 rounded-full ${color}`} />
+      <span className={`absolute bottom-2.5 right-2.5 h-4 w-2 rounded-full ${color}`} />
       <span className="absolute h-0.5 w-4 -rotate-12 rounded-full bg-white/90" />
     </span>
   );
