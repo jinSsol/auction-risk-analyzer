@@ -972,28 +972,32 @@ function MobileBottomTabs({
   onTabChange: (tab: MobileTab) => void;
 }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 bg-white/92 px-4 pb-[calc(env(safe-area-inset-bottom)+10px)] pt-2 shadow-[0_-18px_40px_rgba(21,32,51,0.14)] backdrop-blur md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
+    <nav className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+8px)] md:hidden">
+      <div className="mx-auto grid max-w-md grid-cols-3 items-end rounded-[28px] border border-white/70 bg-white/92 px-3 pb-2 pt-3 shadow-[0_-18px_42px_rgba(21,32,51,0.16)] backdrop-blur">
         <MobileTabButton
           active={activeTab === "browse"}
           label="물건"
           meta={`${resultCount}건`}
+          icon="browse"
           onClick={() => onTabChange("browse")}
         />
+        <Link
+          href="/properties/new"
+          className="button-lift -mt-8 flex min-h-[76px] flex-col items-center justify-start text-center text-xs font-bold text-[#2563EB]"
+        >
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563EB] text-3xl font-light leading-none text-white shadow-[0_16px_32px_rgba(37,99,235,0.28)] ring-4 ring-white">
+            +
+          </span>
+          <span className="mt-1.5">등록</span>
+        </Link>
         <MobileTabButton
           active={activeTab === "compare"}
           label="비교"
           meta={`${selectedCount}/${MAX_COMPARE_COUNT}`}
           highlighted={selectedCount > 0}
+          icon="compare"
           onClick={() => onTabChange("compare")}
         />
-        <Link
-          href="/properties/new"
-          className="button-lift flex min-h-14 flex-col items-center justify-center rounded-[20px] bg-[#2563EB] px-2 text-center text-sm font-semibold text-white shadow-[0_12px_26px_rgba(37,99,235,0.24)]"
-        >
-          등록
-          <span className="mt-0.5 text-[11px] font-bold text-[#DBEAFE]">새 물건</span>
-        </Link>
       </div>
     </nav>
   );
@@ -1003,12 +1007,14 @@ function MobileTabButton({
   active,
   label,
   meta,
+  icon,
   highlighted,
   onClick,
 }: {
   active: boolean;
   label: string;
   meta: string;
+  icon: "browse" | "compare";
   highlighted?: boolean;
   onClick: () => void;
 }) {
@@ -1017,17 +1023,46 @@ function MobileTabButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`button-lift min-h-14 rounded-[20px] px-2 text-center text-sm font-semibold transition ${
+      className={`relative flex min-h-[62px] flex-col items-center justify-center rounded-2xl px-2 text-center text-xs font-bold transition ${
         active
-          ? "bg-[#EAF2FF] text-[#2563EB] ring-1 ring-[#BFDBFE]"
+          ? "text-[#2563EB]"
           : highlighted
-            ? "bg-white text-[#2563EB] ring-2 ring-[#BFDBFE] shadow-[0_10px_22px_rgba(37,99,235,0.14)]"
-          : "bg-[#F8FBFF] text-[#334155] ring-1 ring-[#D8E2F0]"
+            ? "text-[#2563EB]"
+          : "text-[#64748B]"
       }`}
     >
-      <span className="block">{label}</span>
-      <span className="mt-0.5 block text-[11px] font-bold opacity-70">{meta}</span>
+      {active ? (
+        <span className="absolute top-0 h-1 w-7 rounded-full bg-[#2563EB]" />
+      ) : null}
+      {highlighted && !active ? (
+        <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#F97316] ring-2 ring-white" />
+      ) : null}
+      <TabIcon type={icon} active={active || Boolean(highlighted)} />
+      <span className="mt-1 block">{label}</span>
+      <span className="mt-0.5 block text-[10px] font-bold opacity-60">{meta}</span>
     </button>
+  );
+}
+
+function TabIcon({ type, active }: { type: "browse" | "compare"; active: boolean }) {
+  const color = active ? "bg-[#2563EB]" : "bg-[#94A3B8]";
+
+  if (type === "browse") {
+    return (
+      <span className="relative flex h-6 w-6 items-end justify-center" aria-hidden="true">
+        <span className={`absolute bottom-1 h-3.5 w-4 rounded-[5px] ${color}`} />
+        <span className={`absolute bottom-3 h-3 w-3 rotate-45 rounded-[3px] ${color}`} />
+        <span className="absolute bottom-1.5 h-2 w-1.5 rounded-t-full bg-white/90" />
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative flex h-6 w-6 items-center justify-center" aria-hidden="true">
+      <span className={`absolute left-1 top-1.5 h-4 w-2 rounded-full ${color}`} />
+      <span className={`absolute right-1 bottom-1.5 h-4 w-2 rounded-full ${color}`} />
+      <span className="absolute h-0.5 w-4 -rotate-12 rounded-full bg-white/90" />
+    </span>
   );
 }
 
