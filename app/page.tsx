@@ -89,9 +89,8 @@ export default function Home() {
     level !== "전체",
     owner !== "전체",
   ].filter(Boolean).length;
-  const bestPreview = [...enriched].sort(
-    (left, right) => left.analysis.risk - right.analysis.risk
-  )[0];
+  const coachTask = getCoachTask(enriched);
+  const priorityItems = [...enriched].sort(compareForBasket).slice(0, 3);
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -118,117 +117,92 @@ export default function Home() {
 
   return (
     <main className="app-shell min-h-screen pb-24 text-[#1F2A24] md:pb-0">
-      <section className="hero-surface relative overflow-hidden rounded-b-[34px]">
-        <div className="mx-auto grid max-w-7xl gap-7 px-5 pb-8 pt-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8 lg:pb-12">
-          <div className="min-w-0">
-            <div className="flex items-center justify-between gap-3 text-white/80">
-              <p className="text-xs font-bold">9:41</p>
-              <div className="flex items-center gap-2 text-xs font-bold">
-                <span>권리</span>
-                <span>비용</span>
-                <span className="rounded-full bg-white/18 px-2 py-1 text-white">코치 모드</span>
-              </div>
-            </div>
-
-            <div className="mt-8 max-w-2xl">
-              <p className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/18 backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#CFE1D8]" />
-                오늘의 권리분석 루틴
-              </p>
-              <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-normal text-white md:text-5xl">
-                복잡한 경매 리스크, 오늘 확인할 것부터 차근차근.
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-7 text-[#EAF3EE]">
-                처음 보는 물건도 주소, 권리, 비용 체크 순서로 정리하고 공식 문서에서
-                확인할 항목을 놓치지 않게 도와줍니다.
-              </p>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <HeroMetric label="1단계" value="권리 확인" />
-              <HeroMetric label="2단계" value="비용 계산" tone="warn" />
-              <HeroMetric label="3단계" value="비교 담기" tone="soft" />
+      <section className="relative overflow-hidden bg-[#FAF8F3]">
+        <div className="mx-auto max-w-7xl px-5 pb-5 pt-5 lg:px-8 lg:pb-7">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-black text-[#173B35]">경매 권리분석 코치</p>
+            <div className="flex items-center gap-2 text-xs font-bold text-[#6F766F]">
+              <span>경매</span>
+              <span>공매</span>
+              <span className="rounded-full bg-[#EEF5F1] px-2 py-1 text-[#173B35]">MVP</span>
             </div>
           </div>
 
-          <div className="hidden lg:flex lg:justify-end">
-            <div className="phone-mock w-[300px] overflow-hidden bg-[#FFFDF8] text-[#1F2A24]">
-              <div className="phone-notch mx-auto h-5 w-28" />
-              <div className="bg-[#173B35] px-5 pb-5 pt-2 text-white">
-                <p className="text-xs font-semibold text-[#DDEBE5]">3분 검토 루틴</p>
-                <h2 className="mt-2 text-lg font-semibold leading-snug">
-                  {bestPreview?.title ?? "경매·공매 리스크 워크벤치"}
-                </h2>
-                <div className="mt-3 flex gap-2">
-                  <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-bold">
-                    {bestPreview ? bestPreview.channel : "경매"}
-                  </span>
-                  <span className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-bold">
-                    {bestPreview ? bestPreview.analysis.verdict : "입찰 검토"}
-                  </span>
-                </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+            <div className="min-w-0 space-y-4">
+              <div className="max-w-2xl">
+                <p className="inline-flex items-center gap-2 rounded-full bg-[#EEF5F1] px-3 py-1 text-xs font-bold text-[#173B35] ring-1 ring-[#D7E4DC]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#173B35]" />
+                  오늘의 판단 시작점
+                </p>
+                <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-normal text-[#1F2A24] md:text-5xl">
+                  오늘 먼저 확인할 리스크를 알려드려요.
+                </h1>
+                <p className="mt-4 max-w-xl text-base leading-7 text-[#56635C]">
+                  물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해
+                  무엇을 먼저 확인해야 하는지 보여줍니다.
+                </p>
               </div>
-              <div className="space-y-3 p-4">
-                <div className="grid grid-cols-3 gap-2">
-                  <PhoneMiniStat label="리스크" value={bestPreview ? `${bestPreview.analysis.risk}점` : "18점"} />
-                  <PhoneMiniStat label="상한" value={bestPreview ? uk(bestPreview.analysis.suggested) : "8.6억"} />
-                  <PhoneMiniStat label="마진" value={bestPreview ? percent(bestPreview.analysis.marginRate) : "15%"} />
-                </div>
-                <div className="rounded-2xl border border-[#E5DED3] bg-white p-3 shadow-[0_10px_24px_rgba(47,55,45,0.08)]">
-                  <p className="text-xs font-bold text-[#6F766F]">확인할 것</p>
-                  <div className="mt-3 space-y-2">
-                    <PhoneCheckLine label="주소·면적 확인" />
-                    <PhoneCheckLine label="점유·임차 확인" muted />
-                    <PhoneCheckLine label="체납·인수금 확인" muted />
-                  </div>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {["검색", "권리", "비용", "비교"].map((label) => (
-                    <div key={label} className="rounded-2xl bg-[#EEF5F1] py-2 text-center text-[11px] font-bold text-[#173B35]">
-                      {label}
-                    </div>
-                  ))}
+
+              <CoachTaskCard task={coachTask} />
+
+              <div className="app-card rounded-[24px] p-3">
+                <label className="sr-only" htmlFor="property-search">
+                  물건 검색
+                </label>
+                <div className="flex min-h-14 items-center gap-3 rounded-[18px] bg-white px-3">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF5F1] text-sm font-black text-[#173B35]">
+                    Q
+                  </span>
+                  <input
+                    id="property-search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="지역, 사건번호, 온비드, 아파트"
+                    className="h-12 min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-[#1F2A24] outline-none placeholder:text-[#9A958B]"
+                  />
+                  {query ? (
+                    <button
+                      type="button"
+                      onClick={() => setQuery("")}
+                      className="h-9 rounded-full bg-[#F7F2E8] px-3 text-xs font-bold text-[#56635C] transition hover:bg-[#EAF3EE]"
+                    >
+                      지우기
+                    </button>
+                  ) : null}
                 </div>
               </div>
             </div>
+
+            <aside className="app-card rounded-[28px] p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-[#6F766F]">오늘의 후보 정리</p>
+                  <h2 className="mt-1 text-lg font-semibold text-[#1F2A24]">
+                    먼저 열어볼 물건
+                  </h2>
+                </div>
+                <span className="rounded-full bg-[#173B35] px-2.5 py-1 text-xs font-bold text-white">
+                  {priorityItems.length}건
+                </span>
+              </div>
+              <div className="mt-4 space-y-3">
+                {priorityItems.map((item, index) => (
+                  <CoachCandidateRow key={item.id} item={item} index={index} />
+                ))}
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
       <section
-        className={`sticky top-0 z-10 bg-white/82 shadow-[0_12px_30px_rgba(47,55,45,0.08)] backdrop-blur ${
+        className={`sticky top-0 z-10 bg-[#FAF8F3]/88 shadow-[0_12px_30px_rgba(47,55,45,0.08)] backdrop-blur ${
           mobileTab === "browse" ? "block" : "hidden md:block"
         }`}
       >
         <div className="mx-auto max-w-7xl px-5 py-3 xl:px-8">
-          <div className="grid gap-3 xl:grid-cols-[minmax(280px,1fr)_auto] xl:items-start">
-            <div className="app-card rounded-[22px]">
-              <label className="sr-only" htmlFor="property-search">
-                물건 검색
-              </label>
-              <div className="flex min-h-14 items-center gap-3 px-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF5F1] text-sm font-black text-[#173B35]">
-                  Q
-                </span>
-                <input
-                  id="property-search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="지역, 사건번호, 온비드, 아파트"
-                  className="h-12 min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-[#1F2A24] outline-none placeholder:text-[#9A958B]"
-                />
-                {query ? (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="h-9 rounded-full bg-[#F7F2E8] px-3 text-xs font-bold text-[#56635C] transition hover:bg-[#EAF3EE]"
-                  >
-                    지우기
-                  </button>
-                ) : null}
-              </div>
-            </div>
-            <div className="flex items-center justify-between gap-3 xl:justify-end">
+          <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-bold text-[#6F766F]">검색 결과</p>
                 <p className="text-sm font-semibold text-[#1F2A24]">{stats.total}건</p>
@@ -241,7 +215,6 @@ export default function Home() {
               >
                 초기화
               </button>
-            </div>
           </div>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <InlineFilter
@@ -388,6 +361,24 @@ function saveComparisonIds(ids: string[]) {
   }
 }
 
+function getCoachTask(items: AnalyzedItem[]) {
+  const item = [...items].sort((left, right) => right.analysis.risk - left.analysis.risk)[0];
+  if (!item) return null;
+
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
+  const primaryReason =
+    item.analysis.riskFactors[0]?.label ??
+    (checklist.unknownCount > 0 ? "권리 미확인 항목" : "입찰 상한 확인");
+  const action =
+    item.analysis.verdict === "전문가 검토"
+      ? "공식 문서와 전문가 확인이 먼저 필요해요."
+      : item.analysis.verdict === "가격 조정"
+        ? "입찰가를 낮춰도 마진이 남는지 먼저 보세요."
+        : "상한가 안에서 비교 후보로 담아볼 수 있어요.";
+
+  return { item, primaryReason, action, unknownCount: checklist.unknownCount };
+}
+
 function compareForBasket(left: AnalyzedItem, right: AnalyzedItem) {
   return basketScore(left) - basketScore(right);
 }
@@ -410,50 +401,102 @@ function basketScore(item: AnalyzedItem) {
   );
 }
 
-function HeroMetric({
+function CoachTaskCard({
+  task,
+}: {
+  task: ReturnType<typeof getCoachTask>;
+}) {
+  if (!task) {
+    return (
+      <div className="app-card rounded-[26px] p-5">
+        <p className="text-sm font-bold text-[#6F766F]">오늘의 확인 항목</p>
+        <p className="mt-2 text-xl font-semibold text-[#1F2A24]">
+          아직 검토할 물건이 없어요.
+        </p>
+      </div>
+    );
+  }
+
+  const { item } = task;
+
+  return (
+    <div className="app-card rounded-[28px] p-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-[#173B35] px-2.5 py-1 text-xs font-bold text-white">
+          오늘의 확인 항목
+        </span>
+        <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
+        <Verdict value={item.analysis.verdict} />
+      </div>
+      <h2 className="mt-4 text-2xl font-semibold leading-snug text-[#1F2A24] md:text-3xl">
+        {task.primaryReason}부터 확인해요.
+      </h2>
+      <p className="mt-3 text-sm font-medium leading-6 text-[#56635C]">
+        {item.title}은 {task.action} 공식 문서 확인 전에는 참고용으로만 보세요.
+      </p>
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <CoachMiniStat label="입찰 상한" value={uk(item.analysis.suggested)} strong />
+        <CoachMiniStat label="리스크" value={`${item.analysis.risk}점`} />
+        <CoachMiniStat label="권리 미확인" value={`${task.unknownCount}개`} />
+      </div>
+      <Link
+        href={`/properties/${item.id}`}
+        className="button-lift mt-4 inline-flex min-h-11 items-center rounded-2xl bg-[#173B35] px-4 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(23,59,53,0.18)]"
+      >
+        이 물건 먼저 보기
+      </Link>
+    </div>
+  );
+}
+
+function CoachMiniStat({
   label,
   value,
-  tone = "default",
+  strong,
 }: {
   label: string;
   value: string;
-  tone?: "default" | "warn" | "soft";
+  strong?: boolean;
 }) {
-  const styles = {
-    default: "bg-white/16 text-white",
-    warn: "bg-[#DDEBE5]/18 text-white",
-    soft: "bg-[#EAF3EE]/20 text-white",
-  };
-
   return (
-    <div className={`rounded-[22px] px-3 py-3 ring-1 ring-white/14 backdrop-blur ${styles[tone]}`}>
-      <p className="text-[11px] font-bold text-white/70">{label}</p>
-      <p className="mt-1 text-xl font-semibold tabular-nums">{value}</p>
+    <div className="rounded-[18px] border border-[#E5DED3] bg-[#FFFDF8] px-3 py-2">
+      <p className="text-[11px] font-bold text-[#6F766F]">{label}</p>
+      <p className={`mt-0.5 text-sm font-semibold tabular-nums ${strong ? "text-[#173B35]" : "text-[#1F2A24]"}`}>
+        {value}
+      </p>
     </div>
   );
 }
 
-function PhoneMiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-white px-2 py-3 text-center shadow-[0_8px_18px_rgba(47,55,45,0.06)]">
-      <p className="text-[10px] font-bold text-[#6F766F]">{label}</p>
-      <p className="mt-1 truncate text-xs font-black text-[#1F2A24]">{value}</p>
-    </div>
-  );
-}
+function CoachCandidateRow({ item, index }: { item: AnalyzedItem; index: number }) {
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
 
-function PhoneCheckLine({ label, muted }: { label: string; muted?: boolean }) {
   return (
-    <div className="flex items-center gap-2">
-      <span
-        className={`h-5 w-5 rounded-full border ${
-          muted ? "border-[#D7CDC0] bg-[#FBF8F1]" : "border-[#416F67] bg-[#EAF3EE]"
-        }`}
-      />
-      <span className={`text-xs font-bold ${muted ? "text-[#9A958B]" : "text-[#34423C]"}`}>
-        {label}
-      </span>
-    </div>
+    <Link
+      href={`/properties/${item.id}`}
+      className="interactive-card block rounded-[20px] border border-[#E5DED3] bg-white p-3 hover:border-[#D7CDC0] hover:shadow-[0_12px_24px_rgba(47,55,45,0.08)]"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-black text-[#173B35]">추천 #{index + 1}</p>
+          <p className="mt-1 truncate text-sm font-semibold text-[#1F2A24]">{item.title}</p>
+          <p className="mt-1 text-xs font-medium text-[#6F766F]">
+            {item.district} · {item.channel} · {item.analysis.verdict}
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-[#EEF5F1] px-2 py-1 text-xs font-bold text-[#173B35]">
+          {item.analysis.risk}점
+        </span>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold text-[#56635C]">
+        <span className="rounded-full bg-[#F7F2E8] px-2 py-1">
+          상한 {uk(item.analysis.suggested)}
+        </span>
+        <span className="rounded-full bg-[#F7F2E8] px-2 py-1">
+          미확인 {checklist.unknownCount}개
+        </span>
+      </div>
+    </Link>
   );
 }
 

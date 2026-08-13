@@ -684,7 +684,27 @@ Verification notes:
 
 - `DESIGN_DIRECTION.md` now documents the product identity, reference sources, home strategy, visual system, content principles, component priorities, and next redesign requirements.
 
-### 6.4 Extract Shared Visual Components
+### 6.4 Redesign Home Information Architecture
+
+Tasks:
+
+- [x] Remove the need for a separate intro screen by making the home first viewport explain value and action together.
+- [x] Replace the marketing-style hero with a decision-first coach header.
+- [x] Put "today's first risk to check" before search, filters, and property cards.
+- [x] Move search into the first-screen flow and keep filters as lightweight follow-up controls.
+- [x] Add a compact "today's candidate summary" panel for recommended next opens.
+- [x] Re-run lint and render tests.
+
+Completion criteria:
+
+- The first screen follows `DESIGN_DIRECTION.md`: one clear decision message, immediate search, and risk-first next action.
+
+Verification notes:
+
+- Home now starts with "오늘 먼저 확인할 리스크를 알려드려요" instead of a generic app-style intro hero.
+- A separate intro/onboarding screen remains intentionally out of scope for MVP.
+
+### 6.5 Extract Shared Visual Components
 
 Tasks:
 
@@ -696,7 +716,7 @@ Completion criteria:
 
 - Future design changes can be applied consistently across home and detail pages.
 
-### 6.5 Redesign Detail Screen In App Style
+### 6.6 Redesign Detail Screen In App Style
 
 Tasks:
 
@@ -709,7 +729,7 @@ Completion criteria:
 
 - The detail page feels like the same app as the redesigned home screen.
 
-### 6.6 Redesign Registration Flow In App Style
+### 6.7 Redesign Registration Flow In App Style
 
 Tasks:
 
@@ -721,7 +741,7 @@ Completion criteria:
 
 - Manual registration feels lighter without weakening data-quality guidance.
 
-### 6.7 Redesign QA And Polish
+### 6.8 Redesign QA And Polish
 
 Tasks:
 
