@@ -667,7 +667,24 @@ Verification notes:
 - Primary actions and active mobile tabs use deep green, while caution/danger signals stay sage/red.
 - Browser QA checked mobile and desktop widths after the palette/copy shift.
 
-### 6.3 Extract Shared Visual Components
+### 6.3 Document Reference-Based Design Direction
+
+Tasks:
+
+- [x] Confirm product identity as a friendly rights-analysis coach for early auction/public-sale buyers.
+- [x] Define the first-screen priority as "what should I check first today?"
+- [x] Select reference mix: Toss-style easy finance UI, real-estate exploration UI, and trustworthy fintech risk UI.
+- [x] Create `DESIGN_DIRECTION.md` with visual, content, component, and screen-level principles.
+
+Completion criteria:
+
+- Future redesign work has a clear product/design standard before more UI implementation.
+
+Verification notes:
+
+- `DESIGN_DIRECTION.md` now documents the product identity, reference sources, home strategy, visual system, content principles, component priorities, and next redesign requirements.
+
+### 6.4 Extract Shared Visual Components
 
 Tasks:
 
@@ -679,7 +696,7 @@ Completion criteria:
 
 - Future design changes can be applied consistently across home and detail pages.
 
-### 6.4 Redesign Detail Screen In App Style
+### 6.5 Redesign Detail Screen In App Style
 
 Tasks:
 
@@ -692,7 +709,7 @@ Completion criteria:
 
 - The detail page feels like the same app as the redesigned home screen.
 
-### 6.5 Redesign Registration Flow In App Style
+### 6.6 Redesign Registration Flow In App Style
 
 Tasks:
 
@@ -704,7 +721,7 @@ Completion criteria:
 
 - Manual registration feels lighter without weakening data-quality guidance.
 
-### 6.6 Redesign QA And Polish
+### 6.7 Redesign QA And Polish
 
 Tasks:
 
