@@ -344,21 +344,7 @@ function MobileAppHome({
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-center border-b border-[#E3E8E5] bg-white px-4">
-        <button
-          type="button"
-          aria-label="메뉴"
-          className="absolute left-4 flex h-10 w-10 items-center justify-center rounded-full text-xl font-bold text-[#002520] active:bg-[#F6F8F7]"
-        >
-          ≡
-        </button>
         <h1 className="text-[17px] font-bold text-[#002520]">경매 권리분석 코치</h1>
-        <button
-          type="button"
-          aria-label="검색"
-          className="absolute right-4 flex h-10 w-10 items-center justify-center rounded-full text-lg font-black text-[#002520] active:bg-[#F6F8F7]"
-        >
-          Q
-        </button>
       </header>
 
       <main className="min-h-screen bg-white px-4 pb-32 pt-24">
@@ -1392,10 +1378,10 @@ function MobileBottomTabs({
         />
         <MobileTabButton
           active={false}
-          label="검색"
-          meta="필터"
-          icon="search"
-          onClick={() => onTabChange("browse")}
+          label="등록"
+          meta="직접"
+          icon="plus"
+          href="/properties/new"
         />
         <MobileTabButton
           active={activeTab === "compare"}
@@ -1405,14 +1391,13 @@ function MobileBottomTabs({
           icon="analytics"
           onClick={() => onTabChange("compare")}
         />
-        <Link
-          href="/properties/new"
-          className="flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs font-semibold text-[#54615B] transition active:scale-95 active:bg-[#F6F8F7]"
-        >
-          <span className="text-[22px] leading-none">+</span>
-          <span className="mt-1">등록</span>
-          <span className="mt-0.5 text-[10px] font-medium text-[#717976]">직접</span>
-        </Link>
+        <MobileTabButton
+          active={false}
+          label="마이페이지"
+          meta="준비중"
+          icon="user"
+          onClick={() => onTabChange("browse")}
+        />
       </div>
     </nav>
   );
@@ -1423,40 +1408,58 @@ function MobileTabButton({
   label,
   meta,
   icon,
+  href,
   highlighted,
   onClick,
 }: {
   active: boolean;
   label: string;
   meta: string;
-  icon: "home" | "search" | "analytics";
+  icon: "home" | "plus" | "analytics" | "user";
+  href?: string;
   highlighted?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`relative flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs transition active:scale-95 active:bg-[#F6F8F7] ${
-        active
-          ? "font-bold text-[#173B35]"
-          : highlighted
-            ? "font-semibold text-[#173B35]"
-          : "font-semibold text-[#54615B]"
-      }`}
-    >
+  const className = `relative flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs transition active:scale-95 active:bg-[#F6F8F7] ${
+    active
+      ? "font-bold text-[#173B35]"
+      : highlighted
+        ? "font-semibold text-[#173B35]"
+      : "font-semibold text-[#54615B]"
+  }`;
+
+  const content = (
+    <>
       {highlighted && !active ? (
         <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#416F67] ring-2 ring-white" />
       ) : null}
       <TabIcon type={icon} active={active || Boolean(highlighted)} />
       <span className="mt-1 block">{label}</span>
       <span className="mt-0.5 block text-[10px] font-bold opacity-60">{meta}</span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={className}
+    >
+      {content}
     </button>
   );
 }
 
-function TabIcon({ type, active }: { type: "home" | "search" | "analytics"; active: boolean }) {
+function TabIcon({ type, active }: { type: "home" | "plus" | "analytics" | "user"; active: boolean }) {
   const color = active ? "bg-[#173B35]" : "bg-[#85938C]";
   const shell = active ? "bg-[#EEF5F1]" : "bg-transparent";
 
@@ -1470,11 +1473,20 @@ function TabIcon({ type, active }: { type: "home" | "search" | "analytics"; acti
     );
   }
 
-  if (type === "search") {
+  if (type === "plus") {
     return (
       <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
-        <span className={`absolute left-2 top-2 h-3.5 w-3.5 rounded-full border-2 ${active ? "border-[#173B35]" : "border-[#85938C]"}`} />
-        <span className={`absolute bottom-2 right-2 h-2.5 w-0.5 -rotate-45 rounded-full ${color}`} />
+        <span className={`absolute h-4 w-0.5 rounded-full ${color}`} />
+        <span className={`absolute h-0.5 w-4 rounded-full ${color}`} />
+      </span>
+    );
+  }
+
+  if (type === "user") {
+    return (
+      <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
+        <span className={`absolute top-2 h-2.5 w-2.5 rounded-full ${color}`} />
+        <span className={`absolute bottom-2 h-3 w-4 rounded-t-full ${color}`} />
       </span>
     );
   }
