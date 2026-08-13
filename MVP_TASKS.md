@@ -708,13 +708,19 @@ Verification notes:
 
 Tasks:
 
-- [ ] Move duplicated badges, verdict, risk meter, and mini-stat components into shared UI files.
-- [ ] Align home and detail status colors after extraction.
-- [ ] Add focused tests if extracted components affect rendered copy.
+- [x] Move duplicated badges, verdict, risk meter, and mini-stat components into shared UI files.
+- [x] Align home and detail status colors after extraction.
+- [x] Add focused tests if extracted components affect rendered copy.
 
 Completion criteria:
 
 - Future design changes can be applied consistently across home and detail pages.
+
+Verification notes:
+
+- `app/components/auction-ui.tsx` now owns shared status badges, risk badges, verdict badges, risk meter, mini stat, and risk accent classes.
+- Home and detail pages now import the same risk/status/verdict components.
+- Existing server-render tests cover the copied labels after extraction.
 
 ### 6.6 Redesign Detail Screen In App Style
 

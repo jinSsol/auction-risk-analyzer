@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { items } from "./auction-data";
+import {
+  MiniStat,
+  RiskBadge,
+  RiskMeter,
+  StatusBadge,
+  Verdict,
+  riskAccentClass,
+} from "./components/auction-ui";
 import { analyze, percent, uk, type AnalyzedItem } from "./lib/auction-analysis";
 import { mergeAuctionItems } from "./lib/auction-merge";
 import { loadUserAuctionItems, type UserAuctionItem } from "./lib/auction-storage";
@@ -610,21 +618,6 @@ function statusLabelsFor(item: AnalyzedItem) {
   return labels;
 }
 
-function StatusBadge({ label }: { label: string }) {
-  const style =
-    label === "확인 필요"
-      ? "bg-[#EEF3E8] text-[#566A4B]"
-      : label === "직접 입력"
-        ? "bg-[#F7F2E8] text-[#56635C]"
-        : "bg-[#EEF5F1] text-[#173B35]";
-
-  return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
-      {label}
-    </span>
-  );
-}
-
 function ListingCard({
   item,
   selected,
@@ -649,7 +642,7 @@ function ListingCard({
           : "border-[#E5DED3]"
       }`}
     >
-      <div className={`absolute inset-y-0 left-0 w-1 ${riskAccent[item.analysis.level]}`} />
+      <div className={`absolute inset-y-0 left-0 w-1 ${riskAccentClass[item.analysis.level]}`} />
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-center">
         <a href={href} className="min-w-0 text-left">
           <div className="flex flex-wrap items-center gap-2">
@@ -783,12 +776,6 @@ function CompactStat({
   );
 }
 
-const riskAccent: Record<RiskLevel, string> = {
-  안정: "bg-[#173B35]",
-  주의: "bg-[#6B7F5D]",
-  위험: "bg-[#DC2626]",
-};
-
 function PriceStat({
   label,
   value,
@@ -817,16 +804,6 @@ function PriceStat({
         {value}
       </p>
       {sub ? <p className="mt-0.5 text-xs font-medium text-[#9A958B]">{sub}</p> : null}
-    </div>
-  );
-}
-
-function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
-  const color =
-    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#6B7F5D]" : "bg-[#173B35]";
-  return (
-    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#E5DED3]">
-      <div className={`risk-fill h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   );
 }
@@ -1093,53 +1070,6 @@ function TabIcon({ type, active }: { type: "browse" | "compare"; active: boolean
       <span className={`absolute left-2.5 top-2.5 h-4 w-2 rounded-full ${color}`} />
       <span className={`absolute bottom-2.5 right-2.5 h-4 w-2 rounded-full ${color}`} />
       <span className="absolute h-0.5 w-4 -rotate-12 rounded-full bg-white/90" />
-    </span>
-  );
-}
-
-function MiniStat({
-  label,
-  value,
-  danger,
-}: {
-  label: string;
-  value: string;
-  danger?: boolean;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-bold text-[#6F766F]">{label}</p>
-      <p className={`mt-0.5 break-words font-semibold tabular-nums ${danger ? "text-[#B42318]" : "text-[#1F2A24]"}`}>
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
-  const styles = {
-    안정: "bg-[#EEF5F1] text-[#173B35]",
-    주의: "bg-[#EEF3E8] text-[#566A4B]",
-    위험: "bg-[#FEE2E2] text-[#B42318]",
-  };
-  const label = level === "안정" ? "검토 쉬움" : level;
-  return (
-    <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles[level]}`}>
-      {label} · {score}점
-    </span>
-  );
-}
-
-function Verdict({ value }: { value: string }) {
-  const style =
-    value === "입찰 검토"
-      ? "border-[#D7E4DC] bg-[#EEF5F1] text-[#173B35]"
-      : value === "가격 조정"
-        ? "border-[#CBD9C2] bg-[#EEF3E8] text-[#566A4B]"
-        : "border-[#FCA5A5] bg-[#FEE2E2] text-[#B42318]";
-  return (
-    <span className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${style}`}>
-      {value}
     </span>
   );
 }

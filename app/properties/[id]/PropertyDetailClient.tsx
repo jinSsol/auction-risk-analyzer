@@ -3,6 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { items } from "../../auction-data";
+import {
+  RiskBadge,
+  RiskMeter,
+  StatusBadge,
+  Verdict,
+  riskAccentClass,
+} from "../../components/auction-ui";
 import { analyze, analyzeComparableSales, percent, uk } from "../../lib/auction-analysis";
 import { mergeAuctionItems } from "../../lib/auction-merge";
 import { deleteUserAuctionItem, loadUserAuctionItems, saveUserAuctionItems, type UserAuctionItem } from "../../lib/auction-storage";
@@ -138,7 +145,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             </div>
 
             <div className="interactive-card reveal-up relative overflow-hidden rounded-xl border border-[#BFE3D0] bg-white/92 p-5 shadow-[0_16px_36px_rgba(31,138,91,0.11)] backdrop-blur">
-              <div className={`absolute inset-y-0 left-0 w-1 ${riskAccent[analysis.level]}`} />
+              <div className={`absolute inset-y-0 left-0 w-1 ${riskAccentClass[analysis.level]}`} />
               <p className="text-xs font-semibold text-[#1F8A5B]">분석 요약</p>
               <div className="mt-3 flex items-center justify-between gap-3">
                 <Verdict value={analysis.verdict} />
@@ -623,65 +630,6 @@ function detailStatusLabels(item: AuctionItem, unknownCount: number) {
 
   return labels;
 }
-
-function StatusBadge({ label }: { label: string }) {
-  const style =
-    label === "확인 필요"
-      ? "bg-[#FFF4D7] text-[#8A5B00]"
-      : label === "직접 입력"
-        ? "bg-[#EEF3F1] text-[#34423C]"
-        : "bg-[#E7F0FF] text-[#255C99]";
-
-  return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
-      {label}
-    </span>
-  );
-}
-
-function RiskBadge({ level, score }: { level: RiskLevel; score: number }) {
-  const styles = {
-    안정: "bg-[#E7F6EE] text-[#1F8A5B]",
-    주의: "bg-[#FFF4D7] text-[#8A5B00]",
-    위험: "bg-[#FDE8E5] text-[#B53A2E]",
-  };
-  const label = level === "안정" ? "검토 쉬움" : level;
-  return (
-    <span className={`inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold ${styles[level]}`}>
-      {label} · {score}점
-    </span>
-  );
-}
-
-function Verdict({ value }: { value: string }) {
-  const style =
-    value === "입찰 검토"
-      ? "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]"
-      : value === "가격 조정"
-        ? "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]"
-        : "border-[#F2B8AE] bg-[#FDE8E5] text-[#B53A2E]";
-  return (
-    <span className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${style}`}>
-      {value}
-    </span>
-  );
-}
-
-function RiskMeter({ level, score }: { level: RiskLevel; score: number }) {
-  const color =
-    level === "위험" ? "bg-[#DC2626]" : level === "주의" ? "bg-[#B7791F]" : "bg-[#1F8A5B]";
-  return (
-    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#17211D24]">
-      <div className={`risk-fill h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
-    </div>
-  );
-}
-
-const riskAccent: Record<RiskLevel, string> = {
-  안정: "bg-[#1F8A5B]",
-  주의: "bg-[#B7791F]",
-  위험: "bg-[#DC2626]",
-};
 
 const riskPlainText: Record<RiskLevel, string> = {
   안정: "확인할 변수가 비교적 적음",
