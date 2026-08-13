@@ -29,19 +29,20 @@ test("server-renders the auction listing workspace", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>경매 권리분석 워크벤치<\/title>/i);
-  assert.match(html, /오늘의 판단 시작점/);
   assert.match(html, /오늘 먼저 확인할 리스크를 알려드려요/);
   assert.match(html, /물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해/);
+  assert.match(html, /오늘 검토할 권리 리스크를 먼저 정리했어요/);
   assert.match(html, /오늘의 확인 항목/);
   assert.match(html, /오늘의 후보 정리/);
+  assert.match(html, /추천 물건/);
+  assert.match(html, /리스크 미터/);
   assert.match(html, /href="\/properties\/sample-1"/);
   assert.match(html, /href="\/properties\/sample-7"/);
   assert.match(html, /href="\/properties\/new"/);
   assert.match(html, /판교 힐스테이트 아파트 84/);
-  assert.match(html, /내 물건/);
-  assert.match(html, /비교 바구니/);
-  assert.match(html, /2-4개 물건을 총투입금, 권리 미확인, 마진, 판정 기준으로 비교합니다/);
-  assert.match(html, /예상 마진/);
+  assert.match(html, /전체보기/);
+  assert.match(html, /분석/);
+  assert.match(html, /등록/);
   assert.match(html, /권리 미확인/);
 });
 

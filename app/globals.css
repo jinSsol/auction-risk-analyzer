@@ -47,10 +47,16 @@ input:focus-visible {
 }
 
 .app-shell {
-  background:
-    linear-gradient(155deg, rgba(23, 59, 53, 0.055), transparent 34%),
-    linear-gradient(30deg, rgba(65, 111, 103, 0.065), transparent 31%),
-    #fbfdfc;
+  background: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    background:
+      linear-gradient(155deg, rgba(23, 59, 53, 0.055), transparent 34%),
+      linear-gradient(30deg, rgba(65, 111, 103, 0.065), transparent 31%),
+      #fbfdfc;
+  }
 }
 
 .hero-surface {

@@ -229,223 +229,33 @@ export default function Home() {
       </div>
 
       <div className="md:hidden">
-        <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-center border-b border-[#DDE5E1] bg-white/96 px-4 backdrop-blur">
-          <h1 className="text-base font-bold text-[#173B35]">경매 권리분석 코치</h1>
-        </header>
-
-      <section className="relative overflow-hidden bg-[#FBFDFC] pt-16">
-        <div className="mx-auto max-w-7xl px-5 pb-5 pt-5 lg:px-8 lg:pb-7">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-black text-[#173B35]">경매 권리분석 코치</p>
-            <div className="flex items-center gap-2 text-xs font-bold text-[#6F766F]">
-              <span>경매</span>
-              <span>공매</span>
-              <span className="rounded-full bg-[#EEF5F1] px-2 py-1 text-[#173B35]">MVP</span>
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-            <div className="min-w-0 space-y-4">
-              <div className="max-w-2xl">
-                <p className="inline-flex items-center gap-2 rounded-full bg-[#EEF5F1] px-3 py-1 text-xs font-bold text-[#173B35] ring-1 ring-[#D7E4DC]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#173B35]" />
-                  오늘의 판단 시작점
-                </p>
-                <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-normal text-[#1F2A24] md:text-5xl">
-                  오늘 먼저 확인할 리스크를 알려드려요.
-                </h1>
-                <p className="mt-4 max-w-xl text-base leading-7 text-[#56635C]">
-                  물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해
-                  무엇을 먼저 확인해야 하는지 보여줍니다.
-                </p>
-              </div>
-
-              <TopSummaryBanner summary={riskSummary} />
-
-              <CoachTaskCard task={coachTask} />
-
-              <div className="app-card rounded-[24px] p-3">
-                <label className="sr-only" htmlFor="property-search">
-                  물건 검색
-                </label>
-                <div className="flex min-h-14 items-center gap-3 rounded-[18px] bg-white px-3">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF5F1] text-sm font-black text-[#173B35]">
-                    Q
-                  </span>
-                  <input
-                    id="property-search"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="지역, 사건번호, 온비드, 아파트"
-                    className="h-12 min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-[#1F2A24] outline-none placeholder:text-[#85938C]"
-                  />
-                  {query ? (
-                    <button
-                      type="button"
-                      onClick={() => setQuery("")}
-                      className="h-9 rounded-full bg-[#F3F7F4] px-3 text-xs font-bold text-[#56635C] transition hover:bg-[#EAF3EE]"
-                    >
-                      지우기
-                    </button>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            <aside className="app-card rounded-[28px] p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-bold text-[#6F766F]">오늘의 후보 정리</p>
-                  <h2 className="mt-1 text-lg font-semibold text-[#1F2A24]">
-                    먼저 열어볼 물건
-                  </h2>
-                </div>
-                <span className="rounded-full bg-[#173B35] px-2.5 py-1 text-xs font-bold text-white">
-                  {priorityItems.length}건
-                </span>
-              </div>
-              <div className="mt-4 space-y-3">
-                {priorityItems.map((item, index) => (
-                  <CoachCandidateRow key={item.id} item={item} index={index} />
-                ))}
-              </div>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className={`sticky top-0 z-10 bg-[#FBFDFC]/88 shadow-[0_12px_30px_rgba(47,55,45,0.08)] backdrop-blur ${
-          mobileTab === "browse" ? "block" : "hidden md:block"
-        }`}
-      >
-        <div className="mx-auto max-w-7xl px-5 py-3 xl:px-8">
-          <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-bold text-[#6F766F]">검색 결과</p>
-                <p className="text-sm font-semibold text-[#1F2A24]">{stats.total}건</p>
-              </div>
-              <button
-                type="button"
-                onClick={resetFilters}
-                disabled={!query && activeFilterCount === 0}
-                className="h-11 rounded-2xl border border-[#DDE5E1] bg-white px-4 text-sm font-semibold text-[#34423C] transition hover:bg-[#FFFFFF] disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white"
-              >
-                초기화
-              </button>
-          </div>
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <InlineFilter
-              title="방식"
-              options={["전체", "경매", "공매"]}
-              value={channel}
-              onChange={(value) => setChannel(value as SaleChannel | "전체")}
-            />
-            <InlineFilter
-              title="물건"
-              options={["전체", "아파트", "빌라", "오피스텔"]}
-              value={type}
-              onChange={(value) => setType(value as PropertyType | "전체")}
-            />
-            <InlineFilter
-              title="판단"
-              options={["전체", "검토 쉬움", "주의", "위험"]}
-              value={level === "안정" ? "검토 쉬움" : level}
-              onChange={(value) =>
-                setLevel(value === "검토 쉬움" ? "안정" : (value as RiskLevel | "전체"))
-              }
-            />
-            <InlineFilter
-              title="구분"
-              options={["전체", "내 물건", "샘플"]}
-              value={owner}
-              onChange={(value) => setOwner(value as "전체" | "내 물건" | "샘플")}
-            />
-          </div>
-          {activeFilterCount > 0 ? (
-            <p className="mt-2 text-xs font-semibold text-[#6F766F]">
-              필터 {activeFilterCount}개 적용 중
-            </p>
-          ) : null}
-        </div>
-      </section>
-
-      <section ref={contentRef} className="mx-auto max-w-7xl px-5 py-5 lg:px-8">
-        <div className="space-y-5">
-          <div
-            className={`app-card interactive-card gap-3 rounded-[24px] p-4 backdrop-blur md:grid md:grid-cols-[1fr_1fr_auto] md:items-center ${
-              mobileTab === "browse" ? "grid" : "hidden"
-            }`}
-          >
-            <RangeControl
-              label="예상 입찰가"
-              value={bidRatio}
-              suffix="시세 기준"
-              min={60}
-              max={95}
-              onChange={setBidRatio}
-              tone="green"
-            />
-            <RangeControl
-              label="수리·명도 버퍼"
-              value={bufferRatio}
-              suffix="비용 차감"
-              min={0}
-              max={12}
-              onChange={setBufferRatio}
-              tone="sage"
-            />
-            <div className="rounded-[20px] bg-[#173B35] px-4 py-3 text-sm text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-              <p className="font-semibold">계산 기준</p>
-              <p className="mt-1 text-[#EAF3EE]">
-                시세 할인 - 인수금 - 비용 버퍼
-              </p>
-            </div>
-          </div>
-
-          <div
-            className={`gap-3 md:grid ${
-              mobileTab === "browse" ? "grid" : "hidden"
-            }`}
-          >
-            {filtered.map((item) => (
-              <ListingCard
-                key={item.id}
-                item={item}
-                selected={selectedIds.includes(item.id)}
-                href={`/properties/${item.id}`}
-                onToggle={() => toggleSelected(item.id)}
-              />
-            ))}
-            {filtered.length === 0 ? (
-              <div className="rounded-[24px] border border-[#DDE5E1] bg-white p-8 text-center text-sm font-semibold text-[#6F766F]">
-                조건에 맞는 물건이 없습니다.
-              </div>
-            ) : null}
-          </div>
-
-          <div
-            className={`md:block ${
-              mobileTab === "compare" ? "block" : "hidden"
-            }`}
-          >
-            <ComparePanel
-              selected={selected}
-              onClear={() => setSelectedIds([])}
-              onRemove={(id) =>
-                setSelectedIds((current) => current.filter((itemId) => itemId !== id))
-              }
-            />
-          </div>
-        </div>
-      </section>
-
-      <MobileBottomTabs
-        activeTab={mobileTab}
-        selectedCount={selected.length}
-        resultCount={stats.total}
-        onTabChange={changeMobileTab}
-      />
+        <MobileAppHome
+          activeFilterCount={activeFilterCount}
+          bidRatio={bidRatio}
+          bufferRatio={bufferRatio}
+          channel={channel}
+          contentRef={contentRef}
+          filtered={filtered}
+          level={level}
+          mobileTab={mobileTab}
+          query={query}
+          resetFilters={resetFilters}
+          riskSummary={riskSummary}
+          selected={selected}
+          selectedIds={selectedIds}
+          setBidRatio={setBidRatio}
+          setBufferRatio={setBufferRatio}
+          setChannel={setChannel}
+          setLevel={setLevel}
+          setQuery={setQuery}
+          stats={stats}
+          toggleSelected={toggleSelected}
+          onClearCompare={() => setSelectedIds([])}
+          onRemoveCompare={(id) =>
+            setSelectedIds((current) => current.filter((itemId) => itemId !== id))
+          }
+          onTabChange={changeMobileTab}
+        />
       </div>
     </main>
   );
@@ -478,6 +288,198 @@ function saveComparisonIds(ids: string[]) {
   } catch {
     // Local persistence is a convenience layer; the comparison UI still works without it.
   }
+}
+
+function MobileAppHome({
+  activeFilterCount,
+  bidRatio,
+  bufferRatio,
+  channel,
+  contentRef,
+  filtered,
+  level,
+  mobileTab,
+  query,
+  resetFilters,
+  riskSummary,
+  selected,
+  selectedIds,
+  setBidRatio,
+  setBufferRatio,
+  setChannel,
+  setLevel,
+  setQuery,
+  stats,
+  toggleSelected,
+  onClearCompare,
+  onRemoveCompare,
+  onTabChange,
+}: {
+  activeFilterCount: number;
+  bidRatio: number;
+  bufferRatio: number;
+  channel: SaleChannel | "전체";
+  contentRef: { current: HTMLElement | null };
+  filtered: AnalyzedItem[];
+  level: RiskLevel | "전체";
+  mobileTab: MobileTab;
+  query: string;
+  resetFilters: () => void;
+  riskSummary: ReturnType<typeof getRiskSummary>;
+  selected: AnalyzedItem[];
+  selectedIds: string[];
+  setBidRatio: (value: number) => void;
+  setBufferRatio: (value: number) => void;
+  setChannel: (value: SaleChannel | "전체") => void;
+  setLevel: (value: RiskLevel | "전체") => void;
+  setQuery: (value: string) => void;
+  stats: { total: number };
+  toggleSelected: (id: string) => void;
+  onClearCompare: () => void;
+  onRemoveCompare: (id: string) => void;
+  onTabChange: (tab: MobileTab) => void;
+}) {
+  const featured = filtered[0];
+
+  return (
+    <>
+      <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-center border-b border-[#E3E8E5] bg-white px-4">
+        <button
+          type="button"
+          aria-label="메뉴"
+          className="absolute left-4 flex h-10 w-10 items-center justify-center rounded-full text-xl font-bold text-[#002520] active:bg-[#F6F8F7]"
+        >
+          ≡
+        </button>
+        <h1 className="text-[17px] font-bold text-[#002520]">경매 권리분석 코치</h1>
+        <button
+          type="button"
+          aria-label="검색"
+          className="absolute right-4 flex h-10 w-10 items-center justify-center rounded-full text-lg font-black text-[#002520] active:bg-[#F6F8F7]"
+        >
+          Q
+        </button>
+      </header>
+
+      <main className="min-h-screen bg-white px-4 pb-32 pt-24">
+        <section className="space-y-3">
+          <h2 className="text-[26px] font-semibold leading-[34px] text-[#131E18]">
+            오늘 먼저 확인할 리스크를 알려드려요.
+          </h2>
+          <p className="text-[15px] font-medium leading-6 text-[#414846]">
+            물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해
+            무엇을 먼저 확인해야 하는지 보여줍니다.
+          </p>
+        </section>
+
+        <section className="mt-8 rounded-lg border border-[#E3E8E5] bg-white p-4">
+          <p className="text-xs font-bold text-[#002520]">
+            오늘 검토할 권리 리스크를 먼저 정리했어요.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-[#54615B]">
+            <SummaryDot label={`확인 필요 ${riskSummary.needsReview}건`} tone="primary" />
+            <SummaryDot label={`위험 신호 ${riskSummary.danger}건`} tone="danger" />
+            <SummaryDot label={`입찰 검토 ${riskSummary.bidReady}건`} tone="primary" />
+          </div>
+        </section>
+
+        {featured ? <MobileDecisionCard item={featured} /> : null}
+
+        <section className="mt-8 space-y-4">
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-[#717976]">
+              Q
+            </span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="지역, 사건번호, 온비드, 아파트"
+              className="h-12 w-full rounded-lg border border-[#E3E8E5] bg-white pl-11 pr-4 text-[15px] font-medium text-[#131E18] outline-none placeholder:text-[#717976] focus:border-[#173B35] focus:ring-2 focus:ring-[#173B35]/10"
+            />
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <MobileFilterPill active={channel === "전체"} label="전체보기" onClick={() => setChannel("전체")} />
+            <MobileFilterPill active={channel === "경매"} label="경매" onClick={() => setChannel("경매")} />
+            <MobileFilterPill active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
+            <MobileFilterPill active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
+            <MobileFilterPill active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
+          </div>
+
+          {activeFilterCount > 0 || query ? (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="h-10 rounded-lg border border-[#E3E8E5] bg-white px-3 text-xs font-bold text-[#414846]"
+            >
+              필터 초기화
+            </button>
+          ) : null}
+        </section>
+
+        <section ref={contentRef} className="mt-8">
+          {mobileTab === "browse" ? (
+            <>
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-[#131E18]">추천 물건</h3>
+                <span className="text-xs font-bold text-[#54615B]">{stats.total}건</span>
+              </div>
+
+              <div className="mb-4 grid grid-cols-2 gap-3">
+                <RangeControl
+                  label="예상 입찰가"
+                  value={bidRatio}
+                  suffix="시세 기준"
+                  min={60}
+                  max={95}
+                  onChange={setBidRatio}
+                  tone="green"
+                />
+                <RangeControl
+                  label="비용 버퍼"
+                  value={bufferRatio}
+                  suffix="비용 차감"
+                  min={0}
+                  max={12}
+                  onChange={setBufferRatio}
+                  tone="sage"
+                />
+              </div>
+
+              <div className="space-y-4">
+                {filtered.map((item) => (
+                  <MobilePropertyCard
+                    key={item.id}
+                    item={item}
+                    selected={selectedIds.includes(item.id)}
+                    onToggle={() => toggleSelected(item.id)}
+                  />
+                ))}
+                {filtered.length === 0 ? (
+                  <div className="rounded-lg border border-[#E3E8E5] bg-white p-8 text-center text-sm font-semibold text-[#54615B]">
+                    조건에 맞는 물건이 없습니다.
+                  </div>
+                ) : null}
+              </div>
+            </>
+          ) : (
+            <ComparePanel
+              selected={selected}
+              onClear={onClearCompare}
+              onRemove={onRemoveCompare}
+            />
+          )}
+        </section>
+      </main>
+
+      <MobileBottomTabs
+        activeTab={mobileTab}
+        selectedCount={selected.length}
+        resultCount={stats.total}
+        onTabChange={onTabChange}
+      />
+    </>
+  );
 }
 
 function getCoachTask(items: AnalyzedItem[]) {
@@ -628,50 +630,189 @@ function QuickFilterChip({
   );
 }
 
-function CoachTaskCard({
-  task,
-}: {
-  task: ReturnType<typeof getCoachTask>;
-}) {
-  if (!task) {
-    return (
-      <div className="app-card rounded-[26px] p-5">
-        <p className="text-sm font-bold text-[#6F766F]">오늘의 확인 항목</p>
-        <p className="mt-2 text-xl font-semibold text-[#1F2A24]">
-          아직 검토할 물건이 없어요.
-        </p>
-      </div>
-    );
-  }
-
-  const { item } = task;
+function MobileDecisionCard({ item }: { item: AnalyzedItem }) {
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
 
   return (
-    <div className="app-card rounded-[28px] p-5">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-[#173B35] px-2.5 py-1 text-xs font-bold text-white">
+    <section className="mt-8 rounded-lg border border-[#E3E8E5] bg-white p-4">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-xl font-semibold leading-7 text-[#131E18]">
           오늘의 확인 항목
-        </span>
-        <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
-        <Verdict value={item.analysis.verdict} />
+        </h3>
+        <div className="flex shrink-0 gap-2">
+          <Verdict value={item.analysis.verdict} />
+          <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
+        </div>
       </div>
-      <h2 className="mt-4 text-2xl font-semibold leading-snug text-[#1F2A24] md:text-3xl">
-        {task.primaryReason}부터 확인해요.
-      </h2>
-      <p className="mt-3 text-sm font-medium leading-6 text-[#56635C]">
-        {item.title}은 {task.action} 공식 문서 확인 전에는 참고용으로만 보세요.
+
+      <p className="mt-4 text-lg font-semibold leading-7 text-[#173B35]">
+        {item.analysis.riskFactors[0]?.label ?? "입찰 상한"}부터 확인해요.
       </p>
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        <CoachMiniStat label="입찰 상한" value={uk(item.analysis.suggested)} strong />
-        <CoachMiniStat label="리스크" value={`${item.analysis.risk}점`} />
-        <CoachMiniStat label="권리 미확인" value={`${task.unknownCount}개`} />
+
+      <div className="mt-4 grid grid-cols-3 gap-2 border-y border-[#E3E8E5] py-3">
+        <MobileMiniMetric label="입찰 상한" value={uk(item.analysis.suggested)} />
+        <MobileMiniMetric label="리스크" value={`${item.analysis.risk}점`} danger />
+        <MobileMiniMetric label="권리 미확인" value={`${checklist.unknownCount}건`} />
       </div>
+
       <Link
         href={`/properties/${item.id}`}
-        className="button-lift mt-4 inline-flex min-h-11 items-center rounded-2xl bg-[#173B35] px-4 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(23,59,53,0.18)]"
+        className="mt-4 flex h-12 items-center justify-center rounded-lg bg-[#173B35] text-sm font-bold text-white transition active:scale-[0.98]"
       >
         이 물건 먼저 보기
       </Link>
+    </section>
+  );
+}
+
+function MobileMiniMetric({
+  label,
+  value,
+  danger,
+}: {
+  label: string;
+  value: string;
+  danger?: boolean;
+}) {
+  return (
+    <div className="min-w-0 text-center">
+      <p className="text-[11px] font-semibold text-[#54615B]">{label}</p>
+      <p
+        className={`mt-1 break-words text-sm font-bold tabular-nums ${
+          danger ? "text-[#B42318]" : "text-[#131E18]"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function MobileFilterPill({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`h-10 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-[0.98] ${
+        active
+          ? "bg-[#173B35] text-white"
+          : "border border-[#E3E8E5] bg-white text-[#414846] hover:border-[#173B35]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function MobilePropertyCard({
+  item,
+  selected,
+  onToggle,
+}: {
+  item: AnalyzedItem;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
+
+  return (
+    <article className="rounded-lg border border-[#E3E8E5] bg-white p-4 transition active:scale-[0.99]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-[#54615B]">
+            {item.caseNo} · {item.channel}
+          </p>
+          <Link href={`/properties/${item.id}`}>
+            <h4 className="mt-1 text-lg font-semibold leading-6 text-[#131E18]">
+              {item.title}
+            </h4>
+          </Link>
+        </div>
+        <StatusBadge label={item.status} />
+      </div>
+
+      <Link href={`/properties/${item.id}`} className="mt-4 flex gap-4">
+        <div
+          aria-label={`${item.title} 참고 이미지`}
+          className="aspect-[4/3] w-[34%] shrink-0 rounded-lg bg-[#D9E6DC] bg-cover bg-center"
+          role="img"
+          style={{ backgroundImage: `url(${propertyImageFor(item)})` }}
+        />
+        <div className="flex min-w-0 flex-1 flex-col justify-between">
+          <MobilePriceRow label="시세" value={uk(item.market)} />
+          <MobilePriceRow label="최저가" value={uk(item.minimum)} danger />
+          <MobilePriceRow
+            label="안전마진"
+            value={uk(Math.abs(gapToSuggested))}
+            strong={gapToSuggested >= 0}
+          />
+        </div>
+      </Link>
+
+      <div className="mt-4 flex items-center gap-3 rounded-lg border border-[#E3E8E5] bg-[#FBFCFC] p-3">
+        <span className="shrink-0 text-xs font-bold text-[#414846]">리스크 미터</span>
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#E3E8E5]">
+          <div
+            className={`h-full rounded-full ${
+              item.analysis.level === "위험"
+                ? "bg-[#B42318]"
+                : item.analysis.level === "주의"
+                  ? "bg-[#B45309]"
+                  : "bg-[#173B35]"
+            }`}
+            style={{ width: `${Math.max(14, item.analysis.risk)}%` }}
+          />
+        </div>
+        <span className="shrink-0 text-xs font-semibold text-[#173B35]">
+          {item.analysis.level === "안정" ? "양호" : item.analysis.level}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={selected}
+        className={`mt-4 h-12 w-full rounded-lg border text-sm font-bold transition active:scale-[0.98] ${
+          selected
+            ? "border-[#173B35] bg-[#173B35] text-white"
+            : "border-[#E3E8E5] bg-white text-[#131E18] hover:border-[#173B35] hover:text-[#173B35]"
+        }`}
+      >
+        {selected ? "비교 담김" : "비교 담기"}
+      </button>
+    </article>
+  );
+}
+
+function MobilePriceRow({
+  label,
+  value,
+  danger,
+  strong,
+}: {
+  label: string;
+  value: string;
+  danger?: boolean;
+  strong?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-[#E3E8E5] py-1.5 last:border-b-0">
+      <span className="text-xs font-semibold text-[#54615B]">{label}</span>
+      <span
+        className={`text-sm font-semibold tabular-nums ${
+          danger ? "text-[#B42318]" : strong ? "text-[#173B35]" : "text-[#131E18]"
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
@@ -798,40 +939,6 @@ function CoachCandidateRow({ item, index }: { item: AnalyzedItem; index: number 
   );
 }
 
-function InlineFilter({
-  title,
-  options,
-  value,
-  onChange,
-}: {
-  title: string;
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="shrink-0">
-      <p className="mb-1 px-1 text-[11px] font-bold text-[#6F766F]">{title}</p>
-      <div className="flex min-h-11 gap-1 rounded-full border border-[#DDE5E1] bg-[#F3F7F4] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)]">
-        {options.map((option) => (
-          <button
-            type="button"
-            key={option}
-            onClick={() => onChange(option)}
-            className={`min-h-9 whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition ${
-              value === option
-                ? "bg-[#173B35] font-semibold text-white shadow-[0_8px_18px_rgba(23,59,53,0.22)]"
-                : "font-medium text-[#6F766F] hover:bg-white/78"
-            }`}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function RangeControl({
   label,
   value,
@@ -908,6 +1015,8 @@ function statusLabelsFor(item: AnalyzedItem) {
   return labels;
 }
 
+// Kept temporarily while the mobile redesign settles; remove after the app-style cards are finalized.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ListingCard({
   item,
   selected,
@@ -1272,32 +1381,38 @@ function MobileBottomTabs({
   onTabChange: (tab: MobileTab) => void;
 }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+8px)] md:hidden">
-      <div className="mx-auto grid max-w-md grid-cols-3 items-end rounded-[30px] border border-white/80 bg-white/94 px-3 pb-2 pt-3 shadow-[0_-16px_38px_rgba(47,55,45,0.14)] backdrop-blur">
+    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E3E8E5] bg-white px-2 pb-[env(safe-area-inset-bottom)] md:hidden">
+      <div className="mx-auto grid h-24 max-w-md grid-cols-4 items-stretch">
         <MobileTabButton
           active={activeTab === "browse"}
-          label="물건"
+          label="홈"
           meta={`${resultCount}건`}
-          icon="browse"
+          icon="home"
           onClick={() => onTabChange("browse")}
+        />
+        <MobileTabButton
+          active={false}
+          label="검색"
+          meta="필터"
+          icon="search"
+          onClick={() => onTabChange("browse")}
+        />
+        <MobileTabButton
+          active={activeTab === "compare"}
+          label="분석"
+          meta={`${selectedCount}/${MAX_COMPARE_COUNT}`}
+          highlighted={selectedCount > 0}
+          icon="analytics"
+          onClick={() => onTabChange("compare")}
         />
         <Link
           href="/properties/new"
-          className="button-lift -mt-8 flex min-h-[76px] flex-col items-center justify-start text-center text-xs font-black text-[#173B35]"
+          className="flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs font-semibold text-[#54615B] transition active:scale-95 active:bg-[#F6F8F7]"
         >
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#173B35] text-3xl font-light leading-none text-white shadow-[0_14px_28px_rgba(23,59,53,0.24)] ring-4 ring-white">
-            +
-          </span>
-          <span className="mt-1.5">등록</span>
+          <span className="text-[22px] leading-none">+</span>
+          <span className="mt-1">등록</span>
+          <span className="mt-0.5 text-[10px] font-medium text-[#717976]">직접</span>
         </Link>
-        <MobileTabButton
-          active={activeTab === "compare"}
-          label="비교"
-          meta={`${selectedCount}/${MAX_COMPARE_COUNT}`}
-          highlighted={selectedCount > 0}
-          icon="compare"
-          onClick={() => onTabChange("compare")}
-        />
       </div>
     </nav>
   );
@@ -1314,7 +1429,7 @@ function MobileTabButton({
   active: boolean;
   label: string;
   meta: string;
-  icon: "browse" | "compare";
+  icon: "home" | "search" | "analytics";
   highlighted?: boolean;
   onClick: () => void;
 }) {
@@ -1323,12 +1438,12 @@ function MobileTabButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`relative flex min-h-[62px] flex-col items-center justify-center rounded-3xl px-2 text-center text-xs font-black transition ${
+      className={`relative flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs transition active:scale-95 active:bg-[#F6F8F7] ${
         active
-          ? "text-[#173B35]"
+          ? "font-bold text-[#173B35]"
           : highlighted
-            ? "text-[#173B35]"
-          : "text-[#6F766F]"
+            ? "font-semibold text-[#173B35]"
+          : "font-semibold text-[#54615B]"
       }`}
     >
       {highlighted && !active ? (
@@ -1341,11 +1456,11 @@ function MobileTabButton({
   );
 }
 
-function TabIcon({ type, active }: { type: "browse" | "compare"; active: boolean }) {
+function TabIcon({ type, active }: { type: "home" | "search" | "analytics"; active: boolean }) {
   const color = active ? "bg-[#173B35]" : "bg-[#85938C]";
   const shell = active ? "bg-[#EEF5F1]" : "bg-transparent";
 
-  if (type === "browse") {
+  if (type === "home") {
     return (
       <span className={`relative flex h-9 w-9 items-end justify-center rounded-full ${shell}`} aria-hidden="true">
         <span className={`absolute bottom-2.5 h-3.5 w-4 rounded-[5px] ${color}`} />
@@ -1355,11 +1470,20 @@ function TabIcon({ type, active }: { type: "browse" | "compare"; active: boolean
     );
   }
 
+  if (type === "search") {
+    return (
+      <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
+        <span className={`absolute left-2 top-2 h-3.5 w-3.5 rounded-full border-2 ${active ? "border-[#173B35]" : "border-[#85938C]"}`} />
+        <span className={`absolute bottom-2 right-2 h-2.5 w-0.5 -rotate-45 rounded-full ${color}`} />
+      </span>
+    );
+  }
+
   return (
     <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
-      <span className={`absolute left-2.5 top-2.5 h-4 w-2 rounded-full ${color}`} />
-      <span className={`absolute bottom-2.5 right-2.5 h-4 w-2 rounded-full ${color}`} />
-      <span className="absolute h-0.5 w-4 -rotate-12 rounded-full bg-white/90" />
+      <span className={`absolute bottom-2 left-2.5 h-2 w-1.5 rounded-full ${color}`} />
+      <span className={`absolute bottom-2 left-4 h-4 w-1.5 rounded-full ${color}`} />
+      <span className={`absolute bottom-2 right-2.5 h-3 w-1.5 rounded-full ${color}`} />
     </span>
   );
 }
