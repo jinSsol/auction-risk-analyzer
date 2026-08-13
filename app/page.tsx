@@ -21,7 +21,7 @@ import type { PropertyType, RiskLevel, SaleChannel } from "./lib/auction-types";
 const DEFAULT_COMPARE_IDS = ["sample-4", "sample-6", "sample-7"];
 const COMPARISON_STORAGE_KEY = "auction-risk-analyzer:comparison:v1";
 const MAX_COMPARE_COUNT = 4;
-type MobileTab = "browse" | "compare";
+type MobileTab = "browse" | "compare" | "profile";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -235,6 +235,7 @@ export default function Home() {
           bufferRatio={bufferRatio}
           channel={channel}
           contentRef={contentRef}
+          enriched={enriched}
           filtered={filtered}
           level={level}
           mobileTab={mobileTab}
@@ -250,6 +251,7 @@ export default function Home() {
           setQuery={setQuery}
           stats={stats}
           toggleSelected={toggleSelected}
+          userItemCount={userItems.length}
           onClearCompare={() => setSelectedIds([])}
           onRemoveCompare={(id) =>
             setSelectedIds((current) => current.filter((itemId) => itemId !== id))
@@ -296,6 +298,7 @@ function MobileAppHome({
   bufferRatio,
   channel,
   contentRef,
+  enriched,
   filtered,
   level,
   mobileTab,
@@ -311,6 +314,7 @@ function MobileAppHome({
   setQuery,
   stats,
   toggleSelected,
+  userItemCount,
   onClearCompare,
   onRemoveCompare,
   onTabChange,
@@ -320,6 +324,7 @@ function MobileAppHome({
   bufferRatio: number;
   channel: SaleChannel | "전체";
   contentRef: { current: HTMLElement | null };
+  enriched: AnalyzedItem[];
   filtered: AnalyzedItem[];
   level: RiskLevel | "전체";
   mobileTab: MobileTab;
@@ -335,6 +340,7 @@ function MobileAppHome({
   setQuery: (value: string) => void;
   stats: { total: number };
   toggleSelected: (id: string) => void;
+  userItemCount: number;
   onClearCompare: () => void;
   onRemoveCompare: (id: string) => void;
   onTabChange: (tab: MobileTab) => void;
@@ -448,11 +454,17 @@ function MobileAppHome({
                 ) : null}
               </div>
             </>
-          ) : (
+          ) : mobileTab === "compare" ? (
             <ComparePanel
               selected={selected}
               onClear={onClearCompare}
               onRemove={onRemoveCompare}
+            />
+          ) : (
+            <MobileProfilePanel
+              enriched={enriched}
+              selected={selected}
+              userItemCount={userItemCount}
             />
           )}
         </section>
@@ -826,6 +838,149 @@ function MobilePriceRow({
         }`}
       >
         {value}
+      </span>
+    </div>
+  );
+}
+
+function MobileProfilePanel({
+  enriched,
+  selected,
+  userItemCount,
+}: {
+  enriched: AnalyzedItem[];
+  selected: AnalyzedItem[];
+  userItemCount: number;
+}) {
+  const needsReview = enriched.filter(
+    (item) => summarizeRightsChecklist(item.rightsChecklist).unknownCount > 0
+  ).length;
+  const highRisk = enriched.filter((item) => item.analysis.level === "위험").length;
+  const watchItems = [...selected].sort(compareForBasket).slice(0, 2);
+  const recentItems = [...enriched].sort(compareForBasket).slice(0, 3);
+
+  return (
+    <section className="space-y-5">
+      <div>
+        <p className="text-xs font-bold text-[#54615B]">마이페이지</p>
+        <h2 className="mt-1 text-2xl font-semibold leading-8 text-[#131E18]">
+          내 경매 분석 현황을 한눈에 봐요.
+        </h2>
+      </div>
+
+      <div className="rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold text-[#173B35]">현재 사용 모드</p>
+            <h3 className="mt-1 text-lg font-semibold text-[#131E18]">비회원 MVP</h3>
+          </div>
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[#173B35]">
+            로컬 저장
+          </span>
+        </div>
+        <p className="mt-3 text-sm font-medium leading-6 text-[#54615B]">
+          직접 등록한 물건과 비교 바구니는 현재 브라우저에 저장됩니다.
+          계정 기능은 실제 데이터 연동 이후 붙이는 흐름이 좋아요.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <MobileProfileStat label="비교 바구니" value={`${selected.length}/${MAX_COMPARE_COUNT}`} />
+        <MobileProfileStat label="직접 등록" value={`${userItemCount}건`} />
+        <MobileProfileStat label="확인 필요" value={`${needsReview}건`} />
+        <MobileProfileStat label="위험 신호" value={`${highRisk}건`} danger />
+      </div>
+
+      <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-base font-semibold text-[#131E18]">내 비교 후보</h3>
+          <span className="text-xs font-bold text-[#54615B]">{selected.length}건</span>
+        </div>
+        <div className="mt-3 space-y-3">
+          {watchItems.length > 0 ? (
+            watchItems.map((item) => <MobileProfileItem key={item.id} item={item} />)
+          ) : (
+            <p className="rounded-lg bg-[#FBFCFC] p-3 text-sm font-medium text-[#54615B]">
+              아직 비교 바구니에 담긴 물건이 없어요.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
+        <h3 className="text-base font-semibold text-[#131E18]">최근 분석 추천</h3>
+        <div className="mt-3 space-y-3">
+          {recentItems.map((item) => (
+            <MobileProfileItem key={item.id} item={item} compact />
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
+        <h3 className="text-base font-semibold text-[#131E18]">다음에 연결할 기능</h3>
+        <div className="mt-3 space-y-2 text-sm font-medium text-[#54615B]">
+          <MobileTodoLine label="관심 조건 저장" status="준비중" />
+          <MobileTodoLine label="실제 경매/공매 연동" status="설계 필요" />
+          <MobileTodoLine label="시세 데이터 비교" status="범위 결정" />
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function MobileProfileStat({
+  label,
+  value,
+  danger,
+}: {
+  label: string;
+  value: string;
+  danger?: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-[#E3E8E5] bg-white p-3">
+      <p className="text-xs font-semibold text-[#54615B]">{label}</p>
+      <p className={`mt-2 text-xl font-bold tabular-nums ${danger ? "text-[#B42318]" : "text-[#173B35]"}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function MobileProfileItem({
+  item,
+  compact,
+}: {
+  item: AnalyzedItem;
+  compact?: boolean;
+}) {
+  return (
+    <Link
+      href={`/properties/${item.id}`}
+      className="block rounded-lg border border-[#E3E8E5] bg-[#FBFCFC] p-3 active:scale-[0.99]"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-[#54615B]">{item.caseNo}</p>
+          <p className="mt-1 truncate text-sm font-bold text-[#131E18]">{item.title}</p>
+          {!compact ? (
+            <p className="mt-1 text-xs font-medium text-[#54615B]">
+              {compareReason(item)}
+            </p>
+          ) : null}
+        </div>
+        <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
+      </div>
+    </Link>
+  );
+}
+
+function MobileTodoLine({ label, status }: { label: string; status: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg bg-[#FBFCFC] px-3 py-2">
+      <span>{label}</span>
+      <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#173B35]">
+        {status}
       </span>
     </div>
   );
@@ -1420,11 +1575,11 @@ function MobileBottomTabs({
           onClick={() => onTabChange("compare")}
         />
         <MobileTabButton
-          active={false}
+          active={activeTab === "profile"}
           label="마이페이지"
-          meta="준비중"
+          meta="내 정보"
           icon="user"
-          onClick={() => onTabChange("browse")}
+          onClick={() => onTabChange("profile")}
         />
       </div>
     </nav>

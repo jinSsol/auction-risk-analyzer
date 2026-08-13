@@ -44,6 +44,7 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /분석/);
   assert.match(html, /등록/);
   assert.match(html, /마이페이지/);
+  assert.match(html, /내 정보/);
   assert.match(html, /권리 미확인/);
 });
 
