@@ -703,6 +703,7 @@ Verification notes:
 
 - Home now starts with "오늘 먼저 확인할 리스크를 알려드려요" instead of a generic app-style intro hero.
 - A separate intro/onboarding screen remains intentionally out of scope for MVP.
+- Home now uses a desktop-specific web layout and a mobile-specific app layout based on the supplied Stitch references while sharing the same auction data and analysis state.
 
 ### 6.5 Extract Shared Visual Components
 

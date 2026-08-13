@@ -99,6 +99,8 @@ export default function Home() {
   ].filter(Boolean).length;
   const coachTask = getCoachTask(enriched);
   const priorityItems = [...enriched].sort(compareForBasket).slice(0, 3);
+  const riskSummary = getRiskSummary(enriched);
+  const desktopFeatured = coachTask?.item ?? priorityItems[0];
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -125,7 +127,113 @@ export default function Home() {
 
   return (
     <main className="app-shell min-h-screen pb-24 text-[#1F2A24] md:pb-0">
-      <section className="relative overflow-hidden bg-[#FBFDFC]">
+      <div className="hidden md:block">
+        <header className="sticky top-0 z-30 border-b border-[#DDE5E1] bg-white/95 backdrop-blur">
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
+            <div className="flex items-center gap-4">
+              <span className="text-xl font-black text-[#173B35]">≡</span>
+              <span className="text-lg font-bold text-[#173B35]">경매정석</span>
+            </div>
+            <nav className="flex items-center gap-7 text-sm font-semibold text-[#6F766F]">
+              <a className="border-b-2 border-[#173B35] pb-1 text-[#173B35]" href="#">물건</a>
+              <Link className="transition hover:text-[#173B35]" href="/properties/new">등록</Link>
+              <button className="transition hover:text-[#173B35]" type="button" onClick={() => changeMobileTab("compare")}>비교</button>
+            </nav>
+            <span className="text-lg font-black text-[#173B35]">Q</span>
+          </div>
+        </header>
+
+        <section className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_300px] gap-8 px-8 py-8">
+          <div className="min-w-0 space-y-6">
+            <div>
+              <h1 className="text-3xl font-semibold leading-tight text-[#1F2A24]">
+                오늘 먼저 확인할 리스크를 알려드려요.
+              </h1>
+              <p className="mt-2 text-sm font-medium text-[#6F766F]">
+                2026년 8월 13일 기준 업데이트 되었습니다.
+              </p>
+            </div>
+
+            <TopSummaryBanner summary={riskSummary} />
+
+            {desktopFeatured ? (
+              <DesktopDecisionCard item={desktopFeatured} task={coachTask} />
+            ) : null}
+
+            <div className="rounded-xl border border-[#DDE5E1] bg-white p-3">
+              <label className="sr-only" htmlFor="desktop-property-search">
+                사건번호 또는 지역 검색
+              </label>
+              <div className="flex h-12 items-center gap-3 rounded-lg border border-[#DDE5E1] bg-white px-3">
+                <span className="text-sm font-black text-[#85938C]">Q</span>
+                <input
+                  id="desktop-property-search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="사건번호 또는 지역 검색"
+                  className="h-full min-w-0 flex-1 bg-transparent text-sm font-semibold text-[#1F2A24] outline-none placeholder:text-[#85938C]"
+                />
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <QuickFilterChip active={channel === "전체"} label="전체" onClick={() => setChannel("전체")} />
+                <QuickFilterChip active={channel === "경매"} label="경매" onClick={() => setChannel("경매")} />
+                <QuickFilterChip active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
+                <QuickFilterChip active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
+                <QuickFilterChip active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="min-h-9 rounded-full border border-[#DDE5E1] bg-white px-3 text-xs font-semibold text-[#6F766F]"
+                >
+                  초기화
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-4 xl:grid-cols-2">
+              {filtered.map((item) => (
+                <DesktopPropertyCard
+                  key={item.id}
+                  item={item}
+                  selected={selectedIds.includes(item.id)}
+                  onToggle={() => toggleSelected(item.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <aside className="sticky top-24 h-fit rounded-xl border border-[#DDE5E1] bg-white p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold text-[#6F766F]">오늘의 후보 정리</p>
+                <h2 className="mt-1 text-base font-semibold text-[#1F2A24]">먼저 열어볼 물건</h2>
+              </div>
+              <span className="rounded-full bg-[#F3F7F4] px-2.5 py-1 text-xs font-bold text-[#173B35]">
+                {priorityItems.length}건
+              </span>
+            </div>
+            <div className="mt-4 space-y-3">
+              {priorityItems.map((item, index) => (
+                <CoachCandidateRow key={item.id} item={item} index={index} />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => changeMobileTab("compare")}
+              className="mt-5 h-11 w-full rounded-lg border border-[#173B35] bg-white text-sm font-semibold text-[#173B35]"
+            >
+              후보 비교하기
+            </button>
+          </aside>
+        </section>
+      </div>
+
+      <div className="md:hidden">
+        <header className="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-center border-b border-[#DDE5E1] bg-white/96 px-4 backdrop-blur">
+          <h1 className="text-base font-bold text-[#173B35]">경매 권리분석 코치</h1>
+        </header>
+
+      <section className="relative overflow-hidden bg-[#FBFDFC] pt-16">
         <div className="mx-auto max-w-7xl px-5 pb-5 pt-5 lg:px-8 lg:pb-7">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs font-black text-[#173B35]">경매 권리분석 코치</p>
@@ -151,6 +259,8 @@ export default function Home() {
                   무엇을 먼저 확인해야 하는지 보여줍니다.
                 </p>
               </div>
+
+              <TopSummaryBanner summary={riskSummary} />
 
               <CoachTaskCard task={coachTask} />
 
@@ -336,6 +446,7 @@ export default function Home() {
         resultCount={stats.total}
         onTabChange={changeMobileTab}
       />
+      </div>
     </main>
   );
 }
@@ -387,6 +498,16 @@ function getCoachTask(items: AnalyzedItem[]) {
   return { item, primaryReason, action, unknownCount: checklist.unknownCount };
 }
 
+function getRiskSummary(items: AnalyzedItem[]) {
+  return {
+    needsReview: items.filter(
+      (item) => summarizeRightsChecklist(item.rightsChecklist).unknownCount > 0
+    ).length,
+    danger: items.filter((item) => item.analysis.level === "위험").length,
+    bidReady: items.filter((item) => item.analysis.verdict === "입찰 검토").length,
+  };
+}
+
 function compareForBasket(left: AnalyzedItem, right: AnalyzedItem) {
   return basketScore(left) - basketScore(right);
 }
@@ -406,6 +527,104 @@ function basketScore(item: AnalyzedItem) {
     checklist.unknownCount * 18 +
     Math.max(0, 12 - item.analysis.marginRate) * 10 +
     item.analysis.allIn / 1000
+  );
+}
+
+function TopSummaryBanner({
+  summary,
+}: {
+  summary: ReturnType<typeof getRiskSummary>;
+}) {
+  return (
+    <div className="rounded-xl border border-[#DDE5E1] bg-white p-4">
+      <p className="text-sm font-bold text-[#173B35]">
+        오늘 검토할 권리 리스크를 먼저 정리했어요.
+      </p>
+      <div className="mt-3 grid gap-2 text-xs font-semibold text-[#56635C] sm:grid-cols-3">
+        <SummaryDot label={`확인 필요 ${summary.needsReview}건`} tone="primary" />
+        <SummaryDot label={`위험 신호 ${summary.danger}건`} tone="danger" />
+        <SummaryDot label={`입찰 검토 ${summary.bidReady}건`} tone="primary" />
+      </div>
+    </div>
+  );
+}
+
+function SummaryDot({ label, tone }: { label: string; tone: "primary" | "danger" }) {
+  return (
+    <span className="flex items-center gap-2 rounded-lg bg-[#F7F9F8] px-3 py-2">
+      <span className={`h-2 w-2 rounded-full ${tone === "danger" ? "bg-[#B42318]" : "bg-[#173B35]"}`} />
+      {label}
+    </span>
+  );
+}
+
+function DesktopDecisionCard({
+  item,
+  task,
+}: {
+  item: AnalyzedItem;
+  task: ReturnType<typeof getCoachTask>;
+}) {
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
+  const message =
+    task?.item.id === item.id
+      ? `${task.primaryReason}부터 확인해요.`
+      : "입찰 상한과 권리 미확인 항목을 먼저 확인해요.";
+
+  return (
+    <section className="rounded-xl border border-[#DDE5E1] bg-white p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-[#6F766F]">{item.caseNo}</p>
+          <h2 className="mt-2 text-xl font-semibold text-[#1F2A24]">{item.title}</h2>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Verdict value={item.analysis.verdict} />
+          <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
+        </div>
+      </div>
+
+      <p className="mt-4 rounded-lg bg-[#F7F9F8] px-4 py-3 text-sm font-semibold leading-6 text-[#34423C]">
+        {message} 공식 문서 확인 전에는 참고용으로만 보세요.
+      </p>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <CoachMiniStat label="입찰 상한" value={uk(item.analysis.suggested)} strong />
+        <CoachMiniStat label="리스크" value={`${item.analysis.risk}점`} />
+        <CoachMiniStat label="권리 미확인" value={`${checklist.unknownCount}건`} />
+      </div>
+
+      <Link
+        href={`/properties/${item.id}`}
+        className="button-lift mt-4 flex h-12 items-center justify-center rounded-lg bg-[#173B35] text-sm font-semibold text-white"
+      >
+        리스크 상세 분석 보기
+      </Link>
+    </section>
+  );
+}
+
+function QuickFilterChip({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`min-h-9 rounded-full border px-3 text-xs font-semibold transition ${
+        active
+          ? "border-[#173B35] bg-[#173B35] text-white"
+          : "border-[#DDE5E1] bg-white text-[#56635C] hover:border-[#173B35] hover:text-[#173B35]"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -454,6 +673,77 @@ function CoachTaskCard({
         이 물건 먼저 보기
       </Link>
     </div>
+  );
+}
+
+const propertyImageUrls = [
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCctVB4ztNz-qOXKw4MOs7UB7iM29_StBOkVJbkorYo7XiiYfwTI0Y42zL_up4Q1n8PojlNL-SuVH0nDbWh8MWgR-UG7m-9WvpwbSvUv8ahKgLu4yls_NWoFigt568GyTqAR5UKuN-LZmgYKolfKfKY7H0b_TY2IEGyBUn7SOLdFEwFr6TGQxIklngW9KSHRo8azQEbAm6IuCgx0zL_i5_4xYS2Mlow-J4BC0jqisVpdIJGzgL9PxE",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBvlYsfBHplFbW1GRwi5-1flapUlni3FEeTPv8tTgBN16sHkXzZAp_gquz3EcVsolY5nIS0BkaPPrgJtk0jwzp2CBXpZF-FP1L6sWBY97lqDdI5ig-5Ze7Etn3SDy2ahZB6NB7nQqVLF8-YHkWZBf_eZ4-GDeeEUP8XtCRwmi9OJgrnLxwWizrq1LX9IRQqamqK0dIyMaVaLfm02w0wPAZVl9cM5qZPnFj-hQVQgPz7BqlH4LTPOrk",
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCZmiY4WfwpYic1PRBb6NeBoR1JC6j1VZNdHd4MDxekr2rqWUC88mQaSqSGQ0iLOa9hhHKXV6-_hWU5Pc5kRCgRMOzDbhEq4cptuxYKvLQZD2UWmbwMjZ5kGOGQWpy-IUtim2nR0SDsFkhpe8JXjbhkHurWuhySF3eJYGDeoq-bM6gSC5aIGjiKmptVbqgUm5jOQPZmv1IJVwaZZK8daKGfsrYbs4mug5DJE-_HP0QxwBumGKx5ONg",
+];
+
+function propertyImageFor(item: AnalyzedItem) {
+  const index = Math.abs(
+    [...item.id].reduce((total, char) => total + char.charCodeAt(0), 0)
+  ) % propertyImageUrls.length;
+  return propertyImageUrls[index];
+}
+
+function DesktopPropertyCard({
+  item,
+  selected,
+  onToggle,
+}: {
+  item: AnalyzedItem;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
+
+  return (
+    <article className="interactive-card overflow-hidden rounded-xl border border-[#DDE5E1] bg-white hover:border-[#CAD8D1] hover:shadow-[0_16px_32px_rgba(47,55,45,0.08)]">
+      <Link href={`/properties/${item.id}`} className="block">
+        <div
+          aria-label={`${item.title} 참고 이미지`}
+          className="aspect-[16/9] bg-[#F7F9F8] bg-cover bg-center"
+          role="img"
+          style={{ backgroundImage: `url(${propertyImageFor(item)})` }}
+        />
+      </Link>
+      <div className="space-y-3 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs font-bold text-[#6F766F]">{item.caseNo}</span>
+          <ChannelBadge channel={item.channel} />
+        </div>
+        <Link href={`/properties/${item.id}`} className="block">
+          <h3 className="text-base font-semibold leading-snug text-[#1F2A24] transition hover:text-[#173B35]">
+            {item.title}
+          </h3>
+          <p className="mt-1 text-xs font-medium text-[#6F766F]">{item.district} · {item.area}㎡</p>
+        </Link>
+        <div className="grid grid-cols-2 gap-2">
+          <CoachMiniStat label="최저가" value={uk(item.minimum)} />
+          <CoachMiniStat label="적정 상한" value={uk(item.analysis.suggested)} strong />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Verdict value={item.analysis.verdict} />
+          <span className="rounded-full bg-[#F7F9F8] px-2.5 py-1 text-xs font-semibold text-[#56635C]">
+            미확인 {checklist.unknownCount}건
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={onToggle}
+          className={`h-10 w-full rounded-lg border text-sm font-semibold transition ${
+            selected
+              ? "border-[#173B35] bg-[#173B35] text-white"
+              : "border-[#DDE5E1] bg-white text-[#34423C] hover:border-[#173B35] hover:text-[#173B35]"
+          }`}
+        >
+          {selected ? "비교중" : "비교 담기"}
+        </button>
+      </div>
+    </article>
   );
 }
 
