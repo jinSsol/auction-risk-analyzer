@@ -11,7 +11,7 @@ export function StatusBadge({ label }: { label: string }) {
     label === "확인 필요"
       ? "bg-[#EEF3E8] text-[#566A4B]"
       : label === "직접 입력"
-        ? "bg-[#F7F2E8] text-[#56635C]"
+        ? "bg-[#F3F7F4] text-[#56635C]"
         : "bg-[#EEF5F1] text-[#173B35]";
 
   return (
@@ -61,7 +61,7 @@ export function RiskMeter({
   className?: string;
 }) {
   return (
-    <div className={`${className} h-2 overflow-hidden rounded-full bg-[#E5DED3]`}>
+    <div className={`${className} h-2 overflow-hidden rounded-full bg-[#DDE5E1]`}>
       <div className={`risk-fill h-full rounded-full ${riskAccentClass[level]}`} style={{ width: `${score}%` }} />
     </div>
   );

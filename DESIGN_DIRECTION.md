@@ -178,18 +178,19 @@ Avoid:
 
 ### Palette
 
-Use off-white and deep green as the main identity.
+Use white and deep green as the main identity.
 
-- App background: warm off-white
+- App background: white-first, with only a very light green tint when depth is needed
 - Primary: deep green
 - Secondary: ink green/blue
-- Surface: white or off-white
-- Border: warm gray or pale sage
+- Surface: white
+- Border: cool gray or pale sage
 - Caution: muted sage/olive
 - Danger: red only for true danger
 
 Avoid:
 
+- Beige, cream, or lifestyle-style warm backgrounds.
 - Decorative apricot or orange accents.
 - Heavy purple/blue gradients.
 - Neon fintech colors.

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf8f3;
+  --background: #fbfdfc;
   --foreground: #1f2a24;
 }
 
@@ -48,9 +48,9 @@ input:focus-visible {
 
 .app-shell {
   background:
-    linear-gradient(155deg, rgba(23, 59, 53, 0.09), transparent 34%),
-    linear-gradient(30deg, rgba(65, 111, 103, 0.1), transparent 31%),
-    #faf8f3;
+    linear-gradient(155deg, rgba(23, 59, 53, 0.055), transparent 34%),
+    linear-gradient(30deg, rgba(65, 111, 103, 0.065), transparent 31%),
+    #fbfdfc;
 }
 
 .hero-surface {
@@ -60,8 +60,8 @@ input:focus-visible {
 }
 
 .app-card {
-  border: 1px solid rgba(224, 218, 207, 0.92);
-  background: rgba(255, 253, 248, 0.96);
+  border: 1px solid rgba(221, 229, 225, 0.95);
+  background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 16px 36px rgba(47, 55, 45, 0.08);
 }
 

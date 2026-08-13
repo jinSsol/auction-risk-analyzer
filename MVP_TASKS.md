@@ -652,7 +652,7 @@ Verification notes:
 Tasks:
 
 - [x] Lock the B+A direction: friendly legal coach plus clean fintech order.
-- [x] Shift the palette from generic blue app styling to warm off-white, deep green, ink, and muted sage accents.
+- [x] Shift the palette from generic blue app styling to white, deep green, ink, and muted sage accents.
 - [x] Rewrite the first-screen copy around a guided rights-analysis routine.
 - [x] Update the desktop phone preview and mobile bottom tabs to match the softer app tone.
 - [x] Re-run lint, render tests, and mobile layout QA.
@@ -721,6 +721,7 @@ Verification notes:
 - `app/components/auction-ui.tsx` now owns shared status badges, risk badges, verdict badges, risk meter, mini stat, and risk accent classes.
 - Home and detail pages now import the same risk/status/verdict components.
 - Existing server-render tests cover the copied labels after extraction.
+- Palette corrected away from beige/warm lifestyle tones toward a white-first, deep-green professional direction before detail redesign.
 
 ### 6.6 Redesign Detail Screen In App Style
 
