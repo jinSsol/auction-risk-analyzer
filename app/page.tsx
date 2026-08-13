@@ -708,9 +708,13 @@ function MobilePropertyCard({
   onToggle: () => void;
 }) {
   const gapToSuggested = item.analysis.suggested - item.analysis.plannedBid;
+  const riskFrame = mobileRiskFrameFor(item.analysis.level);
+  const checklist = summarizeRightsChecklist(item.rightsChecklist);
 
   return (
-    <article className="rounded-lg border border-[#E3E8E5] bg-white p-4 transition active:scale-[0.99]">
+    <article
+      className={`rounded-lg border bg-white p-4 transition active:scale-[0.99] ${riskFrame.card}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-semibold text-[#54615B]">
@@ -722,7 +726,9 @@ function MobilePropertyCard({
             </h4>
           </Link>
         </div>
-        <StatusBadge label={item.status} />
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${riskFrame.badge}`}>
+          {item.analysis.level === "안정" ? "양호" : item.analysis.level}
+        </span>
       </div>
 
       <Link href={`/properties/${item.id}`} className="mt-4 flex gap-4">
@@ -743,22 +749,22 @@ function MobilePropertyCard({
         </div>
       </Link>
 
-      <div className="mt-4 flex items-center gap-3 rounded-lg border border-[#E3E8E5] bg-[#FBFCFC] p-3">
-        <span className="shrink-0 text-xs font-bold text-[#414846]">리스크 미터</span>
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#E3E8E5]">
-          <div
-            className={`h-full rounded-full ${
-              item.analysis.level === "위험"
-                ? "bg-[#B42318]"
-                : item.analysis.level === "주의"
-                  ? "bg-[#B45309]"
-                  : "bg-[#173B35]"
-            }`}
-            style={{ width: `${Math.max(14, item.analysis.risk)}%` }}
-          />
+      <div className={`mt-4 rounded-lg px-3 py-2 ${riskFrame.panel}`}>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-xs font-bold text-[#414846]">리스크 테두리</span>
+          <span className="text-xs font-bold tabular-nums text-[#131E18]">
+            {item.analysis.risk}점
+          </span>
         </div>
-        <span className="shrink-0 text-xs font-semibold text-[#173B35]">
-          {item.analysis.level === "안정" ? "양호" : item.analysis.level}
+        <p className="mt-1 text-xs font-medium leading-5 text-[#54615B]">
+          {item.analysis.riskFactors[0]?.label ?? "입찰 상한"} · 권리 미확인 {checklist.unknownCount}건
+        </p>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <StatusBadge label={item.status} />
+        <span className="rounded-full bg-[#FBFCFC] px-2.5 py-1 text-xs font-semibold text-[#54615B]">
+          {item.analysis.verdict}
         </span>
       </div>
 
@@ -776,6 +782,28 @@ function MobilePropertyCard({
       </button>
     </article>
   );
+}
+
+function mobileRiskFrameFor(level: RiskLevel) {
+  const frames = {
+    안정: {
+      card: "border-[#D7E4DC] shadow-[0_10px_24px_rgba(23,59,53,0.06)]",
+      badge: "bg-[#EEF5F1] text-[#173B35]",
+      panel: "bg-[#F7FAF8]",
+    },
+    주의: {
+      card: "border-[#CBD9C2] shadow-[0_10px_24px_rgba(86,106,75,0.08)]",
+      badge: "bg-[#EEF3E8] text-[#566A4B]",
+      panel: "bg-[#F8FAF4]",
+    },
+    위험: {
+      card: "border-[#FCA5A5] shadow-[0_10px_24px_rgba(180,35,24,0.08)]",
+      badge: "bg-[#FEE2E2] text-[#B42318]",
+      panel: "bg-[#FFF7F7]",
+    },
+  } satisfies Record<RiskLevel, { card: string; badge: string; panel: string }>;
+
+  return frames[level];
 }
 
 function MobilePriceRow({

@@ -35,7 +35,7 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /오늘의 확인 항목/);
   assert.match(html, /오늘의 후보 정리/);
   assert.match(html, /추천 물건/);
-  assert.match(html, /리스크 미터/);
+  assert.match(html, /리스크 테두리/);
   assert.match(html, /href="\/properties\/sample-1"/);
   assert.match(html, /href="\/properties\/sample-7"/);
   assert.match(html, /href="\/properties\/new"/);
