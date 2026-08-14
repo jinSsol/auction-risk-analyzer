@@ -897,6 +897,24 @@ Completion criteria:
 
 - Users can compare auction/public-sale pricing against visible market evidence.
 
+## Phase 11: Notification And Saved Feed UX
+
+Goal: make the home feed feel like a practical monitoring surface before live data, saved searches, and push reminders are added.
+
+### 11.1 Add Home Feed Filters
+
+Tasks:
+
+- [x] Add feed filters for `전체`, `새로 등록`, `기일 임박`, and `조건 변경`.
+- [x] Keep the same filter behavior on mobile and desktop.
+- [x] Show an empty state when no feed items match the selected filter.
+- [x] Add rendered HTML coverage for the new filter labels and feed empty-state copy.
+
+Completion criteria:
+
+- Users can narrow the home feed by update type without leaving the home screen.
+- `npm run lint` and `npm test` pass.
+
 ## Deferred Until After MVP
 
 - OCR/document extraction

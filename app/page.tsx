@@ -43,6 +43,7 @@ type MarketUpdate = {
   description: string;
   href: string;
 };
+type MarketUpdateFilter = "all" | MarketUpdate["kind"];
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -56,6 +57,7 @@ export default function Home() {
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_COMPARE_IDS);
   const [comparisonReady, setComparisonReady] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>("browse");
+  const [marketUpdateFilter, setMarketUpdateFilter] = useState<MarketUpdateFilter>("all");
   const contentRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -135,6 +137,13 @@ export default function Home() {
     () => getMarketUpdates(enriched, recentUserItems),
     [enriched, recentUserItems]
   );
+  const filteredMarketUpdates = useMemo(
+    () =>
+      marketUpdateFilter === "all"
+        ? marketUpdates
+        : marketUpdates.filter((update) => update.kind === marketUpdateFilter),
+    [marketUpdateFilter, marketUpdates]
+  );
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -190,7 +199,11 @@ export default function Home() {
 
             <TopSummaryBanner summary={riskSummary} />
 
-            <DesktopMarketUpdatesPanel updates={marketUpdates} />
+            <DesktopMarketUpdatesPanel
+              activeFilter={marketUpdateFilter}
+              onFilterChange={setMarketUpdateFilter}
+              updates={filteredMarketUpdates}
+            />
 
             {desktopFeatured ? (
               <DesktopDecisionCard item={desktopFeatured} task={coachTask} />
@@ -277,7 +290,9 @@ export default function Home() {
           mobileTab={mobileTab}
           query={query}
           recentUserItems={recentUserItems}
-          marketUpdates={marketUpdates}
+          marketUpdateFilter={marketUpdateFilter}
+          marketUpdates={filteredMarketUpdates}
+          onMarketUpdateFilterChange={setMarketUpdateFilter}
           resetFilters={resetFilters}
           riskSummary={riskSummary}
           selected={selected}
@@ -349,6 +364,7 @@ function MobileAppHome({
   enriched,
   filtered,
   level,
+  marketUpdateFilter,
   mobileTab,
   query,
   recentUserItems,
@@ -366,6 +382,7 @@ function MobileAppHome({
   toggleSelected,
   userItemCount,
   onClearCompare,
+  onMarketUpdateFilterChange,
   onRemoveCompare,
   onTabChange,
 }: {
@@ -377,6 +394,7 @@ function MobileAppHome({
   enriched: AnalyzedItem[];
   filtered: AnalyzedItem[];
   level: RiskLevel | "전체";
+  marketUpdateFilter: MarketUpdateFilter;
   mobileTab: MobileTab;
   query: string;
   recentUserItems: UserAuctionItem[];
@@ -394,6 +412,7 @@ function MobileAppHome({
   toggleSelected: (id: string) => void;
   userItemCount: number;
   onClearCompare: () => void;
+  onMarketUpdateFilterChange: (filter: MarketUpdateFilter) => void;
   onRemoveCompare: (id: string) => void;
   onTabChange: (tab: MobileTab) => void;
 }) {
@@ -427,7 +446,11 @@ function MobileAppHome({
           </div>
         </section>
 
-        <MobileMarketUpdatesPanel updates={marketUpdates} />
+        <MobileMarketUpdatesPanel
+          activeFilter={marketUpdateFilter}
+          onFilterChange={onMarketUpdateFilterChange}
+          updates={marketUpdates}
+        />
 
         {featured ? <MobileDecisionCard item={featured} /> : null}
 
@@ -676,7 +699,15 @@ function SummaryDot({ label, tone }: { label: string; tone: "primary" | "danger"
   );
 }
 
-function DesktopMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
+function DesktopMarketUpdatesPanel({
+  activeFilter,
+  onFilterChange,
+  updates,
+}: {
+  activeFilter: MarketUpdateFilter;
+  onFilterChange: (filter: MarketUpdateFilter) => void;
+  updates: MarketUpdate[];
+}) {
   return (
     <section className="rounded-xl border border-[#DDE5E1] bg-white p-5">
       <div className="flex items-start justify-between gap-4">
@@ -690,10 +721,13 @@ function DesktopMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
           {updates.length}건
         </span>
       </div>
+      <MarketUpdateFilters activeFilter={activeFilter} onFilterChange={onFilterChange} />
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
-        {updates.map((update) => (
-          <MarketUpdateLink key={update.id} update={update} />
-        ))}
+        {updates.length > 0 ? (
+          updates.map((update) => <MarketUpdateLink key={update.id} update={update} />)
+        ) : (
+          <MarketUpdateEmptyState />
+        )}
       </div>
       <p className="mt-3 text-xs font-medium text-[#6F766F]">
         현재는 샘플/직접 입력 데이터 기준이며, 실제 연동 후에는 신규 공고와 가격·기일 변경 알림으로 연결됩니다.
@@ -702,7 +736,15 @@ function DesktopMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
   );
 }
 
-function MobileMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
+function MobileMarketUpdatesPanel({
+  activeFilter,
+  onFilterChange,
+  updates,
+}: {
+  activeFilter: MarketUpdateFilter;
+  onFilterChange: (filter: MarketUpdateFilter) => void;
+  updates: MarketUpdate[];
+}) {
   return (
     <section className="mt-6 rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-4">
       <div className="flex items-start justify-between gap-3">
@@ -714,15 +756,72 @@ function MobileMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
         </div>
         <Bell className="h-5 w-5 shrink-0 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
       </div>
+      <MarketUpdateFilters activeFilter={activeFilter} onFilterChange={onFilterChange} compact />
       <div className="mt-3 space-y-2">
-        {updates.map((update) => (
-          <MarketUpdateLink key={update.id} update={update} compact />
-        ))}
+        {updates.length > 0 ? (
+          updates.map((update) => <MarketUpdateLink key={update.id} update={update} compact />)
+        ) : (
+          <MarketUpdateEmptyState compact />
+        )}
       </div>
       <p className="mt-3 text-xs font-medium leading-5 text-[#54615B]">
         실제 경매/공매 연동 전까지는 현재 목록을 기준으로 보여줘요.
       </p>
     </section>
+  );
+}
+
+const marketUpdateFilters = [
+  { value: "all", label: "전체" },
+  { value: "new", label: "새로 등록" },
+  { value: "deadline", label: "기일 임박" },
+  { value: "changed", label: "조건 변경" },
+] satisfies Array<{ value: MarketUpdateFilter; label: string }>;
+
+function MarketUpdateFilters({
+  activeFilter,
+  compact,
+  onFilterChange,
+}: {
+  activeFilter: MarketUpdateFilter;
+  compact?: boolean;
+  onFilterChange: (filter: MarketUpdateFilter) => void;
+}) {
+  return (
+    <div
+      className={`flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+        compact ? "mt-3" : "mt-4"
+      }`}
+      aria-label="새소식 필터"
+    >
+      {marketUpdateFilters.map((filter) => (
+        <button
+          key={filter.value}
+          type="button"
+          onClick={() => onFilterChange(filter.value)}
+          aria-pressed={activeFilter === filter.value}
+          className={`h-9 shrink-0 rounded-full border px-3 text-xs font-bold transition active:scale-[0.98] ${
+            activeFilter === filter.value
+              ? "border-[#173B35] bg-[#173B35] text-white"
+              : "border-[#DDE5E1] bg-white text-[#414846] hover:border-[#173B35]"
+          }`}
+        >
+          {filter.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function MarketUpdateEmptyState({ compact }: { compact?: boolean }) {
+  return (
+    <div
+      className={`rounded-lg border border-dashed border-[#DDE5E1] bg-white text-sm font-medium leading-6 text-[#54615B] ${
+        compact ? "p-3" : "p-4 lg:col-span-2"
+      }`}
+    >
+      선택한 새소식이 아직 없어요. 실제 데이터 연동 후 조건에 맞는 변경만 따로 모아볼 수 있어요.
+    </div>
   );
 }
 

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render(path = "/") {
@@ -34,7 +35,11 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /오늘 검토할 권리 리스크를 먼저 정리했어요/);
   assert.match(html, /새소식/);
   assert.match(html, /새로 들어오거나 바뀐 물건을 먼저 봐요/);
+  assert.match(html, /aria-label="새소식 필터"/);
+  assert.match(html, /전체/);
+  assert.match(html, /새로 등록/);
   assert.match(html, /기일 임박/);
+  assert.match(html, /조건 변경/);
   assert.match(html, /조건 변경 확인/);
   assert.match(html, /오늘의 확인 항목/);
   assert.match(html, /오늘의 후보 정리/);
@@ -51,6 +56,12 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /마이페이지/);
   assert.match(html, /내 정보/);
   assert.match(html, /권리 미확인/);
+});
+
+test("keeps home feed empty-state copy available for filtered views", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /선택한 새소식이 아직 없어요/);
+  assert.match(source, /MarketUpdateEmptyState/);
 });
 
 test("server-renders sample property detail pages", async () => {
