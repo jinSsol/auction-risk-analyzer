@@ -32,6 +32,10 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /오늘 먼저 확인할 리스크를 알려드려요/);
   assert.match(html, /물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해/);
   assert.match(html, /오늘 검토할 권리 리스크를 먼저 정리했어요/);
+  assert.match(html, /새소식/);
+  assert.match(html, /새로 들어오거나 바뀐 물건을 먼저 봐요/);
+  assert.match(html, /기일 임박/);
+  assert.match(html, /조건 변경 확인/);
   assert.match(html, /오늘의 확인 항목/);
   assert.match(html, /오늘의 후보 정리/);
   assert.match(html, /추천 물건/);

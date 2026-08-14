@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import {
+  Bell,
   ChartNoAxesColumnIncreasing,
+  Clock3,
   HomeIcon,
+  RefreshCw,
   Search,
   SquarePlus,
   UserRound,
@@ -29,7 +32,17 @@ import type { PropertyType, RiskLevel, SaleChannel } from "./lib/auction-types";
 const DEFAULT_COMPARE_IDS = ["sample-4", "sample-6", "sample-7"];
 const COMPARISON_STORAGE_KEY = "auction-risk-analyzer:comparison:v1";
 const MAX_COMPARE_COUNT = 4;
+const FEED_REFERENCE_DATE = new Date("2026-08-14T00:00:00+09:00");
 type MobileTab = "browse" | "compare" | "profile";
+type MarketUpdate = {
+  id: string;
+  kind: "new" | "changed" | "deadline";
+  label: string;
+  title: string;
+  meta: string;
+  description: string;
+  href: string;
+};
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -118,6 +131,10 @@ export default function Home() {
       ),
     [userItems]
   );
+  const marketUpdates = useMemo(
+    () => getMarketUpdates(enriched, recentUserItems),
+    [enriched, recentUserItems]
+  );
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -172,6 +189,8 @@ export default function Home() {
             </div>
 
             <TopSummaryBanner summary={riskSummary} />
+
+            <DesktopMarketUpdatesPanel updates={marketUpdates} />
 
             {desktopFeatured ? (
               <DesktopDecisionCard item={desktopFeatured} task={coachTask} />
@@ -258,6 +277,7 @@ export default function Home() {
           mobileTab={mobileTab}
           query={query}
           recentUserItems={recentUserItems}
+          marketUpdates={marketUpdates}
           resetFilters={resetFilters}
           riskSummary={riskSummary}
           selected={selected}
@@ -332,6 +352,7 @@ function MobileAppHome({
   mobileTab,
   query,
   recentUserItems,
+  marketUpdates,
   resetFilters,
   riskSummary,
   selected,
@@ -359,6 +380,7 @@ function MobileAppHome({
   mobileTab: MobileTab;
   query: string;
   recentUserItems: UserAuctionItem[];
+  marketUpdates: MarketUpdate[];
   resetFilters: () => void;
   riskSummary: ReturnType<typeof getRiskSummary>;
   selected: AnalyzedItem[];
@@ -404,6 +426,8 @@ function MobileAppHome({
             <SummaryDot label={`입찰 검토 ${riskSummary.bidReady}건`} tone="primary" />
           </div>
         </section>
+
+        <MobileMarketUpdatesPanel updates={marketUpdates} />
 
         {featured ? <MobileDecisionCard item={featured} /> : null}
 
@@ -543,6 +567,65 @@ function getRiskSummary(items: AnalyzedItem[]) {
   };
 }
 
+function getMarketUpdates(
+  analyzedItems: AnalyzedItem[],
+  recentUserItems: UserAuctionItem[]
+): MarketUpdate[] {
+  const directUpdates = recentUserItems.slice(0, 2).map((item) => ({
+    id: `direct-${item.id}`,
+    kind: "new" as const,
+    label: "새로 등록",
+    title: item.title,
+    meta: `${formatShortDate(item.createdAt)} · ${item.channel}`,
+    description: "직접 추가한 물건이 홈 추적 목록에 들어왔어요.",
+    href: `/properties/${item.id}`,
+  }));
+  const futureItems = analyzedItems
+    .map((item) => ({ item, daysLeft: daysUntil(item.auctionDate) }))
+    .filter(({ daysLeft }) => daysLeft !== null && daysLeft >= 0)
+    .sort((left, right) => left.daysLeft - right.daysLeft);
+  const deadlineUpdates = futureItems.slice(0, 2).map(({ item, daysLeft }) => ({
+    id: `deadline-${item.id}`,
+    kind: "deadline" as const,
+    label: "기일 임박",
+    title: item.title,
+    meta: `${item.auctionDate} · D-${daysLeft}`,
+    description: "입찰 전 권리 미확인 항목을 먼저 체크해보세요.",
+    href: `/properties/${item.id}`,
+  }));
+  const changedUpdates = analyzedItems
+    .filter((item) => item.failedBids > 0 || item.analysis.level === "위험")
+    .sort((left, right) => right.failedBids - left.failedBids || right.analysis.risk - left.analysis.risk)
+    .slice(0, 2)
+    .map((item) => ({
+      id: `changed-${item.id}`,
+      kind: "changed" as const,
+      label: item.failedBids > 0 ? "조건 변경 확인" : "리스크 확인",
+      title: item.title,
+      meta: `${item.channel} · 유찰 ${item.failedBids}회`,
+      description: `${item.analysis.riskFactors[0]?.label ?? "입찰 상한"} 기준이 바뀌었는지 확인해요.`,
+      href: `/properties/${item.id}`,
+    }));
+
+  const updates = [...directUpdates, ...deadlineUpdates, ...changedUpdates];
+  const uniqueUpdates = new Map<string, MarketUpdate>();
+
+  updates.forEach((update) => {
+    const itemId = update.href.split("/").at(-1) ?? update.id;
+    if (!uniqueUpdates.has(itemId)) uniqueUpdates.set(itemId, update);
+  });
+
+  return [...uniqueUpdates.values()].slice(0, 4);
+}
+
+function daysUntil(value: string) {
+  const date = new Date(`${value}T00:00:00+09:00`);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const diff = date.getTime() - FEED_REFERENCE_DATE.getTime();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
 function compareForBasket(left: AnalyzedItem, right: AnalyzedItem) {
   return basketScore(left) - basketScore(right);
 }
@@ -590,6 +673,99 @@ function SummaryDot({ label, tone }: { label: string; tone: "primary" | "danger"
       <span className={`h-2 w-2 rounded-full ${tone === "danger" ? "bg-[#B42318]" : "bg-[#173B35]"}`} />
       {label}
     </span>
+  );
+}
+
+function DesktopMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
+  return (
+    <section className="rounded-xl border border-[#DDE5E1] bg-white p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold text-[#173B35]">새소식</p>
+          <h2 className="mt-1 text-xl font-semibold text-[#1F2A24]">
+            새로 들어오거나 바뀐 물건을 먼저 봐요.
+          </h2>
+        </div>
+        <span className="rounded-full bg-[#EEF5F1] px-3 py-1 text-xs font-bold text-[#173B35]">
+          {updates.length}건
+        </span>
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        {updates.map((update) => (
+          <MarketUpdateLink key={update.id} update={update} />
+        ))}
+      </div>
+      <p className="mt-3 text-xs font-medium text-[#6F766F]">
+        현재는 샘플/직접 입력 데이터 기준이며, 실제 연동 후에는 신규 공고와 가격·기일 변경 알림으로 연결됩니다.
+      </p>
+    </section>
+  );
+}
+
+function MobileMarketUpdatesPanel({ updates }: { updates: MarketUpdate[] }) {
+  return (
+    <section className="mt-6 rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-[#173B35]">새소식</p>
+          <h3 className="mt-1 text-lg font-semibold leading-6 text-[#131E18]">
+            새로 뜨거나 바뀐 물건을 먼저 볼게요.
+          </h3>
+        </div>
+        <Bell className="h-5 w-5 shrink-0 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
+      </div>
+      <div className="mt-3 space-y-2">
+        {updates.map((update) => (
+          <MarketUpdateLink key={update.id} update={update} compact />
+        ))}
+      </div>
+      <p className="mt-3 text-xs font-medium leading-5 text-[#54615B]">
+        실제 경매/공매 연동 전까지는 현재 목록을 기준으로 보여줘요.
+      </p>
+    </section>
+  );
+}
+
+function MarketUpdateLink({
+  update,
+  compact,
+}: {
+  update: MarketUpdate;
+  compact?: boolean;
+}) {
+  const Icon = update.kind === "new" ? SquarePlus : update.kind === "deadline" ? Clock3 : RefreshCw;
+  const tone =
+    update.kind === "deadline"
+      ? "bg-[#FFF7F7] text-[#B42318]"
+      : update.kind === "changed"
+        ? "bg-[#EEF3E8] text-[#566A4B]"
+        : "bg-[#EEF5F1] text-[#173B35]";
+
+  return (
+    <Link
+      href={update.href}
+      className={`block rounded-lg border border-[#E3E8E5] bg-white transition hover:border-[#CAD8D1] active:scale-[0.99] ${
+        compact ? "p-3" : "p-4"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tone}`}>
+          <Icon className="h-4 w-4" aria-hidden="true" strokeWidth={2.3} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-[#FBFCFC] px-2 py-0.5 text-[11px] font-bold text-[#173B35]">
+              {update.label}
+            </span>
+            <span className="text-[11px] font-semibold text-[#6F766F]">{update.meta}</span>
+          </div>
+          <p className="mt-1 truncate text-sm font-bold text-[#131E18]">{update.title}</p>
+          <p className="mt-1 text-xs font-medium leading-5 text-[#54615B]">
+            {update.description}
+          </p>
+        </div>
+      </div>
+    </Link>
   );
 }
 
