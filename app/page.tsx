@@ -33,6 +33,7 @@ import type { PropertyType, RiskLevel, SaleChannel } from "./lib/auction-types";
 const DEFAULT_COMPARE_IDS = ["sample-4", "sample-6", "sample-7"];
 const COMPARISON_STORAGE_KEY = "auction-risk-analyzer:comparison:v1";
 const SAVED_CONDITIONS_STORAGE_KEY = "auction-risk-analyzer:saved-conditions:v1";
+const NOTIFICATION_SETTINGS_STORAGE_KEY = "auction-risk-analyzer:notification-settings:v1";
 const MAX_COMPARE_COUNT = 4;
 const FEED_REFERENCE_DATE = new Date("2026-08-14T00:00:00+09:00");
 type MobileTab = "browse" | "compare" | "profile";
@@ -46,6 +47,11 @@ type SavedCondition = {
   level: RiskLevel | "전체";
   owner: OwnerFilter;
   createdAt: string;
+};
+type NotificationSettings = {
+  deadline: boolean;
+  changed: boolean;
+  newListing: boolean;
 };
 type MarketUpdate = {
   id: string;
@@ -68,6 +74,11 @@ export default function Home() {
   const [bufferRatio, setBufferRatio] = useState(4);
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
   const [savedConditions, setSavedConditions] = useState<SavedCondition[]>([]);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
+    deadline: true,
+    changed: true,
+    newListing: true,
+  });
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_COMPARE_IDS);
   const [comparisonReady, setComparisonReady] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>("browse");
@@ -79,6 +90,7 @@ export default function Home() {
       setUserItems(loadUserAuctionItems());
       setSelectedIds(loadComparisonIds() ?? DEFAULT_COMPARE_IDS);
       setSavedConditions(loadSavedConditions());
+      setNotificationSettings(loadNotificationSettings());
       setComparisonReady(true);
     }, 0);
 
@@ -207,6 +219,12 @@ export default function Home() {
   function deleteSavedCondition(id: string) {
     setSavedConditions((current) =>
       saveSavedConditions(current.filter((condition) => condition.id !== id))
+    );
+  }
+
+  function toggleNotificationSetting(key: keyof NotificationSettings) {
+    setNotificationSettings((current) =>
+      saveNotificationSettings({ ...current, [key]: !current[key] })
     );
   }
 
@@ -341,8 +359,10 @@ export default function Home() {
           query={query}
           recentUserItems={recentUserItems}
           savedConditions={savedConditions}
+          allMarketUpdates={marketUpdates}
           marketUpdateFilter={marketUpdateFilter}
           marketUpdates={filteredMarketUpdates}
+          notificationSettings={notificationSettings}
           onMarketUpdateFilterChange={setMarketUpdateFilter}
           resetFilters={resetFilters}
           riskSummary={riskSummary}
@@ -364,6 +384,7 @@ export default function Home() {
           }
           onSaveCurrentCondition={saveCurrentCondition}
           onTabChange={changeMobileTab}
+          onToggleNotificationSetting={toggleNotificationSetting}
         />
       </div>
     </main>
@@ -424,6 +445,43 @@ function saveSavedConditions(conditions: SavedCondition[]) {
   }
 
   return conditions;
+}
+
+function loadNotificationSettings(): NotificationSettings {
+  try {
+    const raw = window.localStorage.getItem(NOTIFICATION_SETTINGS_STORAGE_KEY);
+    if (!raw) return defaultNotificationSettings();
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return defaultNotificationSettings();
+
+    const settings = parsed as Partial<NotificationSettings>;
+    return {
+      deadline: typeof settings.deadline === "boolean" ? settings.deadline : true,
+      changed: typeof settings.changed === "boolean" ? settings.changed : true,
+      newListing: typeof settings.newListing === "boolean" ? settings.newListing : true,
+    };
+  } catch {
+    return defaultNotificationSettings();
+  }
+}
+
+function saveNotificationSettings(settings: NotificationSettings) {
+  try {
+    window.localStorage.setItem(NOTIFICATION_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  } catch {
+    // Notification settings stay local until account and push infrastructure exist.
+  }
+
+  return settings;
+}
+
+function defaultNotificationSettings(): NotificationSettings {
+  return {
+    deadline: true,
+    changed: true,
+    newListing: true,
+  };
 }
 
 function normalizeSavedCondition(value: unknown): SavedCondition | null {
@@ -495,12 +553,14 @@ function MobileAppHome({
   enriched,
   filtered,
   level,
+  allMarketUpdates,
   marketUpdateFilter,
   mobileTab,
   query,
   recentUserItems,
   savedConditions,
   marketUpdates,
+  notificationSettings,
   resetFilters,
   riskSummary,
   selected,
@@ -520,6 +580,7 @@ function MobileAppHome({
   onRemoveCompare,
   onSaveCurrentCondition,
   onTabChange,
+  onToggleNotificationSetting,
 }: {
   activeFilterCount: number;
   bidRatio: number;
@@ -529,12 +590,14 @@ function MobileAppHome({
   enriched: AnalyzedItem[];
   filtered: AnalyzedItem[];
   level: RiskLevel | "전체";
+  allMarketUpdates: MarketUpdate[];
   marketUpdateFilter: MarketUpdateFilter;
   mobileTab: MobileTab;
   query: string;
   recentUserItems: UserAuctionItem[];
   savedConditions: SavedCondition[];
   marketUpdates: MarketUpdate[];
+  notificationSettings: NotificationSettings;
   resetFilters: () => void;
   riskSummary: ReturnType<typeof getRiskSummary>;
   selected: AnalyzedItem[];
@@ -554,6 +617,7 @@ function MobileAppHome({
   onRemoveCompare: (id: string) => void;
   onSaveCurrentCondition: () => void;
   onTabChange: (tab: MobileTab) => void;
+  onToggleNotificationSetting: (key: keyof NotificationSettings) => void;
 }) {
   const featured = filtered[0];
 
@@ -698,6 +762,9 @@ function MobileAppHome({
               userItemCount={userItemCount}
               onApplySavedCondition={onApplySavedCondition}
               onDeleteSavedCondition={onDeleteSavedCondition}
+              marketUpdates={allMarketUpdates}
+              notificationSettings={notificationSettings}
+              onToggleNotificationSetting={onToggleNotificationSetting}
             />
           )}
         </section>
@@ -1355,20 +1422,26 @@ function MobilePriceRow({
 
 function MobileProfilePanel({
   enriched,
+  marketUpdates,
+  notificationSettings,
   recentUserItems,
   savedConditions,
   selected,
   userItemCount,
   onApplySavedCondition,
   onDeleteSavedCondition,
+  onToggleNotificationSetting,
 }: {
   enriched: AnalyzedItem[];
+  marketUpdates: MarketUpdate[];
+  notificationSettings: NotificationSettings;
   recentUserItems: UserAuctionItem[];
   savedConditions: SavedCondition[];
   selected: AnalyzedItem[];
   userItemCount: number;
   onApplySavedCondition: (condition: SavedCondition) => void;
   onDeleteSavedCondition: (id: string) => void;
+  onToggleNotificationSetting: (key: keyof NotificationSettings) => void;
 }) {
   const needsReview = enriched.filter(
     (item) => summarizeRightsChecklist(item.rightsChecklist).unknownCount > 0
@@ -1406,9 +1479,17 @@ function MobileProfilePanel({
         <MobileProfileStat label="비교 바구니" value={`${selected.length}/${MAX_COMPARE_COUNT}`} />
         <MobileProfileStat label="직접 등록" value={`${userItemCount}건`} />
         <MobileProfileStat label="관심 조건" value={`${savedConditions.length}건`} />
+        <MobileProfileStat label="알림센터" value={`${marketUpdates.length}건`} />
         <MobileProfileStat label="확인 필요" value={`${needsReview}건`} />
         <MobileProfileStat label="위험 신호" value={`${highRisk}건`} danger />
       </div>
+
+      <NotificationCenterPanel
+        savedConditions={savedConditions}
+        settings={notificationSettings}
+        updates={marketUpdates}
+        onToggleSetting={onToggleNotificationSetting}
+      />
 
       <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
         <div className="flex items-center justify-between gap-3">
@@ -1492,6 +1573,7 @@ function MobileProfilePanel({
         <h3 className="text-base font-semibold text-[#131E18]">다음에 연결할 기능</h3>
         <div className="mt-3 space-y-2 text-sm font-medium text-[#54615B]">
           <MobileTodoLine label="관심 조건 저장" status="1차 완료" />
+          <MobileTodoLine label="알림센터" status="1차 완료" />
           <MobileTodoLine label="실제 경매/공매 연동" status="설계 필요" />
           <MobileTodoLine label="시세 데이터 비교" status="범위 결정" />
         </div>
@@ -1516,6 +1598,147 @@ function MobileProfileStat({
         {value}
       </p>
     </div>
+  );
+}
+
+function NotificationCenterPanel({
+  savedConditions,
+  settings,
+  updates,
+  onToggleSetting,
+}: {
+  savedConditions: SavedCondition[];
+  settings: NotificationSettings;
+  updates: MarketUpdate[];
+  onToggleSetting: (key: keyof NotificationSettings) => void;
+}) {
+  const visibleUpdates = updates.filter((update) => {
+    if (update.kind === "deadline") return settings.deadline;
+    if (update.kind === "changed") return settings.changed;
+    return settings.newListing;
+  });
+  const matchedInterestLabel =
+    savedConditions[0]?.name ?? "관심 조건을 저장하면 맞춤 알림을 준비할게요";
+
+  return (
+    <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-[#173B35]">알림센터</p>
+          <h3 className="mt-1 text-base font-semibold text-[#131E18]">
+            새소식과 관심 조건을 한곳에서 봐요.
+          </h3>
+        </div>
+        <Bell className="h-5 w-5 shrink-0 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
+      </div>
+
+      <div className="mt-3 rounded-lg bg-[#F7FAF8] p-3">
+        <p className="text-xs font-bold text-[#173B35]">관심 조건 기반 알림</p>
+        <p className="mt-1 text-sm font-medium leading-6 text-[#54615B]">
+          {matchedInterestLabel}
+        </p>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {visibleUpdates.length > 0 ? (
+          visibleUpdates.slice(0, 4).map((update) => (
+            <NotificationUpdateRow key={update.id} update={update} />
+          ))
+        ) : (
+          <p className="rounded-lg bg-[#FBFCFC] p-3 text-sm font-medium text-[#54615B]">
+            켜진 알림 설정에 맞는 새소식이 아직 없어요.
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 border-t border-[#E3E8E5] pt-4">
+        <h4 className="text-sm font-semibold text-[#131E18]">알림 설정</h4>
+        <div className="mt-3 space-y-2">
+          <NotificationSettingToggle
+            checked={settings.deadline}
+            description="마감일이 가까운 물건을 먼저 알려줘요."
+            label="기일 임박 알림"
+            onToggle={() => onToggleSetting("deadline")}
+          />
+          <NotificationSettingToggle
+            checked={settings.changed}
+            description="유찰, 가격, 리스크 변화 후보를 모아줘요."
+            label="조건 변경 알림"
+            onToggle={() => onToggleSetting("changed")}
+          />
+          <NotificationSettingToggle
+            checked={settings.newListing}
+            description="직접 등록하거나 새로 들어온 물건을 보여줘요."
+            label="새로 등록 알림"
+            onToggle={() => onToggleSetting("newListing")}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function NotificationUpdateRow({ update }: { update: MarketUpdate }) {
+  const tone =
+    update.kind === "deadline"
+      ? "bg-[#FFF7F7] text-[#B42318]"
+      : update.kind === "changed"
+        ? "bg-[#EEF3E8] text-[#566A4B]"
+        : "bg-[#EEF5F1] text-[#173B35]";
+
+  return (
+    <Link
+      href={update.href}
+      className="block rounded-lg border border-[#E3E8E5] bg-[#FBFCFC] p-3 active:scale-[0.99]"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-[#131E18]">{update.title}</p>
+          <p className="mt-1 text-xs font-medium leading-5 text-[#54615B]">
+            {update.meta} · {update.description}
+          </p>
+        </div>
+        <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${tone}`}>
+          {update.label}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+function NotificationSettingToggle({
+  checked,
+  description,
+  label,
+  onToggle,
+}: {
+  checked: boolean;
+  description: string;
+  label: string;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={checked}
+      className="flex w-full items-center justify-between gap-3 rounded-lg bg-[#FBFCFC] p-3 text-left active:scale-[0.99]"
+    >
+      <span className="min-w-0">
+        <span className="block text-sm font-bold text-[#131E18]">{label}</span>
+        <span className="mt-1 block text-xs font-medium leading-5 text-[#54615B]">
+          {description}
+        </span>
+      </span>
+      <span
+        className={`flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition ${
+          checked ? "justify-end bg-[#173B35]" : "justify-start bg-[#DDE5E1]"
+        }`}
+        aria-hidden="true"
+      >
+        <span className="h-5 w-5 rounded-full bg-white shadow-sm" />
+      </span>
+    </button>
   );
 }
 

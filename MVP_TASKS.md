@@ -929,6 +929,20 @@ Completion criteria:
 - Users can save, revisit, apply, and remove interest conditions without signing up.
 - `npm run lint` and `npm test` pass.
 
+### 11.3 Notification Center MVP
+
+Tasks:
+
+- [x] Add a My Page notification center that gathers home feed updates.
+- [x] Show deadline, condition-change, and saved-condition related notification context.
+- [x] Add local notification setting toggles for deadline, condition change, and new listing updates.
+- [x] Add rendered HTML/source coverage for notification center labels, settings, and empty-state copy.
+
+Completion criteria:
+
+- Users can review feed-style alerts and adjust MVP notification preferences from My Page.
+- `npm run lint` and `npm test` pass.
+
 ## Deferred Until After MVP
 
 - OCR/document extraction

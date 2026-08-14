@@ -72,6 +72,17 @@ test("keeps saved condition empty-state and actions available", async () => {
   assert.match(source, /SAVED_CONDITIONS_STORAGE_KEY/);
 });
 
+test("keeps notification center labels and settings available", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /알림센터/);
+  assert.match(source, /관심 조건 기반 알림/);
+  assert.match(source, /기일 임박 알림/);
+  assert.match(source, /조건 변경 알림/);
+  assert.match(source, /새로 등록 알림/);
+  assert.match(source, /켜진 알림 설정에 맞는 새소식이 아직 없어요/);
+  assert.match(source, /NOTIFICATION_SETTINGS_STORAGE_KEY/);
+});
+
 test("server-renders sample property detail pages", async () => {
   const response = await render("/properties/sample-1");
   assert.equal(response.status, 200);
