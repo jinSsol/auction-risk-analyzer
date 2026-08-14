@@ -109,6 +109,15 @@ export default function Home() {
   const priorityItems = [...enriched].sort(compareForBasket).slice(0, 3);
   const riskSummary = getRiskSummary(enriched);
   const desktopFeatured = coachTask?.item ?? priorityItems[0];
+  const recentUserItems = useMemo(
+    () =>
+      [...userItems].sort(
+        (left, right) =>
+          Date.parse(right.createdAt || right.updatedAt) -
+          Date.parse(left.createdAt || left.updatedAt)
+      ),
+    [userItems]
+  );
 
   function toggleSelected(id: string) {
     setSelectedIds((current) =>
@@ -248,6 +257,7 @@ export default function Home() {
           level={level}
           mobileTab={mobileTab}
           query={query}
+          recentUserItems={recentUserItems}
           resetFilters={resetFilters}
           riskSummary={riskSummary}
           selected={selected}
@@ -300,6 +310,16 @@ function saveComparisonIds(ids: string[]) {
   }
 }
 
+function formatShortDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "날짜 미확인";
+
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+  }).format(date);
+}
+
 function MobileAppHome({
   activeFilterCount,
   bidRatio,
@@ -311,6 +331,7 @@ function MobileAppHome({
   level,
   mobileTab,
   query,
+  recentUserItems,
   resetFilters,
   riskSummary,
   selected,
@@ -337,6 +358,7 @@ function MobileAppHome({
   level: RiskLevel | "전체";
   mobileTab: MobileTab;
   query: string;
+  recentUserItems: UserAuctionItem[];
   resetFilters: () => void;
   riskSummary: ReturnType<typeof getRiskSummary>;
   selected: AnalyzedItem[];
@@ -417,6 +439,8 @@ function MobileAppHome({
               필터 초기화
             </button>
           ) : null}
+
+          <MobileHomeRegistrationCard recentUserItems={recentUserItems} />
         </section>
 
         <section ref={contentRef} className="mt-8">
@@ -474,6 +498,7 @@ function MobileAppHome({
             <MobileProfilePanel
               enriched={enriched}
               selected={selected}
+              recentUserItems={recentUserItems}
               userItemCount={userItemCount}
             />
           )}
@@ -720,6 +745,55 @@ function MobileFilterPill({
   );
 }
 
+function MobileHomeRegistrationCard({
+  recentUserItems,
+}: {
+  recentUserItems: UserAuctionItem[];
+}) {
+  const latest = recentUserItems[0];
+
+  return (
+    <div className="rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-[#173B35]">내가 추가한 물건</p>
+          <h3 className="mt-1 text-base font-semibold text-[#131E18]">
+            새 물건을 직접 등록하고 추적해요.
+          </h3>
+        </div>
+        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-[#173B35]">
+          {recentUserItems.length}건
+        </span>
+      </div>
+
+      {latest ? (
+        <Link
+          href={`/properties/${latest.id}`}
+          className="mt-3 block rounded-lg border border-[#E3E8E5] bg-white px-3 py-2 active:scale-[0.99]"
+        >
+          <p className="text-xs font-semibold text-[#54615B]">최근 등록</p>
+          <p className="mt-1 truncate text-sm font-bold text-[#131E18]">{latest.title}</p>
+          <p className="mt-1 text-xs font-medium text-[#54615B]">
+            {formatShortDate(latest.createdAt)} · {latest.caseNo || "사건번호 미입력"}
+          </p>
+        </Link>
+      ) : (
+        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-sm font-medium text-[#54615B]">
+          아직 직접 등록한 물건이 없어요. 관심 물건을 넣어두면 여기서 바로 확인할 수 있어요.
+        </p>
+      )}
+
+      <Link
+        href="/properties/new"
+        className="mt-3 flex h-11 items-center justify-center gap-2 rounded-lg bg-[#173B35] text-sm font-bold text-white transition active:scale-[0.98]"
+      >
+        <SquarePlus className="h-4 w-4" aria-hidden="true" strokeWidth={2.3} />
+        새 물건 등록
+      </Link>
+    </div>
+  );
+}
+
 function MobilePropertyCard({
   item,
   selected,
@@ -855,10 +929,12 @@ function MobilePriceRow({
 
 function MobileProfilePanel({
   enriched,
+  recentUserItems,
   selected,
   userItemCount,
 }: {
   enriched: AnalyzedItem[];
+  recentUserItems: UserAuctionItem[];
   selected: AnalyzedItem[];
   userItemCount: number;
 }) {
@@ -923,6 +999,36 @@ function MobileProfilePanel({
           {recentItems.map((item) => (
             <MobileProfileItem key={item.id} item={item} compact />
           ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-base font-semibold text-[#131E18]">최근 직접 등록</h3>
+          <span className="text-xs font-bold text-[#54615B]">{recentUserItems.length}건</span>
+        </div>
+        <div className="mt-3 space-y-3">
+          {recentUserItems.length > 0 ? (
+            recentUserItems.slice(0, 3).map((item) => (
+              <Link
+                key={item.id}
+                href={`/properties/${item.id}`}
+                className="block rounded-lg border border-[#E3E8E5] bg-[#FBFCFC] p-3 active:scale-[0.99]"
+              >
+                <p className="text-xs font-semibold text-[#54615B]">
+                  {formatShortDate(item.createdAt)} · {item.channel}
+                </p>
+                <p className="mt-1 truncate text-sm font-bold text-[#131E18]">{item.title}</p>
+                <p className="mt-1 text-xs font-medium text-[#54615B]">
+                  {item.district || "지역 미입력"} · {item.caseNo || "사건번호 미입력"}
+                </p>
+              </Link>
+            ))
+          ) : (
+            <p className="rounded-lg bg-[#FBFCFC] p-3 text-sm font-medium text-[#54615B]">
+              직접 등록한 물건이 생기면 최신순으로 알려드릴게요.
+            </p>
+          )}
         </div>
       </section>
 
@@ -1561,20 +1667,13 @@ function MobileBottomTabs({
 }) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E3E8E5] bg-white px-2 pb-[env(safe-area-inset-bottom)] md:hidden">
-      <div className="mx-auto grid h-24 max-w-md grid-cols-4 items-stretch">
+      <div className="mx-auto grid h-24 max-w-md grid-cols-3 items-stretch">
         <MobileTabButton
           active={activeTab === "browse"}
           label="홈"
           meta={`${resultCount}건`}
           icon="home"
           onClick={() => onTabChange("browse")}
-        />
-        <MobileTabButton
-          active={false}
-          label="등록"
-          meta="직접"
-          icon="plus"
-          href="/properties/new"
         />
         <MobileTabButton
           active={activeTab === "compare"}
@@ -1608,7 +1707,7 @@ function MobileTabButton({
   active: boolean;
   label: string;
   meta: string;
-  icon: "home" | "plus" | "analytics" | "user";
+  icon: "home" | "analytics" | "user";
   href?: string;
   highlighted?: boolean;
   onClick?: () => void;
@@ -1653,10 +1752,9 @@ function MobileTabButton({
   );
 }
 
-function TabIcon({ type, active }: { type: "home" | "plus" | "analytics" | "user"; active: boolean }) {
-  const icons: Record<"home" | "plus" | "analytics" | "user", LucideIcon> = {
+function TabIcon({ type, active }: { type: "home" | "analytics" | "user"; active: boolean }) {
+  const icons: Record<"home" | "analytics" | "user", LucideIcon> = {
     home: HomeIcon,
-    plus: SquarePlus,
     analytics: ChartNoAxesColumnIncreasing,
     user: UserRound,
   };

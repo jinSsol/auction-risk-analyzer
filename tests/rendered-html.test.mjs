@@ -42,7 +42,8 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /판교 힐스테이트 아파트 84/);
   assert.match(html, /전체보기/);
   assert.match(html, /분석/);
-  assert.match(html, /등록/);
+  assert.match(html, /새 물건 등록/);
+  assert.match(html, /내가 추가한 물건/);
   assert.match(html, /마이페이지/);
   assert.match(html, /내 정보/);
   assert.match(html, /권리 미확인/);
