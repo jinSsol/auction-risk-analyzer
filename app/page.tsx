@@ -65,6 +65,14 @@ type MarketUpdate = {
 type MarketUpdateFilter = "all" | MarketUpdate["kind"];
 
 export default function Home() {
+  return <AuctionWorkspace />;
+}
+
+export function AuctionWorkspace({
+  initialMobileTab = "browse",
+}: {
+  initialMobileTab?: MobileTab;
+}) {
   const [query, setQuery] = useState("");
   const [channel, setChannel] = useState<SaleChannel | "전체">("전체");
   const [type, setType] = useState<PropertyType | "전체">("전체");
@@ -81,7 +89,7 @@ export default function Home() {
   });
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_COMPARE_IDS);
   const [comparisonReady, setComparisonReady] = useState(false);
-  const [mobileTab, setMobileTab] = useState<MobileTab>("browse");
+  const [mobileTab, setMobileTab] = useState<MobileTab>(initialMobileTab);
   const [marketUpdateFilter, setMarketUpdateFilter] = useState<MarketUpdateFilter>("all");
   const contentRef = useRef<HTMLElement | null>(null);
 
@@ -240,7 +248,7 @@ export default function Home() {
             <nav className="flex items-center gap-7 text-sm font-semibold text-[#6F766F]">
               <a className="border-b-2 border-[#173B35] pb-1 text-[#173B35]" href="#">물건</a>
               <Link className="transition hover:text-[#173B35]" href="/properties/new">등록</Link>
-              <button className="transition hover:text-[#173B35]" type="button" onClick={() => changeMobileTab("compare")}>비교</button>
+              <Link className="transition hover:text-[#173B35]" href="/analysis">비교</Link>
             </nav>
             <Search className="h-5 w-5 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
           </div>
@@ -383,7 +391,6 @@ export default function Home() {
             setSelectedIds((current) => current.filter((itemId) => itemId !== id))
           }
           onSaveCurrentCondition={saveCurrentCondition}
-          onTabChange={changeMobileTab}
           onToggleNotificationSetting={toggleNotificationSetting}
         />
       </div>
@@ -579,7 +586,6 @@ function MobileAppHome({
   onMarketUpdateFilterChange,
   onRemoveCompare,
   onSaveCurrentCondition,
-  onTabChange,
   onToggleNotificationSetting,
 }: {
   activeFilterCount: number;
@@ -616,7 +622,6 @@ function MobileAppHome({
   onMarketUpdateFilterChange: (filter: MarketUpdateFilter) => void;
   onRemoveCompare: (id: string) => void;
   onSaveCurrentCondition: () => void;
-  onTabChange: (tab: MobileTab) => void;
   onToggleNotificationSetting: (key: keyof NotificationSettings) => void;
 }) {
   const featured = filtered[0];
@@ -628,79 +633,83 @@ function MobileAppHome({
       </header>
 
       <main className="min-h-screen bg-white px-4 pb-32 pt-24">
-        <section className="space-y-3">
-          <h2 className="text-[26px] font-semibold leading-[34px] text-[#131E18]">
-            오늘 먼저 확인할 리스크를 알려드려요.
-          </h2>
-          <p className="text-[15px] font-medium leading-6 text-[#414846]">
-            물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해
-            무엇을 먼저 확인해야 하는지 보여줍니다.
-          </p>
-        </section>
+        {mobileTab === "browse" ? (
+          <>
+            <section className="space-y-3">
+              <h2 className="text-[26px] font-semibold leading-[34px] text-[#131E18]">
+                오늘 먼저 확인할 리스크를 알려드려요.
+              </h2>
+              <p className="text-[15px] font-medium leading-6 text-[#414846]">
+                물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해
+                무엇을 먼저 확인해야 하는지 보여줍니다.
+              </p>
+            </section>
 
-        <section className="mt-8 rounded-lg border border-[#E3E8E5] bg-white p-4">
-          <p className="text-xs font-bold text-[#002520]">
-            오늘 검토할 권리 리스크를 먼저 정리했어요.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-[#54615B]">
-            <SummaryDot label={`확인 필요 ${riskSummary.needsReview}건`} tone="primary" />
-            <SummaryDot label={`위험 신호 ${riskSummary.danger}건`} tone="danger" />
-            <SummaryDot label={`입찰 검토 ${riskSummary.bidReady}건`} tone="primary" />
-          </div>
-        </section>
+            <section className="mt-8 rounded-lg border border-[#E3E8E5] bg-white p-4">
+              <p className="text-xs font-bold text-[#002520]">
+                오늘 검토할 권리 리스크를 먼저 정리했어요.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-[#54615B]">
+                <SummaryDot label={`확인 필요 ${riskSummary.needsReview}건`} tone="primary" />
+                <SummaryDot label={`위험 신호 ${riskSummary.danger}건`} tone="danger" />
+                <SummaryDot label={`입찰 검토 ${riskSummary.bidReady}건`} tone="primary" />
+              </div>
+            </section>
 
-        <MobileMarketUpdatesPanel
-          activeFilter={marketUpdateFilter}
-          onFilterChange={onMarketUpdateFilterChange}
-          updates={marketUpdates}
-        />
-
-        {featured ? <MobileDecisionCard item={featured} /> : null}
-
-        <section className="mt-8 space-y-4">
-          <div className="relative">
-            <Search
-              className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#717976]"
-              aria-hidden="true"
-              strokeWidth={2.2}
+            <MobileMarketUpdatesPanel
+              activeFilter={marketUpdateFilter}
+              onFilterChange={onMarketUpdateFilterChange}
+              updates={marketUpdates}
             />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="지역, 사건번호, 온비드, 아파트"
-              className="h-12 w-full rounded-lg border border-[#E3E8E5] bg-white pl-11 pr-4 text-[15px] font-medium text-[#131E18] outline-none placeholder:text-[#717976] focus:border-[#173B35] focus:ring-2 focus:ring-[#173B35]/10"
-            />
-          </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <MobileFilterPill active={channel === "전체"} label="전체보기" onClick={() => setChannel("전체")} />
-            <MobileFilterPill active={channel === "경매"} label="경매" onClick={() => setChannel("경매")} />
-            <MobileFilterPill active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
-            <MobileFilterPill active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
-            <MobileFilterPill active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
-          </div>
+            {featured ? <MobileDecisionCard item={featured} /> : null}
 
-          <div className="flex flex-wrap gap-2">
-            {activeFilterCount > 0 || query ? (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="h-10 rounded-lg border border-[#E3E8E5] bg-white px-3 text-xs font-bold text-[#414846]"
-              >
-                필터 초기화
-              </button>
-            ) : null}
-            <button
-              type="button"
-              onClick={onSaveCurrentCondition}
-              className="h-10 rounded-lg bg-[#173B35] px-3 text-xs font-bold text-white"
-            >
-              관심 조건 저장
-            </button>
-          </div>
+            <section className="mt-8 space-y-4">
+              <div className="relative">
+                <Search
+                  className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#717976]"
+                  aria-hidden="true"
+                  strokeWidth={2.2}
+                />
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="지역, 사건번호, 온비드, 아파트"
+                  className="h-12 w-full rounded-lg border border-[#E3E8E5] bg-white pl-11 pr-4 text-[15px] font-medium text-[#131E18] outline-none placeholder:text-[#717976] focus:border-[#173B35] focus:ring-2 focus:ring-[#173B35]/10"
+                />
+              </div>
 
-          <MobileHomeRegistrationCard recentUserItems={recentUserItems} />
-        </section>
+              <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <MobileFilterPill active={channel === "전체"} label="전체보기" onClick={() => setChannel("전체")} />
+                <MobileFilterPill active={channel === "경매"} label="경매" onClick={() => setChannel("경매")} />
+                <MobileFilterPill active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
+                <MobileFilterPill active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
+                <MobileFilterPill active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {activeFilterCount > 0 || query ? (
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="h-10 rounded-lg border border-[#E3E8E5] bg-white px-3 text-xs font-bold text-[#414846]"
+                  >
+                    필터 초기화
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={onSaveCurrentCondition}
+                  className="h-10 rounded-lg bg-[#173B35] px-3 text-xs font-bold text-white"
+                >
+                  관심 조건 저장
+                </button>
+              </div>
+
+              <MobileHomeRegistrationCard recentUserItems={recentUserItems} />
+            </section>
+          </>
+        ) : null}
 
         <section ref={contentRef} className="mt-8">
           {mobileTab === "browse" ? (
@@ -774,7 +783,6 @@ function MobileAppHome({
         activeTab={mobileTab}
         selectedCount={selected.length}
         resultCount={stats.total}
-        onTabChange={onTabChange}
       />
     </>
   );
@@ -2386,12 +2394,10 @@ function MobileBottomTabs({
   activeTab,
   selectedCount,
   resultCount,
-  onTabChange,
 }: {
   activeTab: MobileTab;
   selectedCount: number;
   resultCount: number;
-  onTabChange: (tab: MobileTab) => void;
 }) {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E3E8E5] bg-white px-2 pb-[env(safe-area-inset-bottom)] md:hidden">
@@ -2401,22 +2407,21 @@ function MobileBottomTabs({
           label="홈"
           meta={`${resultCount}건`}
           icon="home"
-          onClick={() => onTabChange("browse")}
+          href="/"
         />
         <MobileTabButton
           active={activeTab === "compare"}
           label="분석"
           meta={`${selectedCount}/${MAX_COMPARE_COUNT}`}
-          highlighted={selectedCount > 0}
           icon="analytics"
-          onClick={() => onTabChange("compare")}
+          href="/analysis"
         />
         <MobileTabButton
           active={activeTab === "profile"}
           label="마이페이지"
           meta="내 정보"
           icon="user"
-          onClick={() => onTabChange("profile")}
+          href="/mypage"
         />
       </div>
     </nav>
@@ -2429,7 +2434,6 @@ function MobileTabButton({
   meta,
   icon,
   href,
-  highlighted,
   onClick,
 }: {
   active: boolean;
@@ -2437,24 +2441,17 @@ function MobileTabButton({
   meta: string;
   icon: "home" | "analytics" | "user";
   href?: string;
-  highlighted?: boolean;
   onClick?: () => void;
 }) {
   const className = `relative flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs transition active:scale-95 active:bg-[#F6F8F7] ${
     active
       ? "font-bold text-[#173B35]"
-      : highlighted
-        ? "font-semibold text-[#173B35]"
       : "font-semibold text-[#54615B]"
   }`;
-  const iconActive = active || Boolean(highlighted);
 
   const content = (
     <>
-      {highlighted && !active ? (
-        <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#416F67] ring-2 ring-white" />
-      ) : null}
-      <TabIcon type={icon} active={iconActive} />
+      <TabIcon type={icon} active={active} />
       <span className="mt-1 block">{label}</span>
       <span className="mt-0.5 block text-[10px] font-bold opacity-60">{meta}</span>
     </>

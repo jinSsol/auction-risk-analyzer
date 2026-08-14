@@ -83,6 +83,23 @@ test("keeps notification center labels and settings available", async () => {
   assert.match(source, /NOTIFICATION_SETTINGS_STORAGE_KEY/);
 });
 
+test("server-renders separated mobile tab routes", async () => {
+  const analysisResponse = await render("/analysis");
+  assert.equal(analysisResponse.status, 200);
+  const analysisHtml = await analysisResponse.text();
+  assert.match(analysisHtml, /비교 바구니/);
+  assert.match(analysisHtml, /href="\/analysis"/);
+  assert.match(analysisHtml, /href="\/mypage"/);
+
+  const mypageResponse = await render("/mypage");
+  assert.equal(mypageResponse.status, 200);
+  const mypageHtml = await mypageResponse.text();
+  assert.match(mypageHtml, /내 경매 분석 현황을 한눈에 봐요/);
+  assert.match(mypageHtml, /알림센터/);
+  assert.match(mypageHtml, /href="\/analysis"/);
+  assert.match(mypageHtml, /href="\/mypage"/);
+});
+
 test("server-renders sample property detail pages", async () => {
   const response = await render("/properties/sample-1");
   assert.equal(response.status, 200);
