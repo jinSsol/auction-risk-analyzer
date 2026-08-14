@@ -52,6 +52,7 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /전체보기/);
   assert.match(html, /분석/);
   assert.match(html, /새 물건 등록/);
+  assert.match(html, /관심 조건 저장/);
   assert.match(html, /내가 추가한 물건/);
   assert.match(html, /마이페이지/);
   assert.match(html, /내 정보/);
@@ -62,6 +63,13 @@ test("keeps home feed empty-state copy available for filtered views", async () =
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /선택한 새소식이 아직 없어요/);
   assert.match(source, /MarketUpdateEmptyState/);
+});
+
+test("keeps saved condition empty-state and actions available", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /저장된 관심 조건이 아직 없어요/);
+  assert.match(source, /이 조건으로 보기/);
+  assert.match(source, /SAVED_CONDITIONS_STORAGE_KEY/);
 });
 
 test("server-renders sample property detail pages", async () => {

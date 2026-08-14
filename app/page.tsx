@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Search,
   SquarePlus,
+  Trash2,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
@@ -31,9 +32,21 @@ import type { PropertyType, RiskLevel, SaleChannel } from "./lib/auction-types";
 
 const DEFAULT_COMPARE_IDS = ["sample-4", "sample-6", "sample-7"];
 const COMPARISON_STORAGE_KEY = "auction-risk-analyzer:comparison:v1";
+const SAVED_CONDITIONS_STORAGE_KEY = "auction-risk-analyzer:saved-conditions:v1";
 const MAX_COMPARE_COUNT = 4;
 const FEED_REFERENCE_DATE = new Date("2026-08-14T00:00:00+09:00");
 type MobileTab = "browse" | "compare" | "profile";
+type OwnerFilter = "전체" | "내 물건" | "샘플";
+type SavedCondition = {
+  id: string;
+  name: string;
+  query: string;
+  channel: SaleChannel | "전체";
+  type: PropertyType | "전체";
+  level: RiskLevel | "전체";
+  owner: OwnerFilter;
+  createdAt: string;
+};
 type MarketUpdate = {
   id: string;
   kind: "new" | "changed" | "deadline";
@@ -50,10 +63,11 @@ export default function Home() {
   const [channel, setChannel] = useState<SaleChannel | "전체">("전체");
   const [type, setType] = useState<PropertyType | "전체">("전체");
   const [level, setLevel] = useState<RiskLevel | "전체">("전체");
-  const [owner, setOwner] = useState<"전체" | "내 물건" | "샘플">("전체");
+  const [owner, setOwner] = useState<OwnerFilter>("전체");
   const [bidRatio, setBidRatio] = useState(78);
   const [bufferRatio, setBufferRatio] = useState(4);
   const [userItems, setUserItems] = useState<UserAuctionItem[]>([]);
+  const [savedConditions, setSavedConditions] = useState<SavedCondition[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_COMPARE_IDS);
   const [comparisonReady, setComparisonReady] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>("browse");
@@ -64,6 +78,7 @@ export default function Home() {
     const timer = window.setTimeout(() => {
       setUserItems(loadUserAuctionItems());
       setSelectedIds(loadComparisonIds() ?? DEFAULT_COMPARE_IDS);
+      setSavedConditions(loadSavedConditions());
       setComparisonReady(true);
     }, 0);
 
@@ -168,6 +183,33 @@ export default function Home() {
     setOwner("전체");
   }
 
+  function saveCurrentCondition() {
+    const nextCondition = createSavedCondition({
+      query,
+      channel,
+      type,
+      level,
+      owner,
+    });
+
+    setSavedConditions((current) => saveSavedConditions([nextCondition, ...current].slice(0, 6)));
+  }
+
+  function applySavedCondition(condition: SavedCondition) {
+    setQuery(condition.query);
+    setChannel(condition.channel);
+    setType(condition.type);
+    setLevel(condition.level);
+    setOwner(condition.owner);
+    changeMobileTab("browse");
+  }
+
+  function deleteSavedCondition(id: string) {
+    setSavedConditions((current) =>
+      saveSavedConditions(current.filter((condition) => condition.id !== id))
+    );
+  }
+
   return (
     <main className="app-shell min-h-screen pb-24 text-[#1F2A24] md:pb-0">
       <div className="hidden md:block">
@@ -229,12 +271,20 @@ export default function Home() {
                 <QuickFilterChip active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
                 <QuickFilterChip active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
                 <QuickFilterChip active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
+                <QuickFilterChip active={owner === "내 물건"} label="내 물건" onClick={() => setOwner(owner === "내 물건" ? "전체" : "내 물건")} />
                 <button
                   type="button"
                   onClick={resetFilters}
                   className="min-h-9 rounded-full border border-[#DDE5E1] bg-white px-3 text-xs font-semibold text-[#6F766F]"
                 >
                   초기화
+                </button>
+                <button
+                  type="button"
+                  onClick={saveCurrentCondition}
+                  className="min-h-9 rounded-full bg-[#173B35] px-3 text-xs font-semibold text-white"
+                >
+                  관심 조건 저장
                 </button>
               </div>
             </div>
@@ -290,6 +340,7 @@ export default function Home() {
           mobileTab={mobileTab}
           query={query}
           recentUserItems={recentUserItems}
+          savedConditions={savedConditions}
           marketUpdateFilter={marketUpdateFilter}
           marketUpdates={filteredMarketUpdates}
           onMarketUpdateFilterChange={setMarketUpdateFilter}
@@ -305,10 +356,13 @@ export default function Home() {
           stats={stats}
           toggleSelected={toggleSelected}
           userItemCount={userItems.length}
+          onApplySavedCondition={applySavedCondition}
           onClearCompare={() => setSelectedIds([])}
+          onDeleteSavedCondition={deleteSavedCondition}
           onRemoveCompare={(id) =>
             setSelectedIds((current) => current.filter((itemId) => itemId !== id))
           }
+          onSaveCurrentCondition={saveCurrentCondition}
           onTabChange={changeMobileTab}
         />
       </div>
@@ -345,6 +399,83 @@ function saveComparisonIds(ids: string[]) {
   }
 }
 
+function loadSavedConditions() {
+  try {
+    const raw = window.localStorage.getItem(SAVED_CONDITIONS_STORAGE_KEY);
+    if (!raw) return [];
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((condition) => normalizeSavedCondition(condition))
+      .filter((condition): condition is SavedCondition => Boolean(condition))
+      .slice(0, 6);
+  } catch {
+    return [];
+  }
+}
+
+function saveSavedConditions(conditions: SavedCondition[]) {
+  try {
+    window.localStorage.setItem(SAVED_CONDITIONS_STORAGE_KEY, JSON.stringify(conditions));
+  } catch {
+    // Saved conditions are local-only in the MVP.
+  }
+
+  return conditions;
+}
+
+function normalizeSavedCondition(value: unknown): SavedCondition | null {
+  if (!value || typeof value !== "object") return null;
+  const condition = value as Partial<SavedCondition>;
+  if (typeof condition.id !== "string" || typeof condition.createdAt !== "string") return null;
+
+  return {
+    id: condition.id,
+    name: typeof condition.name === "string" ? condition.name : "관심 조건",
+    query: typeof condition.query === "string" ? condition.query : "",
+    channel: condition.channel === "경매" || condition.channel === "공매" ? condition.channel : "전체",
+    type:
+      condition.type === "아파트" || condition.type === "빌라" || condition.type === "오피스텔"
+        ? condition.type
+        : "전체",
+    level:
+      condition.level === "안정" || condition.level === "주의" || condition.level === "위험"
+        ? condition.level
+        : "전체",
+    owner:
+      condition.owner === "내 물건" || condition.owner === "샘플" ? condition.owner : "전체",
+    createdAt: condition.createdAt,
+  };
+}
+
+function createSavedCondition(
+  input: Omit<SavedCondition, "id" | "name" | "createdAt">
+): SavedCondition {
+  const timestamp = new Date().toISOString();
+  const name = savedConditionLabel(input);
+
+  return {
+    ...input,
+    id: `condition-${timestamp}-${Math.random().toString(36).slice(2)}`,
+    name,
+    createdAt: timestamp,
+  };
+}
+
+function savedConditionLabel(condition: Omit<SavedCondition, "id" | "name" | "createdAt">) {
+  const labels = [
+    condition.query.trim() || null,
+    condition.channel !== "전체" ? condition.channel : null,
+    condition.type !== "전체" ? condition.type : null,
+    condition.level !== "전체" ? condition.level : null,
+    condition.owner !== "전체" ? condition.owner : null,
+  ].filter((label): label is string => Boolean(label));
+
+  return labels.length > 0 ? labels.join(" · ") : "전체 물건 조건";
+}
+
 function formatShortDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "날짜 미확인";
@@ -368,6 +499,7 @@ function MobileAppHome({
   mobileTab,
   query,
   recentUserItems,
+  savedConditions,
   marketUpdates,
   resetFilters,
   riskSummary,
@@ -381,9 +513,12 @@ function MobileAppHome({
   stats,
   toggleSelected,
   userItemCount,
+  onApplySavedCondition,
   onClearCompare,
+  onDeleteSavedCondition,
   onMarketUpdateFilterChange,
   onRemoveCompare,
+  onSaveCurrentCondition,
   onTabChange,
 }: {
   activeFilterCount: number;
@@ -398,6 +533,7 @@ function MobileAppHome({
   mobileTab: MobileTab;
   query: string;
   recentUserItems: UserAuctionItem[];
+  savedConditions: SavedCondition[];
   marketUpdates: MarketUpdate[];
   resetFilters: () => void;
   riskSummary: ReturnType<typeof getRiskSummary>;
@@ -411,9 +547,12 @@ function MobileAppHome({
   stats: { total: number };
   toggleSelected: (id: string) => void;
   userItemCount: number;
+  onApplySavedCondition: (condition: SavedCondition) => void;
   onClearCompare: () => void;
+  onDeleteSavedCondition: (id: string) => void;
   onMarketUpdateFilterChange: (filter: MarketUpdateFilter) => void;
   onRemoveCompare: (id: string) => void;
+  onSaveCurrentCondition: () => void;
   onTabChange: (tab: MobileTab) => void;
 }) {
   const featured = filtered[0];
@@ -477,15 +616,24 @@ function MobileAppHome({
             <MobileFilterPill active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
           </div>
 
-          {activeFilterCount > 0 || query ? (
+          <div className="flex flex-wrap gap-2">
+            {activeFilterCount > 0 || query ? (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="h-10 rounded-lg border border-[#E3E8E5] bg-white px-3 text-xs font-bold text-[#414846]"
+              >
+                필터 초기화
+              </button>
+            ) : null}
             <button
               type="button"
-              onClick={resetFilters}
-              className="h-10 rounded-lg border border-[#E3E8E5] bg-white px-3 text-xs font-bold text-[#414846]"
+              onClick={onSaveCurrentCondition}
+              className="h-10 rounded-lg bg-[#173B35] px-3 text-xs font-bold text-white"
             >
-              필터 초기화
+              관심 조건 저장
             </button>
-          ) : null}
+          </div>
 
           <MobileHomeRegistrationCard recentUserItems={recentUserItems} />
         </section>
@@ -546,7 +694,10 @@ function MobileAppHome({
               enriched={enriched}
               selected={selected}
               recentUserItems={recentUserItems}
+              savedConditions={savedConditions}
               userItemCount={userItemCount}
+              onApplySavedCondition={onApplySavedCondition}
+              onDeleteSavedCondition={onDeleteSavedCondition}
             />
           )}
         </section>
@@ -1205,13 +1356,19 @@ function MobilePriceRow({
 function MobileProfilePanel({
   enriched,
   recentUserItems,
+  savedConditions,
   selected,
   userItemCount,
+  onApplySavedCondition,
+  onDeleteSavedCondition,
 }: {
   enriched: AnalyzedItem[];
   recentUserItems: UserAuctionItem[];
+  savedConditions: SavedCondition[];
   selected: AnalyzedItem[];
   userItemCount: number;
+  onApplySavedCondition: (condition: SavedCondition) => void;
+  onDeleteSavedCondition: (id: string) => void;
 }) {
   const needsReview = enriched.filter(
     (item) => summarizeRightsChecklist(item.rightsChecklist).unknownCount > 0
@@ -1248,9 +1405,33 @@ function MobileProfilePanel({
       <div className="grid grid-cols-2 gap-3">
         <MobileProfileStat label="비교 바구니" value={`${selected.length}/${MAX_COMPARE_COUNT}`} />
         <MobileProfileStat label="직접 등록" value={`${userItemCount}건`} />
+        <MobileProfileStat label="관심 조건" value={`${savedConditions.length}건`} />
         <MobileProfileStat label="확인 필요" value={`${needsReview}건`} />
         <MobileProfileStat label="위험 신호" value={`${highRisk}건`} danger />
       </div>
+
+      <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-base font-semibold text-[#131E18]">내 관심 조건</h3>
+          <span className="text-xs font-bold text-[#54615B]">{savedConditions.length}건</span>
+        </div>
+        <div className="mt-3 space-y-3">
+          {savedConditions.length > 0 ? (
+            savedConditions.map((condition) => (
+              <SavedConditionCard
+                key={condition.id}
+                condition={condition}
+                onApply={() => onApplySavedCondition(condition)}
+                onDelete={() => onDeleteSavedCondition(condition.id)}
+              />
+            ))
+          ) : (
+            <p className="rounded-lg bg-[#FBFCFC] p-3 text-sm font-medium text-[#54615B]">
+              저장된 관심 조건이 아직 없어요. 홈에서 원하는 검색과 필터를 맞춘 뒤 저장해보세요.
+            </p>
+          )}
+        </div>
+      </section>
 
       <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
         <div className="flex items-center justify-between gap-3">
@@ -1310,7 +1491,7 @@ function MobileProfilePanel({
       <section className="rounded-lg border border-[#E3E8E5] bg-white p-4">
         <h3 className="text-base font-semibold text-[#131E18]">다음에 연결할 기능</h3>
         <div className="mt-3 space-y-2 text-sm font-medium text-[#54615B]">
-          <MobileTodoLine label="관심 조건 저장" status="준비중" />
+          <MobileTodoLine label="관심 조건 저장" status="1차 완료" />
           <MobileTodoLine label="실제 경매/공매 연동" status="설계 필요" />
           <MobileTodoLine label="시세 데이터 비교" status="범위 결정" />
         </div>
@@ -1334,6 +1515,55 @@ function MobileProfileStat({
       <p className={`mt-2 text-xl font-bold tabular-nums ${danger ? "text-[#B42318]" : "text-[#173B35]"}`}>
         {value}
       </p>
+    </div>
+  );
+}
+
+function SavedConditionCard({
+  condition,
+  onApply,
+  onDelete,
+}: {
+  condition: SavedCondition;
+  onApply: () => void;
+  onDelete: () => void;
+}) {
+  const details = [
+    condition.query ? `검색 ${condition.query}` : null,
+    condition.channel !== "전체" ? condition.channel : null,
+    condition.type !== "전체" ? condition.type : null,
+    condition.level !== "전체" ? `${condition.level} 리스크` : null,
+    condition.owner !== "전체" ? condition.owner : null,
+  ].filter((detail): detail is string => Boolean(detail));
+
+  return (
+    <div className="rounded-lg border border-[#E3E8E5] bg-[#FBFCFC] p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-[#131E18]">{condition.name}</p>
+          <p className="mt-1 text-xs font-medium leading-5 text-[#54615B]">
+            {details.length > 0 ? details.join(" · ") : "전체 조건"}
+          </p>
+          <p className="mt-1 text-[11px] font-semibold text-[#7A8580]">
+            {formatShortDate(condition.createdAt)} 저장
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label={`${condition.name} 삭제`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#54615B] active:scale-95"
+        >
+          <Trash2 className="h-4 w-4" aria-hidden="true" strokeWidth={2.2} />
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={onApply}
+        className="mt-3 h-10 w-full rounded-lg bg-[#173B35] text-xs font-bold text-white active:scale-[0.98]"
+      >
+        이 조건으로 보기
+      </button>
     </div>
   );
 }

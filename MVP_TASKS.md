@@ -915,6 +915,20 @@ Completion criteria:
 - Users can narrow the home feed by update type without leaving the home screen.
 - `npm run lint` and `npm test` pass.
 
+### 11.2 Save Interest Conditions
+
+Tasks:
+
+- [x] Let users save the current search/filter condition from the home screen.
+- [x] Store saved conditions locally for the MVP.
+- [x] Show saved conditions in My Page with apply and delete actions.
+- [x] Add rendered HTML coverage for saved-condition entry points and empty-state copy.
+
+Completion criteria:
+
+- Users can save, revisit, apply, and remove interest conditions without signing up.
+- `npm run lint` and `npm test` pass.
+
 ## Deferred Until After MVP
 
 - OCR/document extraction
