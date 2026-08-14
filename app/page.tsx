@@ -1,6 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import {
+  ChartNoAxesColumnIncreasing,
+  HomeIcon,
+  Search,
+  SquarePlus,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { items } from "./auction-data";
@@ -139,7 +147,7 @@ export default function Home() {
               <Link className="transition hover:text-[#173B35]" href="/properties/new">등록</Link>
               <button className="transition hover:text-[#173B35]" type="button" onClick={() => changeMobileTab("compare")}>비교</button>
             </nav>
-            <span className="text-lg font-black text-[#173B35]">Q</span>
+            <Search className="h-5 w-5 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
           </div>
         </header>
 
@@ -165,7 +173,7 @@ export default function Home() {
                 사건번호 또는 지역 검색
               </label>
               <div className="flex h-12 items-center gap-3 rounded-lg border border-[#DDE5E1] bg-white px-3">
-                <span className="text-sm font-black text-[#85938C]">Q</span>
+                <Search className="h-4 w-4 shrink-0 text-[#85938C]" aria-hidden="true" strokeWidth={2.2} />
                 <input
                   id="desktop-property-search"
                   value={query}
@@ -379,9 +387,11 @@ function MobileAppHome({
 
         <section className="mt-8 space-y-4">
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-[#717976]">
-              Q
-            </span>
+            <Search
+              className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#717976]"
+              aria-hidden="true"
+              strokeWidth={2.2}
+            />
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -1610,13 +1620,14 @@ function MobileTabButton({
         ? "font-semibold text-[#173B35]"
       : "font-semibold text-[#54615B]"
   }`;
+  const iconActive = active || Boolean(highlighted);
 
   const content = (
     <>
       {highlighted && !active ? (
         <span className="absolute right-5 top-2 h-2 w-2 rounded-full bg-[#416F67] ring-2 ring-white" />
       ) : null}
-      <TabIcon type={icon} active={active || Boolean(highlighted)} />
+      <TabIcon type={icon} active={iconActive} />
       <span className="mt-1 block">{label}</span>
       <span className="mt-0.5 block text-[10px] font-bold opacity-60">{meta}</span>
     </>
@@ -1643,42 +1654,22 @@ function MobileTabButton({
 }
 
 function TabIcon({ type, active }: { type: "home" | "plus" | "analytics" | "user"; active: boolean }) {
-  const color = active ? "bg-[#173B35]" : "bg-[#85938C]";
-  const shell = active ? "bg-[#EEF5F1]" : "bg-transparent";
-
-  if (type === "home") {
-    return (
-      <span className={`relative flex h-9 w-9 items-end justify-center rounded-full ${shell}`} aria-hidden="true">
-        <span className={`absolute bottom-2.5 h-3.5 w-4 rounded-[5px] ${color}`} />
-        <span className={`absolute bottom-4.5 h-3 w-3 rotate-45 rounded-[3px] ${color}`} />
-        <span className="absolute bottom-3 h-2 w-1.5 rounded-t-full bg-white/90" />
-      </span>
-    );
-  }
-
-  if (type === "plus") {
-    return (
-      <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
-        <span className={`absolute h-4 w-0.5 rounded-full ${color}`} />
-        <span className={`absolute h-0.5 w-4 rounded-full ${color}`} />
-      </span>
-    );
-  }
-
-  if (type === "user") {
-    return (
-      <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
-        <span className={`absolute top-2 h-2.5 w-2.5 rounded-full ${color}`} />
-        <span className={`absolute bottom-2 h-3 w-4 rounded-t-full ${color}`} />
-      </span>
-    );
-  }
+  const icons: Record<"home" | "plus" | "analytics" | "user", LucideIcon> = {
+    home: HomeIcon,
+    plus: SquarePlus,
+    analytics: ChartNoAxesColumnIncreasing,
+    user: UserRound,
+  };
+  const Icon = icons[type];
 
   return (
-    <span className={`relative flex h-9 w-9 items-center justify-center rounded-full ${shell}`} aria-hidden="true">
-      <span className={`absolute bottom-2 left-2.5 h-2 w-1.5 rounded-full ${color}`} />
-      <span className={`absolute bottom-2 left-4 h-4 w-1.5 rounded-full ${color}`} />
-      <span className={`absolute bottom-2 right-2.5 h-3 w-1.5 rounded-full ${color}`} />
+    <span
+      className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
+        active ? "bg-[#EEF5F1] text-[#173B35]" : "text-[#85938C]"
+      }`}
+      aria-hidden="true"
+    >
+      <Icon className="h-[21px] w-[21px]" strokeWidth={active ? 2.5 : 2.1} />
     </span>
   );
 }
