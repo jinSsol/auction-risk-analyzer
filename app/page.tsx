@@ -10,6 +10,7 @@ import {
   House,
   RefreshCcw,
   Search,
+  Sparkles,
   Trash2,
   UserCircle2,
   type LucideIcon,
@@ -260,17 +261,11 @@ export function AuctionWorkspace({
                 </p>
               </div>
 
-              <TopSummaryBanner summary={riskSummary} />
-
-              <DesktopMarketUpdatesPanel
-                activeFilter={marketUpdateFilter}
-                onFilterChange={setMarketUpdateFilter}
-                updates={filteredMarketUpdates}
+              <DesktopHomeFocusPanel
+                featured={desktopFeatured}
+                summary={riskSummary}
+                task={coachTask}
               />
-
-              {desktopFeatured ? (
-                <DesktopDecisionCard item={desktopFeatured} task={coachTask} />
-              ) : null}
 
               <DesktopSearchAndFilters
                 channel={channel}
@@ -283,6 +278,12 @@ export function AuctionWorkspace({
                 setOwner={setOwner}
                 setQuery={setQuery}
                 onSaveCurrentCondition={saveCurrentCondition}
+              />
+
+              <DesktopMarketUpdatesPanel
+                activeFilter={marketUpdateFilter}
+                onFilterChange={setMarketUpdateFilter}
+                updates={filteredMarketUpdates}
               />
 
               <div className="grid gap-4 xl:grid-cols-2">
@@ -612,26 +613,7 @@ function MobileAppHome({
       <main className="min-h-screen bg-white px-4 pb-32 pt-24">
         {mobileTab === "browse" ? (
           <>
-            <section className="space-y-3">
-              <h2 className="text-[26px] font-semibold leading-[34px] text-[#131E18]">
-                오늘 먼저 확인할 리스크를 알려드려요.
-              </h2>
-              <p className="text-[15px] font-medium leading-6 text-[#414846]">
-                물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해
-                무엇을 먼저 확인해야 하는지 보여줍니다.
-              </p>
-            </section>
-
-            <section className="mt-8 rounded-lg border border-[#E3E8E5] bg-white p-4">
-              <p className="text-xs font-bold text-[#002520]">
-                오늘 검토할 권리 리스크를 먼저 정리했어요.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-[#54615B]">
-                <SummaryDot label={`확인 필요 ${riskSummary.needsReview}건`} tone="primary" />
-                <SummaryDot label={`위험 신호 ${riskSummary.danger}건`} tone="danger" />
-                <SummaryDot label={`입찰 검토 ${riskSummary.bidReady}건`} tone="primary" />
-              </div>
-            </section>
+            <MobileHomeFocusPanel featured={featured} summary={riskSummary} />
 
             <MobileMarketUpdatesPanel
               activeFilter={marketUpdateFilter}
@@ -639,9 +621,7 @@ function MobileAppHome({
               updates={marketUpdates}
             />
 
-            {featured ? <MobileDecisionCard item={featured} /> : null}
-
-            <section className="mt-8 space-y-4">
+            <section className="mt-6 space-y-4">
               <div className="relative">
                 <Search
                   className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#717976]"
@@ -874,31 +854,125 @@ function basketScore(item: AnalyzedItem) {
   );
 }
 
-function TopSummaryBanner({
+function DesktopHomeFocusPanel({
+  featured,
   summary,
+  task,
 }: {
+  featured?: AnalyzedItem;
   summary: ReturnType<typeof getRiskSummary>;
+  task: ReturnType<typeof getCoachTask>;
 }) {
+  const checklist = featured ? summarizeRightsChecklist(featured.rightsChecklist) : null;
+  const primaryReason =
+    task?.item.id === featured?.id
+      ? task.primaryReason
+      : (featured?.analysis.riskFactors[0]?.label ?? "입찰 상한");
+
   return (
-    <div className="rounded-xl border border-[#DDE5E1] bg-white p-4">
-      <p className="text-sm font-bold text-[#173B35]">
-        오늘 검토할 권리 리스크를 먼저 정리했어요.
-      </p>
-      <div className="mt-3 grid gap-2 text-xs font-semibold text-[#56635C] sm:grid-cols-3">
-        <SummaryDot label={`확인 필요 ${summary.needsReview}건`} tone="primary" />
-        <SummaryDot label={`위험 신호 ${summary.danger}건`} tone="danger" />
-        <SummaryDot label={`입찰 검토 ${summary.bidReady}건`} tone="primary" />
+    <section className="rounded-xl border border-[#DDE5E1] bg-white p-5">
+      <div className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <AppIconBadge icon={Sparkles} size="sm" />
+            <p className="text-xs font-bold text-[#173B35]">오늘의 우선순위</p>
+          </div>
+          <h2 className="mt-4 text-2xl font-semibold leading-8 text-[#1F2A24]">
+            {featured
+              ? `${featured.title}의 ${primaryReason}부터 확인해요.`
+              : "오늘 확인할 권리 리스크를 먼저 정리했어요."}
+          </h2>
+          <p className="mt-3 text-sm font-medium leading-6 text-[#56635C]">
+            공식 문서 확인 전에는 참고용으로만 보고, 미확인 권리와 입찰 상한을 먼저 좁혀보세요.
+          </p>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <CoachMiniStat label="확인 필요" value={`${summary.needsReview}건`} />
+            <CoachMiniStat label="위험 신호" value={`${summary.danger}건`} />
+            <CoachMiniStat label="입찰 검토" value={`${summary.bidReady}건`} strong />
+          </div>
+        </div>
+
+        {featured ? (
+          <div className="rounded-xl border border-[#E3E8E5] bg-[#F7FAF8] p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-bold text-[#54615B]">{featured.caseNo}</span>
+              <RiskBadge level={featured.analysis.level} score={featured.analysis.risk} />
+            </div>
+            <p className="mt-3 text-base font-bold leading-6 text-[#131E18]">{featured.title}</p>
+            <div className="mt-4 space-y-2 text-xs font-semibold text-[#54615B]">
+              <div className="flex justify-between gap-3">
+                <span>검토 상한</span>
+                <span className="text-[#173B35]">{uk(featured.analysis.suggested)}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>권리 미확인</span>
+                <span>{checklist?.unknownCount ?? 0}건</span>
+              </div>
+            </div>
+            <Link
+              href={`/properties/${featured.id}`}
+              className="button-lift mt-4 flex h-11 items-center justify-center rounded-lg bg-[#173B35] text-sm font-semibold text-white"
+            >
+              리스크 상세 분석 보기
+            </Link>
+          </div>
+        ) : null}
       </div>
-    </div>
+    </section>
   );
 }
 
-function SummaryDot({ label, tone }: { label: string; tone: "primary" | "danger" }) {
+function MobileHomeFocusPanel({
+  featured,
+  summary,
+}: {
+  featured?: AnalyzedItem;
+  summary: ReturnType<typeof getRiskSummary>;
+}) {
+  const checklist = featured ? summarizeRightsChecklist(featured.rightsChecklist) : null;
+  const primaryReason = featured?.analysis.riskFactors[0]?.label ?? "입찰 상한";
+
   return (
-    <span className="flex items-center gap-2 rounded-lg bg-[#F7F9F8] px-3 py-2">
-      <span className={`h-2 w-2 rounded-full ${tone === "danger" ? "bg-[#B42318]" : "bg-[#173B35]"}`} />
-      {label}
-    </span>
+    <section className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_14px_30px_rgba(23,59,53,0.06)]">
+      <div className="flex items-center gap-2">
+        <AppIconBadge icon={Sparkles} size="sm" />
+        <p className="text-xs font-bold text-[#173B35]">오늘의 우선순위</p>
+      </div>
+      <h2 className="mt-4 text-[25px] font-semibold leading-[33px] text-[#131E18]">
+        오늘 먼저 확인할 리스크를 알려드려요.
+      </h2>
+      <p className="mt-3 text-[15px] font-medium leading-6 text-[#414846]">
+        권리, 인수금, 입찰 상한 중 먼저 볼 항목을 골라드릴게요.
+      </p>
+
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        <MobileMiniMetric label="확인 필요" value={`${summary.needsReview}건`} />
+        <MobileMiniMetric label="위험 신호" value={`${summary.danger}건`} danger />
+        <MobileMiniMetric label="입찰 검토" value={`${summary.bidReady}건`} />
+      </div>
+
+      {featured ? (
+        <div className="mt-4 rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-[#173B35]">먼저 열어볼 물건</p>
+              <p className="mt-1 truncate text-base font-bold text-[#131E18]">{featured.title}</p>
+            </div>
+            <RiskBadge level={featured.analysis.level} score={featured.analysis.risk} />
+          </div>
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#34423C]">
+            {primaryReason}부터 확인해요. 권리 미확인 {checklist?.unknownCount ?? 0}건
+          </p>
+          <Link
+            href={`/properties/${featured.id}`}
+            className="mt-3 flex h-11 items-center justify-center rounded-lg bg-[#173B35] text-sm font-bold text-white transition active:scale-[0.98]"
+          >
+            이 물건 먼저 보기
+          </Link>
+        </div>
+      ) : null}
+    </section>
   );
 }
 
@@ -1241,52 +1315,6 @@ function MarketUpdateLink({
   );
 }
 
-function DesktopDecisionCard({
-  item,
-  task,
-}: {
-  item: AnalyzedItem;
-  task: ReturnType<typeof getCoachTask>;
-}) {
-  const checklist = summarizeRightsChecklist(item.rightsChecklist);
-  const message =
-    task?.item.id === item.id
-      ? `${task.primaryReason}부터 확인해요.`
-      : "입찰 상한과 권리 미확인 항목을 먼저 확인해요.";
-
-  return (
-    <section className="rounded-xl border border-[#DDE5E1] bg-white p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-bold text-[#6F766F]">{item.caseNo}</p>
-          <h2 className="mt-2 text-xl font-semibold text-[#1F2A24]">{item.title}</h2>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Verdict value={item.analysis.verdict} />
-          <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
-        </div>
-      </div>
-
-      <p className="mt-4 rounded-lg bg-[#F7F9F8] px-4 py-3 text-sm font-semibold leading-6 text-[#34423C]">
-        {message} 공식 문서 확인 전에는 참고용으로만 보세요.
-      </p>
-
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <CoachMiniStat label="입찰 상한" value={uk(item.analysis.suggested)} strong />
-        <CoachMiniStat label="리스크" value={`${item.analysis.risk}점`} />
-        <CoachMiniStat label="권리 미확인" value={`${checklist.unknownCount}건`} />
-      </div>
-
-      <Link
-        href={`/properties/${item.id}`}
-        className="button-lift mt-4 flex h-12 items-center justify-center rounded-lg bg-[#173B35] text-sm font-semibold text-white"
-      >
-        리스크 상세 분석 보기
-      </Link>
-    </section>
-  );
-}
-
 function QuickFilterChip({
   active,
   label,
@@ -1308,41 +1336,6 @@ function QuickFilterChip({
     >
       {label}
     </button>
-  );
-}
-
-function MobileDecisionCard({ item }: { item: AnalyzedItem }) {
-  const checklist = summarizeRightsChecklist(item.rightsChecklist);
-
-  return (
-    <section className="mt-8 rounded-lg border border-[#E3E8E5] bg-white p-4">
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="text-xl font-semibold leading-7 text-[#131E18]">
-          오늘의 확인 항목
-        </h3>
-        <div className="flex shrink-0 gap-2">
-          <Verdict value={item.analysis.verdict} />
-          <RiskBadge level={item.analysis.level} score={item.analysis.risk} />
-        </div>
-      </div>
-
-      <p className="mt-4 text-lg font-semibold leading-7 text-[#173B35]">
-        {item.analysis.riskFactors[0]?.label ?? "입찰 상한"}부터 확인해요.
-      </p>
-
-      <div className="mt-4 grid grid-cols-3 gap-2 border-y border-[#E3E8E5] py-3">
-        <MobileMiniMetric label="입찰 상한" value={uk(item.analysis.suggested)} />
-        <MobileMiniMetric label="리스크" value={`${item.analysis.risk}점`} danger />
-        <MobileMiniMetric label="권리 미확인" value={`${checklist.unknownCount}건`} />
-      </div>
-
-      <Link
-        href={`/properties/${item.id}`}
-        className="mt-4 flex h-12 items-center justify-center rounded-lg bg-[#173B35] text-sm font-bold text-white transition active:scale-[0.98]"
-      >
-        이 물건 먼저 보기
-      </Link>
-    </section>
   );
 }
 

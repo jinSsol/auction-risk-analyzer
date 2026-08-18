@@ -31,8 +31,10 @@ test("server-renders the auction listing workspace", async () => {
   const html = await response.text();
   assert.match(html, /<title>경매 권리분석 워크벤치<\/title>/i);
   assert.match(html, /오늘 먼저 확인할 리스크를 알려드려요/);
-  assert.match(html, /물건을 고르기 전에 권리, 인수금, 입찰 상한을 쉬운 말로 정리해/);
-  assert.match(html, /오늘 검토할 권리 리스크를 먼저 정리했어요/);
+  assert.match(html, /공식 문서 확인 전에는 참고용으로만 보고/);
+  assert.match(html, /권리, 인수금, 입찰 상한 중 먼저 볼 항목을 골라드릴게요/);
+  assert.match(html, /오늘의 우선순위/);
+  assert.match(html, /먼저 열어볼 물건/);
   assert.match(html, /새소식/);
   assert.match(html, /새로 들어오거나 바뀐 물건을 먼저 봐요/);
   assert.match(html, /aria-label="새소식 필터"/);
@@ -41,7 +43,6 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /기일 임박/);
   assert.match(html, /조건 변경/);
   assert.match(html, /조건 변경 확인/);
-  assert.match(html, /오늘의 확인 항목/);
   assert.match(html, /오늘의 후보 정리/);
   assert.match(html, /추천 물건/);
   assert.match(html, /리스크 테두리/);
@@ -66,6 +67,8 @@ test("keeps home feed empty-state copy available for filtered views", async () =
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /선택한 새소식이 아직 없어요/);
   assert.match(source, /MarketUpdateEmptyState/);
+  assert.match(source, /DesktopHomeFocusPanel/);
+  assert.match(source, /MobileHomeFocusPanel/);
 });
 
 test("keeps desktop header free of decorative icon buttons and uses unified app icons", async () => {

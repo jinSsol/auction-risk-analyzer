@@ -744,6 +744,26 @@ Verification notes:
 - Mobile bottom tabs now use filled deep-green active icon badges and muted inactive badges.
 - Market updates, registration, and notification panels now share the same circular icon-badge pattern.
 
+### 6.5.2 Home Information Hierarchy Polish
+
+Tasks:
+
+- [x] Combine the scattered summary and decision cards into one first-screen priority panel.
+- [x] Put the primary "what to check first" message before search, updates, and listing cards.
+- [x] Keep desktop and mobile home layouts aligned while respecting their different screen densities.
+- [x] Preserve search, market updates, registration, and comparison behavior.
+- [x] Re-run lint and render tests.
+
+Completion criteria:
+
+- The home screen gives a clearer first answer: what risk to check, which item to open, and why it matters.
+
+Verification notes:
+
+- Desktop home now starts with a focused priority panel containing today's risk summary and the first recommended item.
+- Mobile home now compresses the intro, risk counts, and recommended item into a single app-style first card.
+- Search and updates now follow the first decision block instead of competing with it.
+
 ### 6.6 Redesign Detail Screen In App Style
 
 Tasks:
