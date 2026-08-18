@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Bell,
-  ChartNoAxesColumnIncreasing,
-  Clock3,
-  HomeIcon,
-  RefreshCw,
+  BellDot,
+  CalendarClock,
+  ChartPie,
+  CirclePlus,
+  House,
+  RefreshCcw,
   Search,
-  SquarePlus,
   Trash2,
-  UserRound,
+  UserCircle2,
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
@@ -240,9 +240,9 @@ export function AuctionWorkspace({
               <span className="text-lg font-bold text-[#173B35]">경매정석</span>
             </Link>
             <nav className="flex items-center gap-7 text-sm font-semibold text-[#6F766F]">
-              <DesktopNavLink active={mobileTab === "browse"} href="/" label="홈" />
-              <DesktopNavLink active={mobileTab === "compare"} href="/analysis" label="분석" />
-              <DesktopNavLink active={mobileTab === "profile"} href="/mypage" label="마이페이지" />
+              <DesktopNavLink active={mobileTab === "browse"} href="/" icon={House} label="홈" />
+              <DesktopNavLink active={mobileTab === "compare"} href="/analysis" icon={ChartPie} label="분석" />
+              <DesktopNavLink active={mobileTab === "profile"} href="/mypage" icon={UserCircle2} label="마이페이지" />
             </nav>
             <span className="w-[62px]" aria-hidden="true" />
           </div>
@@ -902,24 +902,54 @@ function SummaryDot({ label, tone }: { label: string; tone: "primary" | "danger"
   );
 }
 
+function AppIconBadge({
+  icon: Icon,
+  size = "md",
+  tone = "primary",
+}: {
+  icon: LucideIcon;
+  size?: "sm" | "md";
+  tone?: "primary" | "muted" | "danger";
+}) {
+  const toneClass = {
+    primary: "border-[#D8E6DE] bg-[#EEF7F2] text-[#173B35]",
+    muted: "border-[#DEE8E1] bg-[#F5F8F4] text-[#52695E]",
+    danger: "border-[#F4D4D4] bg-[#FFF7F7] text-[#B42318]",
+  }[tone];
+  const sizeClass = size === "sm" ? "h-9 w-9" : "h-10 w-10";
+  const iconClass = size === "sm" ? "h-4 w-4" : "h-[18px] w-[18px]";
+
+  return (
+    <span
+      className={`flex ${sizeClass} shrink-0 items-center justify-center rounded-full border ${toneClass}`}
+      aria-hidden="true"
+    >
+      <Icon className={iconClass} strokeWidth={2.05} />
+    </span>
+  );
+}
+
 function DesktopNavLink({
   active,
   href,
+  icon: Icon,
   label,
 }: {
   active: boolean;
   href: string;
+  icon: LucideIcon;
   label: string;
 }) {
   return (
     <Link
-      className={`border-b-2 pb-1 transition ${
+      className={`flex items-center gap-1.5 border-b-2 pb-1 transition ${
         active
           ? "border-[#173B35] text-[#173B35]"
           : "border-transparent text-[#6F766F] hover:text-[#173B35]"
       }`}
       href={href}
     >
+      <Icon className="h-4 w-4" aria-hidden="true" strokeWidth={2.05} />
       {label}
     </Link>
   );
@@ -1094,7 +1124,7 @@ function MobileMarketUpdatesPanel({
             새로 뜨거나 바뀐 물건을 먼저 볼게요.
           </h3>
         </div>
-        <Bell className="h-5 w-5 shrink-0 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
+        <AppIconBadge icon={BellDot} />
       </div>
       <MarketUpdateFilters activeFilter={activeFilter} onFilterChange={onFilterChange} compact />
       <div className="mt-3 space-y-2">
@@ -1172,13 +1202,18 @@ function MarketUpdateLink({
   update: MarketUpdate;
   compact?: boolean;
 }) {
-  const Icon = update.kind === "new" ? SquarePlus : update.kind === "deadline" ? Clock3 : RefreshCw;
+  const Icon =
+    update.kind === "new"
+      ? CirclePlus
+      : update.kind === "deadline"
+        ? CalendarClock
+        : RefreshCcw;
   const tone =
     update.kind === "deadline"
-      ? "bg-[#FFF7F7] text-[#B42318]"
+      ? "danger"
       : update.kind === "changed"
-        ? "bg-[#EEF3E8] text-[#566A4B]"
-        : "bg-[#EEF5F1] text-[#173B35]";
+        ? "muted"
+        : "primary";
 
   return (
     <Link
@@ -1188,9 +1223,7 @@ function MarketUpdateLink({
       }`}
     >
       <div className="flex items-start gap-3">
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tone}`}>
-          <Icon className="h-4 w-4" aria-hidden="true" strokeWidth={2.3} />
-        </span>
+        <AppIconBadge icon={Icon} tone={tone} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-[#FBFCFC] px-2 py-0.5 text-[11px] font-bold text-[#173B35]">
@@ -1402,7 +1435,7 @@ function MobileHomeRegistrationCard({
         href="/properties/new"
         className="mt-3 flex h-11 items-center justify-center gap-2 rounded-lg bg-[#173B35] text-sm font-bold text-white transition active:scale-[0.98]"
       >
-        <SquarePlus className="h-4 w-4" aria-hidden="true" strokeWidth={2.3} />
+        <CirclePlus className="h-4 w-4" aria-hidden="true" strokeWidth={2.1} />
         새 물건 등록
       </Link>
     </div>
@@ -1751,7 +1784,7 @@ function NotificationCenterPanel({
             새소식과 관심 조건을 한곳에서 봐요.
           </h3>
         </div>
-        <Bell className="h-5 w-5 shrink-0 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
+        <AppIconBadge icon={BellDot} size="sm" />
       </div>
 
       <div className="mt-3 rounded-lg bg-[#F7FAF8] p-3">
@@ -2557,7 +2590,7 @@ function MobileTabButton({
   href?: string;
   onClick?: () => void;
 }) {
-  const className = `relative flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs transition active:scale-95 active:bg-[#F6F8F7] ${
+  const className = `relative flex flex-col items-center justify-center rounded-lg p-2 text-center text-xs transition active:scale-95 ${
     active
       ? "font-bold text-[#173B35]"
       : "font-semibold text-[#54615B]"
@@ -2593,20 +2626,22 @@ function MobileTabButton({
 
 function TabIcon({ type, active }: { type: "home" | "analytics" | "user"; active: boolean }) {
   const icons: Record<"home" | "analytics" | "user", LucideIcon> = {
-    home: HomeIcon,
-    analytics: ChartNoAxesColumnIncreasing,
-    user: UserRound,
+    home: House,
+    analytics: ChartPie,
+    user: UserCircle2,
   };
   const Icon = icons[type];
 
   return (
     <span
-      className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
-        active ? "bg-[#EEF5F1] text-[#173B35]" : "text-[#85938C]"
+      className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${
+        active
+          ? "border-[#173B35] bg-[#173B35] text-white shadow-[0_8px_18px_rgba(23,59,53,0.18)]"
+          : "border-[#E5ECE8] bg-[#F7FAF8] text-[#7C8983]"
       }`}
       aria-hidden="true"
     >
-      <Icon className="h-[21px] w-[21px]" strokeWidth={active ? 2.5 : 2.1} />
+      <Icon className="h-5 w-5" strokeWidth={active ? 2.25 : 2.05} />
     </span>
   );
 }

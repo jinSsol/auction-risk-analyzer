@@ -724,6 +724,26 @@ Verification notes:
 - Existing server-render tests cover the copied labels after extraction.
 - Palette corrected away from beige/warm lifestyle tones toward a white-first, deep-green professional direction before detail redesign.
 
+### 6.5.1 Icon System First Pass
+
+Tasks:
+
+- [x] Replace the heavier temporary tab icons with a softer app-style icon set.
+- [x] Add a shared icon badge treatment for updates, alerts, and repeated action surfaces.
+- [x] Align desktop navigation and mobile bottom tabs around the same home, analysis, and profile icon language.
+- [x] Keep the removed desktop menu/search header buttons out of the header.
+- [x] Re-run lint and render tests.
+
+Completion criteria:
+
+- Primary navigation and home-status iconography feel consistent, rounded, and less formal without changing the app flow.
+
+Verification notes:
+
+- Desktop navigation now uses small line icons for home, analysis, and profile while keeping the decorative header menu/search buttons removed.
+- Mobile bottom tabs now use filled deep-green active icon badges and muted inactive badges.
+- Market updates, registration, and notification panels now share the same circular icon-badge pattern.
+
 ### 6.6 Redesign Detail Screen In App Style
 
 Tasks:

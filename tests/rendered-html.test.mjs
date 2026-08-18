@@ -68,10 +68,14 @@ test("keeps home feed empty-state copy available for filtered views", async () =
   assert.match(source, /MarketUpdateEmptyState/);
 });
 
-test("keeps desktop header free of decorative icon buttons", async () => {
+test("keeps desktop header free of decorative icon buttons and uses unified app icons", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(source, />≡<\/span>/);
   assert.doesNotMatch(source, /<Search className="h-5 w-5 text-\[#173B35\]"/);
+  assert.match(source, /function AppIconBadge/);
+  assert.match(source, /icon=\{House\}/);
+  assert.match(source, /icon=\{ChartPie\}/);
+  assert.match(source, /icon=\{UserCircle2\}/);
 });
 
 test("keeps saved condition empty-state and actions available", async () => {
