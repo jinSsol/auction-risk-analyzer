@@ -943,6 +943,21 @@ Completion criteria:
 - Users can review feed-style alerts and adjust MVP notification preferences from My Page.
 - `npm run lint` and `npm test` pass.
 
+### 11.4 Unify Web And Mobile Navigation IA
+
+Tasks:
+
+- [x] Use the same primary navigation labels on web and mobile: `홈`, `분석`, `마이페이지`.
+- [x] Move desktop registration out of primary navigation and keep it as a home CTA.
+- [x] Render `/analysis` and `/mypage` as distinct desktop screens, not just mobile tab states.
+- [x] Remove non-active highlight behavior from navigation tabs.
+- [x] Add rendered route coverage for unified navigation links.
+
+Completion criteria:
+
+- Web and mobile feel like the same product with matching destinations.
+- `npm run lint` and `npm test` pass.
+
 ## Deferred Until After MVP
 
 - OCR/document extraction

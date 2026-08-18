@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Bell,
   ChartNoAxesColumnIncreasing,
@@ -13,7 +14,7 @@ import {
   UserRound,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { items } from "./auction-data";
 import {
@@ -73,6 +74,7 @@ export function AuctionWorkspace({
 }: {
   initialMobileTab?: MobileTab;
 }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [channel, setChannel] = useState<SaleChannel | "전체">("전체");
   const [type, setType] = useState<PropertyType | "전체">("전체");
@@ -91,7 +93,6 @@ export function AuctionWorkspace({
   const [comparisonReady, setComparisonReady] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>(initialMobileTab);
   const [marketUpdateFilter, setMarketUpdateFilter] = useState<MarketUpdateFilter>("all");
-  const contentRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -188,13 +189,6 @@ export function AuctionWorkspace({
     );
   }
 
-  function changeMobileTab(tab: MobileTab) {
-    setMobileTab(tab);
-    window.requestAnimationFrame(() => {
-      contentRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
-    });
-  }
-
   function resetFilters() {
     setQuery("");
     setChannel("전체");
@@ -221,7 +215,8 @@ export function AuctionWorkspace({
     setType(condition.type);
     setLevel(condition.level);
     setOwner(condition.owner);
-    changeMobileTab("browse");
+    setMobileTab("browse");
+    router.push("/");
   }
 
   function deleteSavedCondition(id: string) {
@@ -241,116 +236,102 @@ export function AuctionWorkspace({
       <div className="hidden md:block">
         <header className="sticky top-0 z-30 border-b border-[#DDE5E1] bg-white/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
-            <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-4">
               <span className="text-xl font-black text-[#173B35]">≡</span>
               <span className="text-lg font-bold text-[#173B35]">경매정석</span>
-            </div>
+            </Link>
             <nav className="flex items-center gap-7 text-sm font-semibold text-[#6F766F]">
-              <a className="border-b-2 border-[#173B35] pb-1 text-[#173B35]" href="#">물건</a>
-              <Link className="transition hover:text-[#173B35]" href="/properties/new">등록</Link>
-              <Link className="transition hover:text-[#173B35]" href="/analysis">비교</Link>
+              <DesktopNavLink active={mobileTab === "browse"} href="/" label="홈" />
+              <DesktopNavLink active={mobileTab === "compare"} href="/analysis" label="분석" />
+              <DesktopNavLink active={mobileTab === "profile"} href="/mypage" label="마이페이지" />
             </nav>
             <Search className="h-5 w-5 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
           </div>
         </header>
 
-        <section className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_300px] gap-8 px-8 py-8">
-          <div className="min-w-0 space-y-6">
-            <div>
-              <h1 className="text-3xl font-semibold leading-tight text-[#1F2A24]">
-                오늘 먼저 확인할 리스크를 알려드려요.
-              </h1>
-              <p className="mt-2 text-sm font-medium text-[#6F766F]">
-                2026년 8월 13일 기준 업데이트 되었습니다.
-              </p>
-            </div>
-
-            <TopSummaryBanner summary={riskSummary} />
-
-            <DesktopMarketUpdatesPanel
-              activeFilter={marketUpdateFilter}
-              onFilterChange={setMarketUpdateFilter}
-              updates={filteredMarketUpdates}
-            />
-
-            {desktopFeatured ? (
-              <DesktopDecisionCard item={desktopFeatured} task={coachTask} />
-            ) : null}
-
-            <div className="rounded-xl border border-[#DDE5E1] bg-white p-3">
-              <label className="sr-only" htmlFor="desktop-property-search">
-                사건번호 또는 지역 검색
-              </label>
-              <div className="flex h-12 items-center gap-3 rounded-lg border border-[#DDE5E1] bg-white px-3">
-                <Search className="h-4 w-4 shrink-0 text-[#85938C]" aria-hidden="true" strokeWidth={2.2} />
-                <input
-                  id="desktop-property-search"
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="사건번호 또는 지역 검색"
-                  className="h-full min-w-0 flex-1 bg-transparent text-sm font-semibold text-[#1F2A24] outline-none placeholder:text-[#85938C]"
-                />
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <QuickFilterChip active={channel === "전체"} label="전체" onClick={() => setChannel("전체")} />
-                <QuickFilterChip active={channel === "경매"} label="경매" onClick={() => setChannel("경매")} />
-                <QuickFilterChip active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
-                <QuickFilterChip active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
-                <QuickFilterChip active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
-                <QuickFilterChip active={owner === "내 물건"} label="내 물건" onClick={() => setOwner(owner === "내 물건" ? "전체" : "내 물건")} />
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="min-h-9 rounded-full border border-[#DDE5E1] bg-white px-3 text-xs font-semibold text-[#6F766F]"
-                >
-                  초기화
-                </button>
-                <button
-                  type="button"
-                  onClick={saveCurrentCondition}
-                  className="min-h-9 rounded-full bg-[#173B35] px-3 text-xs font-semibold text-white"
-                >
-                  관심 조건 저장
-                </button>
-              </div>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-2">
-              {filtered.map((item) => (
-                <DesktopPropertyCard
-                  key={item.id}
-                  item={item}
-                  selected={selectedIds.includes(item.id)}
-                  onToggle={() => toggleSelected(item.id)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <aside className="sticky top-24 h-fit rounded-xl border border-[#DDE5E1] bg-white p-4">
-            <div className="flex items-center justify-between gap-3">
+        {mobileTab === "browse" ? (
+          <section className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_300px] gap-8 px-8 py-8">
+            <div className="min-w-0 space-y-6">
               <div>
-                <p className="text-xs font-bold text-[#6F766F]">오늘의 후보 정리</p>
-                <h2 className="mt-1 text-base font-semibold text-[#1F2A24]">먼저 열어볼 물건</h2>
+                <h1 className="text-3xl font-semibold leading-tight text-[#1F2A24]">
+                  오늘 먼저 확인할 리스크를 알려드려요.
+                </h1>
+                <p className="mt-2 text-sm font-medium text-[#6F766F]">
+                  2026년 8월 18일 기준 업데이트 되었습니다.
+                </p>
               </div>
-              <span className="rounded-full bg-[#F3F7F4] px-2.5 py-1 text-xs font-bold text-[#173B35]">
-                {priorityItems.length}건
-              </span>
+
+              <TopSummaryBanner summary={riskSummary} />
+
+              <DesktopMarketUpdatesPanel
+                activeFilter={marketUpdateFilter}
+                onFilterChange={setMarketUpdateFilter}
+                updates={filteredMarketUpdates}
+              />
+
+              {desktopFeatured ? (
+                <DesktopDecisionCard item={desktopFeatured} task={coachTask} />
+              ) : null}
+
+              <DesktopSearchAndFilters
+                channel={channel}
+                level={level}
+                owner={owner}
+                query={query}
+                resetFilters={resetFilters}
+                setChannel={setChannel}
+                setLevel={setLevel}
+                setOwner={setOwner}
+                setQuery={setQuery}
+                onSaveCurrentCondition={saveCurrentCondition}
+              />
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                {filtered.map((item) => (
+                  <DesktopPropertyCard
+                    key={item.id}
+                    item={item}
+                    selected={selectedIds.includes(item.id)}
+                    onToggle={() => toggleSelected(item.id)}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="mt-4 space-y-3">
-              {priorityItems.map((item, index) => (
-                <CoachCandidateRow key={item.id} item={item} index={index} />
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => changeMobileTab("compare")}
-              className="mt-5 h-11 w-full rounded-lg border border-[#173B35] bg-white text-sm font-semibold text-[#173B35]"
-            >
-              후보 비교하기
-            </button>
-          </aside>
-        </section>
+
+            <DesktopCandidateAside priorityItems={priorityItems} />
+          </section>
+        ) : mobileTab === "compare" ? (
+          <DesktopRouteShell
+            eyebrow="분석"
+            title="비교 바구니에서 입찰 후보를 정리해요."
+            description="선택한 물건의 총투입금, 권리 미확인, 마진을 한 화면에서 비교합니다."
+          >
+            <ComparePanel
+              selected={selected}
+              onClear={() => setSelectedIds([])}
+              onRemove={(id) => setSelectedIds((current) => current.filter((itemId) => itemId !== id))}
+            />
+          </DesktopRouteShell>
+        ) : (
+          <DesktopRouteShell
+            eyebrow="마이페이지"
+            title="내 조건과 알림을 한곳에서 관리해요."
+            description="관심 조건, 알림센터, 직접 등록 물건을 같은 방식으로 확인합니다."
+          >
+            <MobileProfilePanel
+              enriched={enriched}
+              selected={selected}
+              recentUserItems={recentUserItems}
+              savedConditions={savedConditions}
+              userItemCount={userItems.length}
+              onApplySavedCondition={applySavedCondition}
+              onDeleteSavedCondition={deleteSavedCondition}
+              marketUpdates={marketUpdates}
+              notificationSettings={notificationSettings}
+              onToggleNotificationSetting={toggleNotificationSetting}
+            />
+          </DesktopRouteShell>
+        )}
       </div>
 
       <div className="md:hidden">
@@ -359,7 +340,6 @@ export function AuctionWorkspace({
           bidRatio={bidRatio}
           bufferRatio={bufferRatio}
           channel={channel}
-          contentRef={contentRef}
           enriched={enriched}
           filtered={filtered}
           level={level}
@@ -556,7 +536,6 @@ function MobileAppHome({
   bidRatio,
   bufferRatio,
   channel,
-  contentRef,
   enriched,
   filtered,
   level,
@@ -592,7 +571,6 @@ function MobileAppHome({
   bidRatio: number;
   bufferRatio: number;
   channel: SaleChannel | "전체";
-  contentRef: { current: HTMLElement | null };
   enriched: AnalyzedItem[];
   filtered: AnalyzedItem[];
   level: RiskLevel | "전체";
@@ -711,7 +689,7 @@ function MobileAppHome({
           </>
         ) : null}
 
-        <section ref={contentRef} className="mt-8">
+        <section className="mt-8">
           {mobileTab === "browse" ? (
             <>
               <div className="mb-4 flex items-center justify-between">
@@ -922,6 +900,143 @@ function SummaryDot({ label, tone }: { label: string; tone: "primary" | "danger"
       <span className={`h-2 w-2 rounded-full ${tone === "danger" ? "bg-[#B42318]" : "bg-[#173B35]"}`} />
       {label}
     </span>
+  );
+}
+
+function DesktopNavLink({
+  active,
+  href,
+  label,
+}: {
+  active: boolean;
+  href: string;
+  label: string;
+}) {
+  return (
+    <Link
+      className={`border-b-2 pb-1 transition ${
+        active
+          ? "border-[#173B35] text-[#173B35]"
+          : "border-transparent text-[#6F766F] hover:text-[#173B35]"
+      }`}
+      href={href}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function DesktopSearchAndFilters({
+  channel,
+  level,
+  owner,
+  query,
+  resetFilters,
+  setChannel,
+  setLevel,
+  setOwner,
+  setQuery,
+  onSaveCurrentCondition,
+}: {
+  channel: SaleChannel | "전체";
+  level: RiskLevel | "전체";
+  owner: OwnerFilter;
+  query: string;
+  resetFilters: () => void;
+  setChannel: (value: SaleChannel | "전체") => void;
+  setLevel: (value: RiskLevel | "전체") => void;
+  setOwner: (value: OwnerFilter) => void;
+  setQuery: (value: string) => void;
+  onSaveCurrentCondition: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-[#DDE5E1] bg-white p-3">
+      <label className="sr-only" htmlFor="desktop-property-search">
+        사건번호 또는 지역 검색
+      </label>
+      <div className="flex h-12 items-center gap-3 rounded-lg border border-[#DDE5E1] bg-white px-3">
+        <Search className="h-4 w-4 shrink-0 text-[#85938C]" aria-hidden="true" strokeWidth={2.2} />
+        <input
+          id="desktop-property-search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="사건번호 또는 지역 검색"
+          className="h-full min-w-0 flex-1 bg-transparent text-sm font-semibold text-[#1F2A24] outline-none placeholder:text-[#85938C]"
+        />
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <QuickFilterChip active={channel === "전체"} label="전체" onClick={() => setChannel("전체")} />
+        <QuickFilterChip active={channel === "경매"} label="경매" onClick={() => setChannel("경매")} />
+        <QuickFilterChip active={channel === "공매"} label="공매" onClick={() => setChannel("공매")} />
+        <QuickFilterChip active={level === "주의"} label="주의" onClick={() => setLevel(level === "주의" ? "전체" : "주의")} />
+        <QuickFilterChip active={level === "위험"} label="위험" onClick={() => setLevel(level === "위험" ? "전체" : "위험")} />
+        <QuickFilterChip active={owner === "내 물건"} label="내 물건" onClick={() => setOwner(owner === "내 물건" ? "전체" : "내 물건")} />
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="min-h-9 rounded-full border border-[#DDE5E1] bg-white px-3 text-xs font-semibold text-[#6F766F]"
+        >
+          초기화
+        </button>
+        <button
+          type="button"
+          onClick={onSaveCurrentCondition}
+          className="min-h-9 rounded-full bg-[#173B35] px-3 text-xs font-semibold text-white"
+        >
+          관심 조건 저장
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DesktopCandidateAside({ priorityItems }: { priorityItems: AnalyzedItem[] }) {
+  return (
+    <aside className="sticky top-24 h-fit rounded-xl border border-[#DDE5E1] bg-white p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-[#6F766F]">오늘의 후보 정리</p>
+          <h2 className="mt-1 text-base font-semibold text-[#1F2A24]">먼저 열어볼 물건</h2>
+        </div>
+        <span className="rounded-full bg-[#F3F7F4] px-2.5 py-1 text-xs font-bold text-[#173B35]">
+          {priorityItems.length}건
+        </span>
+      </div>
+      <div className="mt-4 space-y-3">
+        {priorityItems.map((item, index) => (
+          <CoachCandidateRow key={item.id} item={item} index={index} />
+        ))}
+      </div>
+      <Link
+        href="/analysis"
+        className="mt-5 flex h-11 w-full items-center justify-center rounded-lg border border-[#173B35] bg-white text-sm font-semibold text-[#173B35]"
+      >
+        후보 비교하기
+      </Link>
+    </aside>
+  );
+}
+
+function DesktopRouteShell({
+  children,
+  description,
+  eyebrow,
+  title,
+}: {
+  children: ReactNode;
+  description: string;
+  eyebrow: string;
+  title: string;
+}) {
+  return (
+    <section className="mx-auto max-w-5xl px-8 py-8">
+      <div className="mb-6">
+        <p className="text-xs font-bold text-[#173B35]">{eyebrow}</p>
+        <h1 className="mt-2 text-3xl font-semibold leading-tight text-[#1F2A24]">{title}</h1>
+        <p className="mt-2 text-sm font-medium leading-6 text-[#6F766F]">{description}</p>
+      </div>
+      {children}
+    </section>
   );
 }
 

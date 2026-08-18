@@ -50,6 +50,9 @@ test("server-renders the auction listing workspace", async () => {
   assert.match(html, /href="\/properties\/new"/);
   assert.match(html, /판교 힐스테이트 아파트 84/);
   assert.match(html, /전체보기/);
+  assert.match(html, /href="\/"/);
+  assert.match(html, /href="\/analysis"/);
+  assert.match(html, /href="\/mypage"/);
   assert.match(html, /분석/);
   assert.match(html, /새 물건 등록/);
   assert.match(html, /관심 조건 저장/);
@@ -87,6 +90,7 @@ test("server-renders separated mobile tab routes", async () => {
   const analysisResponse = await render("/analysis");
   assert.equal(analysisResponse.status, 200);
   const analysisHtml = await analysisResponse.text();
+  assert.match(analysisHtml, /비교 바구니에서 입찰 후보를 정리해요/);
   assert.match(analysisHtml, /비교 바구니/);
   assert.match(analysisHtml, /href="\/analysis"/);
   assert.match(analysisHtml, /href="\/mypage"/);
@@ -94,6 +98,7 @@ test("server-renders separated mobile tab routes", async () => {
   const mypageResponse = await render("/mypage");
   assert.equal(mypageResponse.status, 200);
   const mypageHtml = await mypageResponse.text();
+  assert.match(mypageHtml, /내 조건과 알림을 한곳에서 관리해요/);
   assert.match(mypageHtml, /내 경매 분석 현황을 한눈에 봐요/);
   assert.match(mypageHtml, /알림센터/);
   assert.match(mypageHtml, /href="\/analysis"/);
