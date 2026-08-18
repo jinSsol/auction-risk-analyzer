@@ -203,7 +203,7 @@ export function PropertyForm({
       <main className="min-h-screen bg-[#F6F8F7] px-5 py-8 text-[#17211D]">
         <div className="mx-auto max-w-3xl rounded-xl border border-[#DDE5E1] bg-white p-6 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/" className="text-sm font-semibold text-[#1F8A5B]">
+          <a href="/" className="text-sm font-semibold text-[#173B35]">
             목록으로
           </a>
           <h1 className="mt-4 text-2xl font-semibold">수정할 수 없는 물건입니다.</h1>
@@ -217,37 +217,38 @@ export function PropertyForm({
   }
 
   return (
-    <main className="app-shell min-h-screen text-[#17211D]">
-      <section className="hero-surface border-b border-[#DDE5E1]">
-        <div className="mx-auto max-w-4xl px-5 py-6 lg:px-8">
+    <main className="min-h-screen bg-white text-[#17211D]">
+      <section className="border-b border-[#DDE5E1] bg-white">
+        <div className="mx-auto max-w-4xl px-5 py-5 lg:px-8 lg:py-7">
           <a
             href={mode === "edit" && itemId ? `/properties/${itemId}` : "/"}
-            className="button-lift inline-flex rounded-lg border border-[#DDE5E1] bg-white/85 px-3 py-2 text-sm font-semibold text-[#34423C] backdrop-blur transition hover:bg-white"
+            className="button-lift inline-flex min-h-11 items-center rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
           >
             돌아가기
           </a>
-          <div className="mt-5">
-            <p className="inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1 text-xs font-semibold text-[#1F8A5B] ring-1 ring-[#BFE3D0] backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#1F8A5B] shadow-[0_0_0_4px_rgba(31,138,91,0.12)]" />
+          <div className="mt-5 rounded-xl border border-[#DDE5E1] bg-[#F7FAF8] p-5 shadow-[0_14px_30px_rgba(23,59,53,0.05)]">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#173B35] ring-1 ring-[#D7E4DC]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#173B35] shadow-[0_0_0_4px_rgba(23,59,53,0.12)]" />
               {mode === "edit" ? "내 물건 수정" : "새 물건 등록"}
             </p>
             <h1 className="mt-5 text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-4xl">
-              공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요.
+              먼저 아는 것만 넣고, 모르는 건 확인 필요로 남겨요.
             </h1>
-            <p className="mt-3 text-sm leading-6 text-[#66736D]">
-              필수는 물건명과 예상 시세뿐입니다. 모르는 값은 비워두거나
-              확인 필요로 남겨도 됩니다. 직접 등록한 물건은 현재 브라우저에 저장됩니다.
+            <p className="mt-3 text-sm font-medium leading-6 text-[#66736D]">
+              필수는 물건명과 예상 시세뿐입니다. 경매·공매 원문을 보면서 나머지
+              권리, 비용, 메모는 단계별로 채워도 됩니다.
             </p>
-            <p className="mt-2 text-xs font-semibold leading-5 text-[#66736D]">
-              지금은 회원가입 없이 빠르게 기록하는 MVP입니다. 여러 기기 동기화와
-              알림이 필요해질 때 계정 기능을 붙일 예정입니다.
-            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <RegistrationHeroMetric label="필수 입력" value="2개" />
+              <RegistrationHeroMetric label="저장 방식" value="브라우저" />
+              <RegistrationHeroMetric label="수정" value="언제든 가능" />
+            </div>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-4xl px-5 py-5 lg:px-8">
-        <div className="interactive-card rounded-xl border border-[#DDE5E1] bg-white/94 p-4 shadow-[0_12px_32px_rgba(23,33,29,0.07)] backdrop-blur md:p-5">
+        <div className="interactive-card rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_14px_32px_rgba(23,59,53,0.06)] md:p-5">
           <div className="grid gap-2 sm:grid-cols-4">
             {steps.map((label, index) => (
               <button
@@ -255,10 +256,10 @@ export function PropertyForm({
                 onClick={() => setStep(index as StepId)}
                 className={`button-lift rounded-lg border px-3 py-3 text-left text-sm transition ${
                   step === index
-                    ? "border-[#1F8A5B] bg-[#E7F6EE] font-semibold text-[#1F8A5B] shadow-[0_8px_18px_rgba(31,138,91,0.1)]"
+                    ? "border-[#173B35] bg-[#173B35] font-semibold text-white shadow-[0_8px_18px_rgba(23,59,53,0.16)]"
                     : index < step
-                      ? "border-[#BFE3D0] bg-white font-semibold text-[#1F8A5B] hover:bg-[#F9FBFA]"
-                      : "border-[#DDE5E1] bg-white font-medium text-[#66736D] hover:bg-[#F9FBFA]"
+                      ? "border-[#D7E4DC] bg-[#F7FAF8] font-semibold text-[#173B35] hover:bg-[#EEF5F1]"
+                      : "border-[#DDE5E1] bg-white font-medium text-[#66736D] hover:bg-[#F7FAF8]"
                 }`}
               >
                 <span className="block text-xs opacity-70">Step {index + 1}</span>
@@ -266,14 +267,14 @@ export function PropertyForm({
               </button>
             ))}
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF3F1]">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#E8EFEC]">
             <div
-              className="risk-fill h-full rounded-full bg-[#1F8A5B]"
+              className="risk-fill h-full rounded-full bg-[#173B35]"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <div className="mt-4 rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
-            <p className="text-sm font-semibold text-[#17211D]">
+          <div className="mt-4 rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-3">
+            <p className="text-sm font-bold text-[#17211D]">
               {steps[step]} 단계
             </p>
             <p className="mt-1 text-xs font-medium leading-5 text-[#66736D]">
@@ -305,7 +306,7 @@ export function PropertyForm({
                 분석 결과는 입력값을 정리한 참고 자료이며 법률·투자 자문이
                 아닙니다. 입찰 전 원문 서류와 전문가 확인을 함께 진행하세요.
               </p>
-              <p className="mt-1 font-semibold text-[#1F8A5B]">
+              <p className="mt-1 font-semibold text-[#173B35]">
                 저장 후에도 언제든 수정할 수 있습니다.
               </p>
             </div>
@@ -323,14 +324,14 @@ export function PropertyForm({
               {step < 3 ? (
                 <button
                   onClick={goNext}
-                  className="button-lift h-11 w-full rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E] sm:w-auto"
+                  className="button-lift h-11 w-full rounded-lg bg-[#173B35] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,59,53,0.16)] transition hover:bg-[#0F2D28] sm:w-auto"
                 >
                   다음
                 </button>
               ) : (
                 <button
                   onClick={submit}
-                  className="button-lift h-11 w-full rounded-lg bg-[#17211D] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,33,29,0.16)] transition hover:bg-[#26332E] sm:w-auto"
+                  className="button-lift h-11 w-full rounded-lg bg-[#173B35] px-4 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,59,53,0.16)] transition hover:bg-[#0F2D28] sm:w-auto"
                 >
                   저장하고 상세 보기
                 </button>
@@ -377,6 +378,15 @@ function SourceStep({ draft, update }: StepProps) {
         placeholder="https://..."
         helper="공고 링크를 붙여두면 나중에 서류 확인으로 돌아가기 쉽습니다."
       />
+    </div>
+  );
+}
+
+function RegistrationHeroMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-[#DDE5E1] bg-white p-3">
+      <p className="text-xs font-semibold text-[#66736D]">{label}</p>
+      <p className="mt-1 text-base font-bold text-[#173B35]">{value}</p>
     </div>
   );
 }
@@ -450,7 +460,7 @@ function PriceStep({ draft, update }: StepProps) {
         <TextInput label="최근 실거래" value={draft.lastTrade} onChange={(value) => update("lastTrade", value)} inputMode="numeric" placeholder="129500" helper="모르면 비워도 됩니다." />
       </div>
       <TextInput label="유찰 횟수" value={draft.failedBids} onChange={(value) => update("failedBids", value)} inputMode="numeric" placeholder="0" />
-      <details className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
+      <details className="rounded-xl border border-[#DDE5E1] bg-white p-4 shadow-[0_8px_20px_rgba(23,59,53,0.04)]">
         <summary className="cursor-pointer list-none">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
@@ -524,7 +534,7 @@ function PriceStep({ draft, update }: StepProps) {
           />
         </div>
       </details>
-      <details className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
+      <details className="rounded-xl border border-[#DDE5E1] bg-[#F7FAF8] p-4">
         <summary className="cursor-pointer list-none">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
@@ -533,7 +543,7 @@ function PriceStep({ draft, update }: StepProps) {
                 시세 근거를 남기고 싶을 때만 열어서 입력하세요.
               </p>
             </div>
-            <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
+            <span className="rounded-full bg-[#EEF5F1] px-2.5 py-1 text-xs font-semibold text-[#173B35]">
               선택 입력
             </span>
           </div>
@@ -613,7 +623,7 @@ function RightsStep({ draft, update }: StepProps) {
           placeholder="확인해야 할 서류, 시세 근거, 통화 내용 등을 적어두세요."
         />
       </Field>
-      <details className="rounded-xl border border-[#DDE5E1] bg-[#F9FBFA] p-4">
+      <details className="rounded-xl border border-[#DDE5E1] bg-[#F7FAF8] p-4">
         <summary className="cursor-pointer list-none">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -625,7 +635,7 @@ function RightsStep({ draft, update }: StepProps) {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-[#E7F6EE] px-2.5 py-1 text-xs font-semibold text-[#1F8A5B]">
+              <span className="rounded-full bg-[#EEF5F1] px-2.5 py-1 text-xs font-semibold text-[#173B35]">
                 확인 {checklistSummary.completedCount}/{checklistSummary.totalCount}
               </span>
               <span className="rounded-full bg-[#FFF4D7] px-2.5 py-1 text-xs font-semibold text-[#8A5B00]">
@@ -768,7 +778,7 @@ function RightsChecklistCard({
 }
 
 const inputClass =
-  "h-11 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#1F8A5B] focus:ring-2 focus:ring-[#D8F1E4]";
+  "h-12 w-full rounded-lg border border-[#DDE5E1] bg-white px-3 text-sm font-medium text-[#17211D] outline-none transition placeholder:text-[#9AA6A0] focus:border-[#173B35] focus:ring-2 focus:ring-[#D7E4DC]";
 
 function Field({
   label,
@@ -852,14 +862,14 @@ function Segmented({
   return (
     <div>
       <p className="text-xs font-semibold text-[#66736D]">{label}</p>
-      <div className="mt-1 grid grid-cols-2 gap-2 rounded-lg border border-[#DDE5E1] bg-[#EEF3F1] p-1">
+      <div className="mt-1 grid grid-cols-2 gap-2 rounded-lg border border-[#DDE5E1] bg-[#F7FAF8] p-1">
         {options.map((option) => (
           <button
             key={option}
             onClick={() => onChange(option)}
             className={`h-10 rounded-md text-sm transition ${
               value === option
-                ? "bg-white font-semibold text-[#17211D] shadow-[0_4px_12px_rgba(23,33,29,0.08)]"
+                ? "bg-[#173B35] font-semibold text-white shadow-[0_4px_12px_rgba(23,59,53,0.12)]"
                 : "font-medium text-[#66736D] hover:bg-white/70"
             }`}
           >
@@ -885,8 +895,8 @@ function Toggle({
       onClick={() => onChange(!checked)}
       className={`button-lift flex h-11 items-center justify-between rounded-lg border px-3 text-sm font-semibold transition ${
         checked
-          ? "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]"
-          : "border-[#DDE5E1] bg-white text-[#66736D] hover:bg-[#F9FBFA]"
+          ? "border-[#173B35] bg-[#173B35] text-white"
+          : "border-[#DDE5E1] bg-white text-[#66736D] hover:bg-[#F7FAF8]"
       }`}
     >
       <span>{label}</span>
@@ -897,7 +907,7 @@ function Toggle({
 
 function checklistAnswerActiveClass(answer: RightsChecklistAnswer) {
   if (answer === "예") return "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]";
-  if (answer === "아니요") return "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]";
+  if (answer === "아니요") return "border-[#D7E4DC] bg-[#EEF5F1] text-[#173B35]";
   if (answer === "해당 없음") return "border-[#CFE3F8] bg-[#E7F0FF] text-[#255C99]";
   return "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]";
 }

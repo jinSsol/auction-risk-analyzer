@@ -788,27 +788,40 @@ Verification notes:
 
 Tasks:
 
-- [ ] Restyle the wizard shell, progress indicator, inputs, segmented controls, and optional sections.
-- [ ] Preserve incomplete-save behavior and local-browser storage copy.
-- [ ] Verify date, number, details/summary, and step navigation accessibility.
+- [x] Restyle the wizard shell, progress indicator, inputs, segmented controls, and optional sections.
+- [x] Preserve incomplete-save behavior and local-browser storage copy.
+- [x] Verify date, number, details/summary, and step navigation accessibility.
 
 Completion criteria:
 
 - Manual registration feels lighter without weakening data-quality guidance.
 
+Verification notes:
+
+- Registration now uses a white-first app header, deep-green status pill, and compact first-screen metrics.
+- Step buttons, progress fill, segmented controls, focus rings, and toggles now match the home/detail deep-green system.
+- Optional calculator, comparable sales, and rights checklist sections remain available behind `details/summary`.
+- Local-browser storage and incomplete-save guidance remain visible before final save.
+
 ### 6.8 Redesign QA And Polish
 
 Tasks:
 
-- [ ] Check mobile widths after home, detail, and registration redesigns.
-- [ ] Check desktop layout for oversized mobile-app styling.
-- [ ] Re-run `npm run lint`.
-- [ ] Re-run `npm test`.
-- [ ] Deploy the completed redesign phase.
+- [x] Check mobile widths after home, detail, and registration redesigns.
+- [x] Check desktop layout for oversized mobile-app styling.
+- [x] Re-run `npm run lint`.
+- [x] Re-run `npm test`.
+- [x] Deploy the completed redesign phase.
 
 Completion criteria:
 
 - The redesigned app is ready to continue into live data integration planning.
+
+Verification notes:
+
+- Home, detail, and registration now share the white + deep-green visual direction.
+- Mobile tappable controls use larger button/input heights and sticky/pill navigation where appropriate.
+- Desktop layouts keep constrained content widths instead of stretching mobile-app cards too wide.
 
 ## Phase 7: Live Data Integration Planning
 

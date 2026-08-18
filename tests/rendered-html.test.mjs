@@ -155,8 +155,10 @@ test("server-renders the manual property creation flow", async () => {
 
   const html = await response.text();
   assert.match(html, /새 물건 등록/);
-  assert.match(html, /공고 정보를 단계별로 정리하고 분석 기준을 남겨두세요/);
-  assert.match(html, /직접 등록한 물건은 현재 브라우저에 저장됩니다/);
+  assert.match(html, /먼저 아는 것만 넣고, 모르는 건 확인 필요로 남겨요/);
+  assert.match(html, /필수 입력/);
+  assert.match(html, /저장 방식/);
+  assert.match(html, /브라우저/);
   assert.match(html, /Step <!-- -->1/);
   assert.match(html, /매각 방식/);
   assert.match(html, /가격/);
