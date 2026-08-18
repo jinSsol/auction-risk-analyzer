@@ -768,14 +768,21 @@ Verification notes:
 
 Tasks:
 
-- [ ] Add an app-style detail header with judgment summary first.
-- [ ] Restyle section navigation and analysis cards to match the home redesign.
-- [ ] Keep rights-analysis and official-document warnings prominent.
-- [ ] Verify mobile reading order and tap targets.
+- [x] Add an app-style detail header with judgment summary first.
+- [x] Restyle section navigation and analysis cards to match the home redesign.
+- [x] Keep rights-analysis and official-document warnings prominent.
+- [x] Verify mobile reading order and tap targets.
 
 Completion criteria:
 
 - The detail page feels like the same app as the redesigned home screen.
+
+Verification notes:
+
+- Detail pages now start with a white-first app header, deep-green judgment summary, and priority metrics for bid ceiling, margin, and unknown rights.
+- Mobile section navigation now uses larger pill-style tap targets aligned with the home design.
+- The 5-second judgment block now keeps official-document warnings directly under the primary decision summary.
+- Legacy brighter green accents were normalized toward the app's deep-green palette.
 
 ### 6.7 Redesign Registration Flow In App Style
 

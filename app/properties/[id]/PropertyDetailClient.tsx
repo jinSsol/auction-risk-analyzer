@@ -54,7 +54,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
       <main className="min-h-screen bg-[#F6F8F7] px-5 py-8 text-[#17211D]">
         <div className="mx-auto max-w-3xl rounded-xl border border-[#DDE5E1] bg-white p-6 shadow-[0_1px_2px_rgba(23,33,29,0.05)]">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/" className="text-sm font-semibold text-[#1F8A5B]">
+          <a href="/" className="text-sm font-semibold text-[#173B35]">
             목록으로
           </a>
           <h1 className="mt-4 text-2xl font-semibold">물건을 찾을 수 없습니다.</h1>
@@ -93,14 +93,14 @@ export function PropertyDetailClient({ id }: { id: string }) {
   const statusLabels = detailStatusLabels(item, rightsSummary.unknownCount);
 
   return (
-    <main className="app-shell min-h-screen text-[#17211D]">
-      <section className="hero-surface border-b border-[#DDE5E1]">
-        <div className="mx-auto max-w-7xl px-5 py-6 lg:px-8">
+    <main className="min-h-screen bg-white text-[#17211D]">
+      <section className="border-b border-[#DDE5E1] bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-5 lg:px-8 lg:py-7">
           <div className="flex flex-wrap items-center justify-between gap-2">
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
-              className="button-lift inline-flex rounded-lg border border-[#DDE5E1] bg-white/85 px-3 py-2 text-sm font-semibold text-[#34423C] backdrop-blur transition hover:bg-white"
+              className="button-lift inline-flex min-h-11 items-center rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
             >
               목록으로
             </a>
@@ -108,13 +108,13 @@ export function PropertyDetailClient({ id }: { id: string }) {
               <div className="flex gap-2">
                 <a
                   href={`/properties/${item.id}/edit`}
-                  className="button-lift inline-flex rounded-lg border border-[#DDE5E1] bg-white/85 px-3 py-2 text-sm font-semibold text-[#34423C] backdrop-blur transition hover:bg-white"
+                  className="button-lift inline-flex min-h-11 items-center rounded-lg border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
                 >
                   수정
                 </a>
                 <button
                   onClick={deleteCurrentItem}
-                  className="button-lift rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] px-3 py-2 text-sm font-semibold text-[#B53A2E] transition hover:bg-[#FBD6CF]"
+                  className="button-lift min-h-11 rounded-lg border border-[#F2B8AE] bg-[#FDE8E5] px-3 py-2 text-sm font-semibold text-[#B53A2E] transition hover:bg-[#FBD6CF]"
                 >
                   삭제
                 </button>
@@ -122,48 +122,53 @@ export function PropertyDetailClient({ id }: { id: string }) {
             ) : null}
           </div>
 
-          <div className="mt-5 grid gap-6 lg:grid-cols-[1fr_360px] lg:items-end">
-            <div>
+          <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-stretch">
+            <div className="rounded-xl border border-[#DDE5E1] bg-[#F7FAF8] p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <ChannelBadge channel={item.channel} />
                 {statusLabels.map((label) => (
                   <StatusBadge key={label} label={label} />
                 ))}
-                <span className="rounded-full bg-[#EEF3F1] px-2.5 py-1 text-xs font-semibold text-[#34423C]">
+                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#34423C]">
                   {item.agency}
                 </span>
                 <span className="text-xs font-medium text-[#66736D]">
                   {item.caseNo}
                 </span>
               </div>
-              <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-5xl">
+              <h1 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-[#17211D] md:text-4xl">
                 {item.title}
               </h1>
               <p className="mt-3 text-sm font-medium leading-6 text-[#66736D] md:text-base">
                 {item.district} · {item.area || "면적 확인 필요"}㎡ · {item.floor} · 마감 {item.auctionDate}
               </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <DetailHeroMetric label="검토 상한가" value={uk(analysis.suggested)} strong />
+                <DetailHeroMetric label="예상 마진" value={percent(analysis.marginRate)} />
+                <DetailHeroMetric label="권리 미확인" value={`${rightsSummary.unknownCount}건`} danger={rightsSummary.unknownCount > 0} />
+              </div>
             </div>
 
-            <div className="interactive-card reveal-up relative overflow-hidden rounded-xl border border-[#BFE3D0] bg-white/92 p-5 shadow-[0_16px_36px_rgba(31,138,91,0.11)] backdrop-blur">
+            <div className="interactive-card reveal-up relative overflow-hidden rounded-xl border border-[#D7E4DC] bg-white p-5 shadow-[0_16px_36px_rgba(23,59,53,0.08)]">
               <div className={`absolute inset-y-0 left-0 w-1 ${riskAccentClass[analysis.level]}`} />
-              <p className="text-xs font-semibold text-[#1F8A5B]">분석 요약</p>
-              <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-xs font-bold text-[#173B35]">판단 요약</p>
+              <h2 className="mt-2 text-xl font-semibold leading-7 text-[#17211D]">
+                {getDecisionHeadline(analysis.verdict)}
+              </h2>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Verdict value={analysis.verdict} />
                 <RiskBadge level={analysis.level} score={analysis.risk} />
               </div>
-              <div className="mt-4 flex items-end justify-between gap-3">
-                <span className="text-sm font-medium text-[#34423C]">검토 상한가</span>
-                <span className="break-words text-2xl font-semibold tabular-nums text-[#17211D] sm:text-3xl">
-                  {uk(analysis.suggested)}
-                </span>
-              </div>
+              <p className="mt-4 text-sm font-semibold leading-6 text-[#34423C]">
+                공식 문서 확인 전에는 참고용으로만 보고, 미확인 권리와 입찰 상한을 먼저 확인하세요.
+              </p>
               <RiskMeter level={analysis.level} score={analysis.risk} />
             </div>
           </div>
         </div>
       </section>
 
-      <nav className="sticky top-0 z-20 border-b border-[#DDE5E1] bg-white/90 px-5 py-2 backdrop-blur lg:hidden">
+      <nav className="sticky top-0 z-20 border-b border-[#DDE5E1] bg-white/95 px-5 py-2 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             ["#summary", "요약"],
@@ -175,7 +180,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             <a
               key={href}
               href={href}
-              className="shrink-0 rounded-full border border-[#DDE5E1] bg-[#F9FBFA] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+              className="flex min-h-10 shrink-0 items-center rounded-full border border-[#DDE5E1] bg-white px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
             >
               {label}
             </a>
@@ -185,10 +190,10 @@ export function PropertyDetailClient({ id }: { id: string }) {
 
       <section className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[1fr_360px] lg:px-8">
         <div className="space-y-5">
-          <section id="summary" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_1px_2px_rgba(23,33,29,0.05)] hover:shadow-[0_12px_30px_rgba(23,33,29,0.07)]">
+          <section id="summary" className="scroll-mt-20 interactive-card rounded-xl border border-[#DDE5E1] bg-white p-5 shadow-[0_12px_28px_rgba(23,59,53,0.05)] hover:shadow-[0_14px_32px_rgba(23,59,53,0.08)]">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold text-[#1F8A5B]">
+                <p className="text-xs font-bold text-[#173B35]">
                   5초 판단 요약
                 </p>
                 <h2 className="mt-1 text-xl font-semibold">
@@ -237,7 +242,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {coreRiskReasons.length === 0 ? (
-                  <span className="rounded-full bg-[#E7F6EE] px-3 py-1.5 text-sm font-semibold text-[#1F8A5B]">
+                  <span className="rounded-full bg-[#EEF5F1] px-3 py-1.5 text-sm font-semibold text-[#173B35]">
                     큰 체크 포인트 없음
                   </span>
                 ) : (
@@ -255,6 +260,13 @@ export function PropertyDetailClient({ id }: { id: string }) {
                   ))
                 )}
               </div>
+            </div>
+            <div className="mt-4 rounded-lg border border-[#D7E4DC] bg-[#F7FAF8] p-4">
+              <p className="text-sm font-bold text-[#173B35]">확인 안내</p>
+              <p className="mt-1 text-sm font-medium leading-6 text-[#56635C]">
+                이 판단은 입력값 기준의 보조 정보입니다. 입찰 전 등기사항전부증명서,
+                매각물건명세서, 현황조사서, 공매 공고문 원문을 다시 확인하세요.
+              </p>
             </div>
           </section>
 
@@ -339,7 +351,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-[#E7F6EE] px-3 py-1 text-sm font-semibold text-[#1F8A5B]">
+                <span className="rounded-full bg-[#EEF5F1] px-3 py-1 text-sm font-semibold text-[#173B35]">
                   확인 {rightsSummary.completedCount}/{rightsSummary.totalCount}
                 </span>
                 <span className="rounded-full bg-[#FFF4D7] px-3 py-1 text-sm font-semibold text-[#8A5B00]">
@@ -400,7 +412,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
             ) : null}
             <div className="mt-4 flex flex-wrap gap-2">
               {analysis.flags.length === 0 ? (
-                <span className="rounded-full bg-[#E7F6EE] px-3 py-1.5 text-sm font-semibold text-[#1F8A5B]">
+                <span className="rounded-full bg-[#EEF5F1] px-3 py-1.5 text-sm font-semibold text-[#173B35]">
                   큰 체크 포인트 없음
                 </span>
               ) : (
@@ -441,7 +453,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                   입찰가와 추가 비용을 합산해 넘지 말아야 할 금액을 계산합니다.
                 </p>
               </div>
-              <span className="rounded-full bg-[#E7F6EE] px-3 py-1 text-sm font-semibold text-[#1F8A5B]">
+              <span className="rounded-full bg-[#EEF5F1] px-3 py-1 text-sm font-semibold text-[#173B35]">
                 목표 마진 {percent(analysis.desiredMarginRate)}
               </span>
             </div>
@@ -475,7 +487,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
               {isUserItem ? (
                 <a
                   href={`/properties/${item.id}/edit`}
-                  className="button-lift rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+                  className="button-lift rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
                 >
                   수정
                 </a>
@@ -509,7 +521,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                   href={item.sourceUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="button-lift mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+                  className="button-lift mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
                 >
                   원문 보기
                 </a>
@@ -560,7 +572,7 @@ export function PropertyDetailClient({ id }: { id: string }) {
                 href={item.sourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="button-lift mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#1F8A5B] hover:text-[#1F8A5B]"
+                className="button-lift mt-3 inline-flex rounded-lg border border-[#DDE5E1] px-3 py-2 text-sm font-semibold text-[#34423C] transition hover:border-[#173B35] hover:text-[#173B35]"
               >
                 원문 보기
               </a>
@@ -607,12 +619,37 @@ export function PropertyDetailClient({ id }: { id: string }) {
 function ChannelBadge({ channel }: { channel: SaleChannel }) {
   const style =
     channel === "경매"
-      ? "bg-[#E7F6EE] text-[#1F8A5B]"
+      ? "bg-[#EEF5F1] text-[#173B35]"
       : "bg-[#E7F0FF] text-[#255C99]";
   return (
     <span className={`inline-flex w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${style}`}>
       {channel}
     </span>
+  );
+}
+
+function DetailHeroMetric({
+  danger,
+  label,
+  strong,
+  value,
+}: {
+  danger?: boolean;
+  label: string;
+  strong?: boolean;
+  value: string;
+}) {
+  return (
+    <div className="rounded-lg border border-[#DDE5E1] bg-white p-3">
+      <p className="text-xs font-semibold text-[#66736D]">{label}</p>
+      <p
+        className={`mt-1 break-words text-base font-bold tabular-nums ${
+          danger ? "text-[#B42318]" : strong ? "text-[#173B35]" : "text-[#17211D]"
+        }`}
+      >
+        {value}
+      </p>
+    </div>
   );
 }
 
@@ -651,7 +688,7 @@ function DecisionStat({
   tone: DecisionTone;
 }) {
   const styles: Record<DecisionTone, string> = {
-    good: "border-[#BFE3D0] bg-[#E7F6EE] text-[#1F8A5B]",
+    good: "border-[#D7E4DC] bg-[#EEF5F1] text-[#173B35]",
     caution: "border-[#F3D083] bg-[#FFF4D7] text-[#8A5B00]",
     danger: "border-[#F2B8AE] bg-[#FDE8E5] text-[#B53A2E]",
     neutral: "border-[#DDE5E1] bg-[#F9FBFA] text-[#34423C]",
@@ -727,7 +764,7 @@ function CostLine({ label, value }: { label: string; value: string }) {
 function GuidanceLine({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[#E5ECE8] bg-[#F9FBFA] p-3">
-      <p className="text-xs font-semibold text-[#1F8A5B]">{label}</p>
+      <p className="text-xs font-semibold text-[#173B35]">{label}</p>
       <p className="mt-1 text-xs font-medium leading-5 text-[#66736D]">
         {value}
       </p>
@@ -802,7 +839,7 @@ function RightsAnswerCard({
 function AnswerBadge({ value }: { value: RightsChecklistAnswer }) {
   const style =
     value === "아니요"
-      ? "bg-[#E7F6EE] text-[#1F8A5B]"
+      ? "bg-[#EEF5F1] text-[#173B35]"
       : value === "예"
         ? "bg-[#FFF4D7] text-[#8A5B00]"
         : value === "해당 없음"
@@ -834,7 +871,7 @@ function ComparableSaleSummary({
               .join(" · ") || "세부 정보 미입력"}
           </p>
         </div>
-        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold tabular-nums text-[#1F8A5B]">
+        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-semibold tabular-nums text-[#173B35]">
           {uk(sale.price)}
         </span>
       </div>
@@ -848,7 +885,7 @@ function ComparableSaleSummary({
 function MarketVerdict({ value }: { value: string }) {
   const style =
     value === "입력 시세 적정"
-      ? "bg-[#E7F6EE] text-[#1F8A5B]"
+      ? "bg-[#EEF5F1] text-[#173B35]"
       : value === "입력 시세 보수적"
         ? "bg-[#E7F0FF] text-[#255C99]"
         : value === "입력 시세 높음"
@@ -874,7 +911,7 @@ function MiniLine({
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
       <span className="font-medium text-[#66736D]">{label}</span>
-      <span className={strong ? "break-words text-right text-lg font-semibold tabular-nums text-[#1F8A5B]" : "break-words text-right font-semibold tabular-nums text-[#17211D]"}>
+      <span className={strong ? "break-words text-right text-lg font-semibold tabular-nums text-[#173B35]" : "break-words text-right font-semibold tabular-nums text-[#17211D]"}>
         {value}
       </span>
     </div>
