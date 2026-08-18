@@ -236,8 +236,7 @@ export function AuctionWorkspace({
       <div className="hidden md:block">
         <header className="sticky top-0 z-30 border-b border-[#DDE5E1] bg-white/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
-            <Link href="/" className="flex items-center gap-4">
-              <span className="text-xl font-black text-[#173B35]">≡</span>
+            <Link href="/" className="flex items-center">
               <span className="text-lg font-bold text-[#173B35]">경매정석</span>
             </Link>
             <nav className="flex items-center gap-7 text-sm font-semibold text-[#6F766F]">
@@ -245,7 +244,7 @@ export function AuctionWorkspace({
               <DesktopNavLink active={mobileTab === "compare"} href="/analysis" label="분석" />
               <DesktopNavLink active={mobileTab === "profile"} href="/mypage" label="마이페이지" />
             </nav>
-            <Search className="h-5 w-5 text-[#173B35]" aria-hidden="true" strokeWidth={2.2} />
+            <span className="w-[62px]" aria-hidden="true" />
           </div>
         </header>
 

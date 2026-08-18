@@ -68,6 +68,12 @@ test("keeps home feed empty-state copy available for filtered views", async () =
   assert.match(source, /MarketUpdateEmptyState/);
 });
 
+test("keeps desktop header free of decorative icon buttons", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(source, />≡<\/span>/);
+  assert.doesNotMatch(source, /<Search className="h-5 w-5 text-\[#173B35\]"/);
+});
+
 test("keeps saved condition empty-state and actions available", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(source, /저장된 관심 조건이 아직 없어요/);
